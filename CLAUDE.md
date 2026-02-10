@@ -1,43 +1,73 @@
-# Valkyrie MoM MCP Server
+# CLAUDE.md
 
-MCP server for AI-assisted Mansions of Madness 2nd Edition scenario creation with [Valkyrie](https://github.com/NPBruce/valkyrie).
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Quick Reference
+## Commands
 
-- **Run tests:** `npm test`
-- **Dev server:** `npx tsx src/index.ts`
-- **Build:** `npm run build`
-
-## Valkyrie Editor Paths
-
-Scenarios created in the Valkyrie editor are stored at:
-
-| Platform | Path |
-|----------|------|
-| macOS/Linux | `~/.config/Valkyrie/MoM/Editor/` |
-| Windows | `%APPDATA%/Valkyrie/MoM/Editor/` |
-
-This mirrors `Game.DefaultAppData()` + `/MoM/Editor` from the Valkyrie C# source (`unity/Assets/Scripts/Game.cs`).
-
-The MCP server's `list_scenarios` tool auto-detects this path. `create_scenario` defaults to creating new scenarios there.
-
-## Project Structure
-
-```
-src/
-  io/          - INI parser/writer, localization CSV, ZIP packager
-  model/       - ScenarioModel, LocalizationStore, component types
-  validation/  - 6 rules + orchestrator
-  tools/       - MCP tool implementations (lifecycle, upsert, map, etc.)
-  resources/   - Format documentation resources
-  server.ts    - MCP server with all tool/resource/prompt registrations
-tests/
-  fixtures/    - ExoticMaterial (complete reference scenario), MinimalScenario
+```bash
+npm test                              # Run all tests (vitest)
+npx vitest run tests/tools/map.test.ts  # Run a single test file
+npx vitest run -t "round-trips"       # Run tests matching a name pattern
+npm run test:watch                    # Watch mode
+npm run lint                          # Type check (tsc --noEmit)
+npm run build                         # Compile to dist/
+npx tsx src/index.ts                  # Run MCP server locally via stdio
 ```
 
-## Scenario File Format
+## What This Project Is
 
-- `quest.ini` - Quest config + file listings (format=19, type=MoM)
-- `events.ini`, `tiles.ini`, `tokens.ini`, `spawns.ini`, `items.ini`, `ui.ini`, `other.ini` - Component data
-- `Localization.English.txt` - CSV localization (`.,English` header, `key,value` rows)
-- Built scenarios are ZIP archives with `.valkyrie` extension
+An MCP (Model Context Protocol) server that exposes Valkyrie scenario editing as tools. AI assistants call these tools to create, modify, validate, and build Mansions of Madness 2nd Edition scenarios for the [Valkyrie](https://github.com/NPBruce/valkyrie) app.
+
+## Architecture
+
+**ESM project** (`"type": "module"` in package.json). All imports use `.js` extensions which tsx resolves to `.ts` at runtime.
+
+### Data Flow
+
+```
+Valkyrie INI files on disk
+    ↓ loadScenario() [src/tools/lifecycle.ts]
+    ↓ parseIni() [src/io/ini-parser.ts] + parseLocalization() [src/io/localization-io.ts]
+ScenarioModel (in-memory) [src/model/scenario-model.ts]
+    ↓ upsert/delete/validate via MCP tool calls
+    ↓ saveScenario() → writeIni() + writeLocalization()
+Valkyrie INI files on disk
+    ↓ buildScenario() → buildPackage() [src/io/package-builder.ts]
+.valkyrie ZIP archive
+```
+
+### Key Design Decisions
+
+- **Singleton model**: `server.ts` holds one `currentModel: ScenarioModel | null`. All tools operate on it. `load_scenario` or `create_scenario` sets it.
+- **Component-to-file mapping**: Component names determine their INI file via prefix matching (`Event*` → `events.ini`, `Tile*` → `tiles.ini`, etc.). Defined in `COMPONENT_FILE_MAP` in `component-types.ts`.
+- **Reference tracking**: Fields `event1`..`event6`, `add`, `remove`, `monster` contain space-separated component names. Deleting a component cascades: its name is removed from all reference fields in other components.
+- **Validation is rule-based**: Each rule in `src/validation/rules/` is an independent function `(model) => ValidationResult[]`. The orchestrator in `validator.ts` runs them all.
+
+### Valkyrie INI Format Quirks
+
+The INI parser/writer handle Valkyrie-specific behavior:
+- `[QuestData]` and `[QuestText]` are "bare-key" sections: they list filenames without `key=value` syntax.
+- Values split on first `=` only, so `operations=$end,=,1` is valid (key=`operations`, value=`$end,=,1`).
+- Localization CSVs use `.,English` as the header line and optionally quote values containing commas.
+
+### Valkyrie Editor Paths
+
+The MCP server auto-detects where Valkyrie stores scenarios (`getEditorDir()` in `lifecycle.ts`):
+- macOS/Linux: `~/.config/Valkyrie/MoM/Editor/`
+- Windows: `%APPDATA%\Valkyrie\MoM\Editor\`
+
+This mirrors `Game.DefaultAppData()` from the Valkyrie C# source.
+
+## Testing Conventions
+
+- TDD approach: tests mirror source structure (`tests/io/`, `tests/model/`, `tests/tools/`, `tests/validation/`).
+- `tests/fixtures/ExoticMaterial/` is the golden reference scenario (complete, community-authored, format=18). Golden tests load it, validate (0 errors expected), re-serialize, and compare.
+- `tests/integration.test.ts` exercises the full create → populate → validate → build pipeline.
+- Tool-level tests in `tests/tools/` test the business logic functions directly, not the MCP protocol layer.
+
+## Valkyrie Source Reference
+
+The Valkyrie Unity app source is at `/Users/hakketh/projects/repos/valkyrie/`. Key files for understanding the scenario format:
+- `unity/Assets/Scripts/Quest/QuestData.cs` — all component types, fields, parsing logic
+- `unity/Assets/Scripts/Game.cs` — `DefaultAppData()` path logic
+- `unity/Assets/Scripts/Content/QuestLoader.cs` — editor path construction
