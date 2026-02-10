@@ -6,6 +6,7 @@ import { checkCrossReferences } from './rules/cross-references.js';
 import { checkEventGraph } from './rules/event-graph.js';
 import { checkLocalizationCompleteness } from './rules/localization-completeness.js';
 import { checkFormatRules } from './rules/format-rules.js';
+import { checkCatalogReferences } from './rules/catalog-references.js';
 
 const ALL_RULES = [
   checkUniqueNames,
@@ -14,6 +15,7 @@ const ALL_RULES = [
   checkEventGraph,
   checkLocalizationCompleteness,
   checkFormatRules,
+  checkCatalogReferences,
 ];
 
 /**

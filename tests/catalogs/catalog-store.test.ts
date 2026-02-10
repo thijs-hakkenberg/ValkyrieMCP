@@ -1,0 +1,107 @@
+import { describe, it, expect } from 'vitest';
+import { CatalogStore } from '../../src/catalogs/catalog-store.js';
+
+describe('CatalogStore', () => {
+  // Use a single store instance — it loads the generated catalog data
+  const store = new CatalogStore();
+
+  describe('search', () => {
+    it('finds MonsterCultist by name', () => {
+      const results = store.search('cultist');
+      expect(results.length).toBeGreaterThan(0);
+      const monster = results.find(e => e.id === 'MonsterCultist');
+      expect(monster).toBeDefined();
+      expect(monster!.type).toBe('monster');
+    });
+
+    it('filters by type', () => {
+      const results = store.search('cultist', 'monster');
+      expect(results.length).toBeGreaterThan(0);
+      for (const r of results) {
+        expect(r.type).toBe('monster');
+      }
+    });
+
+    it('finds tiles with outside trait', () => {
+      const results = store.search('outside', 'tile');
+      expect(results.length).toBeGreaterThan(0);
+      for (const r of results) {
+        expect(r.type).toBe('tile');
+      }
+    });
+
+    it('is case insensitive', () => {
+      const lower = store.search('cultist');
+      const upper = store.search('CULTIST');
+      expect(lower).toEqual(upper);
+    });
+
+    it('returns empty array for no match', () => {
+      const results = store.search('zzzznonexistent999');
+      expect(results).toEqual([]);
+    });
+
+    it('matches on id substring', () => {
+      const results = store.search('TileSideAlley');
+      expect(results.length).toBeGreaterThan(0);
+      for (const r of results) {
+        expect(r.id.toLowerCase()).toContain('tilesidealley');
+      }
+    });
+  });
+
+  describe('getById', () => {
+    it('finds exact match', () => {
+      const entry = store.getById('MonsterCultist');
+      expect(entry).toBeDefined();
+      expect(entry!.id).toBe('MonsterCultist');
+      expect(entry!.type).toBe('monster');
+    });
+
+    it('returns undefined for unknown id', () => {
+      expect(store.getById('NonexistentThing')).toBeUndefined();
+    });
+  });
+
+  describe('getByType', () => {
+    it('returns all monsters', () => {
+      const monsters = store.getByType('monster');
+      expect(monsters.length).toBeGreaterThan(0);
+      for (const m of monsters) {
+        expect(m.type).toBe('monster');
+      }
+    });
+
+    it('returns all tiles', () => {
+      const tiles = store.getByType('tile');
+      expect(tiles.length).toBeGreaterThan(0);
+      for (const t of tiles) {
+        expect(t.type).toBe('tile');
+      }
+    });
+  });
+
+  describe('getAllIds', () => {
+    it('returns a set of all IDs', () => {
+      const ids = store.getAllIds();
+      expect(ids.size).toBeGreaterThan(100);
+      expect(ids.has('MonsterCultist')).toBe(true);
+    });
+
+    it('filters by type', () => {
+      const tileIds = store.getAllIds('tile');
+      expect(tileIds.size).toBeGreaterThan(50);
+      // All IDs should correspond to tile entries
+      for (const id of tileIds) {
+        const entry = store.getById(id);
+        expect(entry?.type).toBe('tile');
+      }
+    });
+
+    it('returns tile count around 174', () => {
+      const tileIds = store.getAllIds('tile');
+      // From extraction: 174 tiles
+      expect(tileIds.size).toBeGreaterThanOrEqual(100);
+    });
+  });
+});
