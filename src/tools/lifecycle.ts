@@ -1,11 +1,67 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as os from 'node:os';
 import { ScenarioModel } from '../model/scenario-model.js';
 import { DEFAULT_QUEST_CONFIG } from '../model/component-types.js';
 import { writeIni } from '../io/ini-writer.js';
 import { buildPackage } from '../io/package-builder.js';
+import { parseLocalization } from '../io/localization-io.js';
 
 const DATA_FILES = ['events.ini', 'tiles.ini', 'tokens.ini', 'spawns.ini', 'items.ini', 'ui.ini', 'other.ini'] as const;
+
+/**
+ * Get the Valkyrie editor directory for MoM scenarios.
+ *
+ * Platform paths (mirrors Game.DefaultAppData() + "/MoM/Editor" in Valkyrie C#):
+ *   macOS/Linux: ~/.config/Valkyrie/MoM/Editor
+ *   Windows:     %APPDATA%/Valkyrie/MoM/Editor
+ */
+export function getEditorDir(): string {
+  const platform = os.platform();
+  let appData: string;
+  if (platform === 'win32') {
+    appData = process.env.APPDATA ?? path.join(os.homedir(), 'AppData', 'Roaming');
+  } else {
+    appData = process.env.XDG_CONFIG_HOME ?? path.join(os.homedir(), '.config');
+  }
+  return path.join(appData, 'Valkyrie', 'MoM', 'Editor');
+}
+
+export interface ScenarioSummary {
+  name: string;
+  dir: string;
+  questName: string;
+}
+
+/** List all scenarios in the Valkyrie editor directory */
+export function listScenarios(editorDir?: string): ScenarioSummary[] {
+  const dir = editorDir ?? getEditorDir();
+  if (!fs.existsSync(dir)) return [];
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const results: ScenarioSummary[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const scenarioDir = path.join(dir, entry.name);
+    const questPath = path.join(scenarioDir, 'quest.ini');
+    if (!fs.existsSync(questPath)) continue;
+
+    // Try to read quest name from localization
+    let questName = entry.name;
+    const locPath = path.join(scenarioDir, 'Localization.English.txt');
+    if (fs.existsSync(locPath)) {
+      try {
+        const parsed = parseLocalization(fs.readFileSync(locPath, 'utf-8'));
+        questName = parsed.entries.get('quest.name') ?? entry.name;
+      } catch { /* use folder name */ }
+    }
+
+    results.push({ name: entry.name, dir: scenarioDir, questName });
+  }
+
+  return results;
+}
 
 export interface ScenarioState {
   totalComponents: number;

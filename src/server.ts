@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ScenarioModel } from './model/scenario-model.js';
@@ -8,6 +9,8 @@ import {
   getScenarioState,
   saveScenario,
   buildScenario,
+  listScenarios,
+  getEditorDir,
 } from './tools/lifecycle.js';
 import {
   upsertEvent,
@@ -44,11 +47,27 @@ export function createServer(): McpServer {
   // ── Lifecycle Tools ──
 
   server.tool(
+    'list_scenarios',
+    'List all MoM scenarios in the Valkyrie editor directory',
+    { dir: z.string().optional().describe('Custom editor directory (defaults to platform Valkyrie editor path)') },
+    async ({ dir }) => {
+      const editorDir = dir ?? getEditorDir();
+      const scenarios = listScenarios(editorDir);
+      if (scenarios.length === 0) {
+        return { content: [{ type: 'text', text: `No scenarios found in ${editorDir}` }] };
+      }
+      const lines = scenarios.map(s => `- ${s.questName} (${s.name}) → ${s.dir}`);
+      return { content: [{ type: 'text', text: `Found ${scenarios.length} scenario(s) in ${editorDir}:\n${lines.join('\n')}` }] };
+    },
+  );
+
+  server.tool(
     'create_scenario',
-    'Create a new MoM scenario with default scaffold',
-    { name: z.string().describe('Scenario name'), dir: z.string().optional().describe('Custom output directory') },
+    'Create a new MoM scenario with default scaffold. Defaults to the Valkyrie editor directory.',
+    { name: z.string().describe('Scenario name'), dir: z.string().optional().describe('Custom output directory (defaults to Valkyrie editor dir)') },
     async ({ name, dir }) => {
-      const result = await createScenario(name, { dir });
+      const targetDir = dir ?? path.join(getEditorDir(), name);
+      const result = await createScenario(name, { dir: targetDir });
       currentModel = result.model;
       return { content: [{ type: 'text', text: `Scenario "${name}" created at ${result.dir}` }] };
     },
