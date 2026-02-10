@@ -1,0 +1,28 @@
+{
+  "name": "valkyrie-mom-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for AI-assisted Mansions of Madness scenario creation with Valkyrie",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "extract-catalogs": "tsx src/catalogs/extract-catalogs.ts",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "archiver": "^7.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

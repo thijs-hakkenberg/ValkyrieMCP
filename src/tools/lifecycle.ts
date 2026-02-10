@@ -1,0 +1,161 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { ScenarioModel } from '../model/scenario-model.js';
+import { DEFAULT_QUEST_CONFIG } from '../model/component-types.js';
+import { writeIni } from '../io/ini-writer.js';
+import { buildPackage } from '../io/package-builder.js';
+
+const DATA_FILES = ['events.ini', 'tiles.ini', 'tokens.ini', 'spawns.ini', 'items.ini', 'ui.ini', 'other.ini'] as const;
+
+export interface ScenarioState {
+  totalComponents: number;
+  componentCounts: Record<string, number>;
+  localizationKeys: number;
+}
+
+/** Creates new scenario directory with quest.ini + empty data files */
+export async function createScenario(
+  name: string,
+  options?: { dir?: string },
+): Promise<{ model: ScenarioModel; dir: string }> {
+  const dir = options?.dir ?? name;
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  const model = new ScenarioModel(undefined, dir);
+
+  // Write quest.ini
+  const questSections: Record<string, Record<string, string>> = {
+    Quest: {
+      format: String(DEFAULT_QUEST_CONFIG.format),
+      type: DEFAULT_QUEST_CONFIG.type,
+      hidden: String(DEFAULT_QUEST_CONFIG.hidden),
+      defaultlanguage: DEFAULT_QUEST_CONFIG.defaultlanguage,
+      defaultmusicon: String(DEFAULT_QUEST_CONFIG.defaultmusicon),
+      difficulty: String(DEFAULT_QUEST_CONFIG.difficulty),
+      lengthmin: String(DEFAULT_QUEST_CONFIG.lengthmin),
+      lengthmax: String(DEFAULT_QUEST_CONFIG.lengthmax),
+    },
+  };
+  const bareKeySections: Record<string, string[]> = {
+    QuestText: ['Localization.English.txt'],
+    QuestData: [...DATA_FILES],
+  };
+  fs.writeFileSync(path.join(dir, 'quest.ini'), writeIni(questSections, bareKeySections));
+
+  // Write empty data files
+  for (const f of DATA_FILES) {
+    fs.writeFileSync(path.join(dir, f), writeIni({}));
+  }
+
+  // Write empty localization file
+  fs.writeFileSync(path.join(dir, 'Localization.English.txt'), '.,English\n');
+
+  return { model, dir };
+}
+
+/** Loads existing scenario from directory */
+export async function loadScenario(dir: string): Promise<ScenarioModel> {
+  const questIni = fs.readFileSync(path.join(dir, 'quest.ini'), 'utf-8');
+
+  const dataFiles: Record<string, string> = {};
+  for (const f of DATA_FILES) {
+    const filePath = path.join(dir, f);
+    if (fs.existsSync(filePath)) {
+      dataFiles[f] = fs.readFileSync(filePath, 'utf-8');
+    }
+  }
+
+  // Find English localization file
+  let locContent: string | undefined;
+  const locPath = path.join(dir, 'Localization.English.txt');
+  if (fs.existsSync(locPath)) {
+    locContent = fs.readFileSync(locPath, 'utf-8');
+  }
+
+  const model = ScenarioModel.loadFromData(questIni, dataFiles, locContent);
+  model.scenarioDir = dir;
+
+  return model;
+}
+
+/** Returns current scenario state summary */
+export function getScenarioState(model: ScenarioModel): ScenarioState {
+  const all = model.getAll();
+  const counts: Record<string, number> = {};
+
+  for (const comp of all) {
+    // Determine type prefix
+    const prefix = getTypePrefix(comp.name);
+    counts[prefix] = (counts[prefix] ?? 0) + 1;
+  }
+
+  return {
+    totalComponents: all.length,
+    componentCounts: counts,
+    localizationKeys: model.localization.size,
+  };
+}
+
+function getTypePrefix(name: string): string {
+  const prefixes = ['Event', 'Tile', 'Token', 'Spawn', 'QItem', 'UI', 'Puzzle', 'CustomMonster'];
+  for (const p of prefixes) {
+    if (name.startsWith(p)) return p;
+  }
+  return 'Other';
+}
+
+/** Saves model to disk */
+export async function saveScenario(model: ScenarioModel): Promise<void> {
+  const dir = model.scenarioDir;
+  if (!dir) throw new Error('Model has no scenarioDir set');
+
+  // Serialize components by file
+  const iniData = model.serializeToIniData();
+
+  // Write each data file
+  for (const f of DATA_FILES) {
+    const sections = iniData[f] ?? {};
+    fs.writeFileSync(path.join(dir, f), writeIni(sections));
+  }
+
+  // Write quest.ini
+  const questSections: Record<string, Record<string, string>> = {
+    Quest: {
+      format: String(model.questConfig.format),
+      type: model.questConfig.type,
+      hidden: String(model.questConfig.hidden),
+      defaultlanguage: model.questConfig.defaultlanguage,
+      defaultmusicon: String(model.questConfig.defaultmusicon),
+      difficulty: String(model.questConfig.difficulty),
+      lengthmin: String(model.questConfig.lengthmin),
+      lengthmax: String(model.questConfig.lengthmax),
+    },
+  };
+  if (model.questConfig.image) {
+    questSections.Quest.image = model.questConfig.image;
+  }
+  if (model.questConfig.version) {
+    questSections.Quest.version = model.questConfig.version;
+  }
+
+  const bareKeySections: Record<string, string[]> = {
+    QuestText: ['Localization.English.txt'],
+    QuestData: [...DATA_FILES],
+  };
+  fs.writeFileSync(path.join(dir, 'quest.ini'), writeIni(questSections, bareKeySections));
+
+  // Write localization
+  const locContent = model.localization.toCSV();
+  fs.writeFileSync(path.join(dir, 'Localization.English.txt'), locContent);
+}
+
+/** Builds .valkyrie package */
+export async function buildScenario(model: ScenarioModel, outputPath: string): Promise<void> {
+  const dir = model.scenarioDir;
+  if (!dir) throw new Error('Model has no scenarioDir set');
+
+  await buildPackage(dir, outputPath);
+}
