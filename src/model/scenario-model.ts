@@ -4,18 +4,12 @@ import {
   type QuestConfig,
   type ScenarioComponent,
   DEFAULT_QUEST_CONFIG,
+  REFERENCE_FIELDS,
+  parseRefList,
   getIniFileForSection,
 } from './component-types.js';
 import { LocalizationStore } from './localization-store.js';
 import { parseIni } from '../io/ini-parser.js';
-
-/** Reference fields that may contain space-separated component names */
-const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster', 'inspect'];
-
-/** Extract all component name references from a field value (space-separated) */
-function extractRefs(value: string): string[] {
-  return value.split(/\s+/).filter(s => s.length > 0);
-}
 
 export class ScenarioModel {
   questConfig: QuestConfig;
@@ -61,7 +55,7 @@ export class ScenarioModel {
         const val = comp.data[field];
         if (val === undefined) continue;
 
-        const refs = extractRefs(val);
+        const refs = parseRefList(val);
         if (refs.includes(name)) {
           const newRefs = refs.filter(r => r !== name);
           comp.data[field] = newRefs.join(' ');
@@ -95,7 +89,7 @@ export class ScenarioModel {
       for (const field of REFERENCE_FIELDS) {
         const val = comp.data[field];
         if (val === undefined) continue;
-        const refs = extractRefs(val);
+        const refs = parseRefList(val);
         if (refs.includes(targetName)) {
           results.push({ from: comp.name, field });
         }
@@ -112,7 +106,7 @@ export class ScenarioModel {
     for (const field of REFERENCE_FIELDS) {
       const val = comp.data[field];
       if (val === undefined) continue;
-      for (const ref of extractRefs(val)) {
+      for (const ref of parseRefList(val)) {
         refs.add(ref);
       }
     }

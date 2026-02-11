@@ -1,35 +1,7 @@
 import type { ValidationResult } from '../../model/component-types.js';
+import { parseRefList } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
-
-const EVENT_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6'];
-
-/**
- * Walk the event chain from a starting event, collecting all events reachable
- * via event1..event6 references (BFS, max depth to prevent infinite loops).
- */
-function collectEventChain(model: ScenarioModel, startEventName: string, maxDepth = 10): string[] {
-  const visited = new Set<string>();
-  const queue = [startEventName];
-
-  while (queue.length > 0 && visited.size < maxDepth) {
-    const current = queue.shift()!;
-    if (visited.has(current)) continue;
-    visited.add(current);
-
-    const comp = model.get(current);
-    if (!comp) continue;
-
-    for (const field of EVENT_FIELDS) {
-      const val = comp.data[field];
-      if (!val) continue;
-      for (const ref of val.split(/\s+/).filter(s => s.length > 0)) {
-        if (!visited.has(ref)) queue.push(ref);
-      }
-    }
-  }
-
-  return [...visited];
-}
+import { collectEventChain } from './event-chain-utils.js';
 
 /**
  * Checks explore token conventions from the MoM rulebook:
@@ -65,8 +37,7 @@ export function checkExploreTokenPattern(model: ScenarioModel): ValidationResult
     for (const eventName of chain) {
       const comp = model.get(eventName);
       if (!comp) continue;
-      const removeVal = comp.data.remove ?? '';
-      if (removeVal.split(/\s+/).includes(token.name)) {
+      if (parseRefList(comp.data.remove ?? '').includes(token.name)) {
         removesToken = true;
         break;
       }
@@ -86,9 +57,7 @@ export function checkExploreTokenPattern(model: ScenarioModel): ValidationResult
     for (const eventName of chain) {
       const comp = model.get(eventName);
       if (!comp) continue;
-      const addVal = comp.data.add ?? '';
-      const refs = addVal.split(/\s+/).filter(s => s.length > 0);
-      if (refs.some(r => r.startsWith('Tile'))) {
+      if (parseRefList(comp.data.add ?? '').some(r => r.startsWith('Tile'))) {
         addsTile = true;
         break;
       }

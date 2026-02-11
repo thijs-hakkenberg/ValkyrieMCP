@@ -1,4 +1,6 @@
-const BARE_KEY_SECTION_NAMES = ['QuestText', 'QuestData'];
+import { BARE_KEY_SECTIONS } from '../model/component-types.js';
+
+const BARE_KEY_ORDER = ['QuestText', 'QuestData'];
 
 export function writeIni(
   sections: Record<string, Record<string, string>>,
@@ -17,7 +19,7 @@ export function writeIni(
   }
 
   // Write bare-key sections in defined order
-  for (const name of BARE_KEY_SECTION_NAMES) {
+  for (const name of BARE_KEY_ORDER) {
     if (bareKeySections?.[name]) {
       lines.push(`[${name}]`);
       for (const entry of bareKeySections[name]) {

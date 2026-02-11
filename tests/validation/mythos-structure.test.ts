@@ -78,4 +78,40 @@ describe('mythos-structure', () => {
     const mythosWarnings = results.filter(r => r.message.includes('Mythos') && r.message.includes('conditions'));
     expect(mythosWarnings).toHaveLength(0);
   });
+
+  it('warning when Mythos trigger has buttons=0 (auto-skip)', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventStart', { trigger: 'EventStart', buttons: '1', event1: 'EventEnd' });
+    model.upsert('EventMythos', { trigger: 'Mythos', buttons: '0', conditions: 'MythosCount,<,3', event1: 'EventSub' });
+    model.upsert('EventSub', { buttons: '1', event1: '' });
+    model.upsert('EventEnd', { buttons: '1', operations: '$end,=,1' });
+
+    const results = checkMythosStructure(model);
+    const autoSkip = results.find(r => r.component === 'EventMythos' && r.message.includes('auto-confirms'));
+    expect(autoSkip).toBeDefined();
+    expect(autoSkip!.severity).toBe('warning');
+    expect(autoSkip!.field).toBe('buttons');
+  });
+
+  it('no auto-skip warning when Mythos trigger has buttons=1', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventStart', { trigger: 'EventStart', buttons: '1', event1: 'EventEnd' });
+    model.upsert('EventMythos', { trigger: 'Mythos', buttons: '1', conditions: 'MythosCount,<,3', event1: 'EventSub' });
+    model.upsert('EventSub', { buttons: '1', event1: '' });
+    model.upsert('EventEnd', { buttons: '1', operations: '$end,=,1' });
+
+    const results = checkMythosStructure(model);
+    const autoSkip = results.find(r => r.component === 'EventMythos' && r.message.includes('auto-confirms'));
+    expect(autoSkip).toBeUndefined();
+  });
+
+  it('no auto-skip false positive for non-Mythos trigger with buttons=0', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventSetup', { display: 'false', buttons: '0', event1: 'EventNext', add: 'TileHall' });
+    model.upsert('EventNext', { buttons: '1', operations: '$end,=,1' });
+
+    const results = checkMythosStructure(model);
+    const autoSkip = results.find(r => r.message.includes('auto-confirms'));
+    expect(autoSkip).toBeUndefined();
+  });
 });

@@ -1,9 +1,9 @@
+import { BARE_KEY_SECTIONS } from '../model/component-types.js';
+
 export interface ParsedIni {
   sections: Record<string, Record<string, string>>;
   bareKeySections: Record<string, string[]>;
 }
-
-const BARE_KEY_SECTIONS = new Set(['QuestData', 'QuestText']);
 
 export function parseIni(content: string): ParsedIni {
   const sections: Record<string, Record<string, string>> = {};

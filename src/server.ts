@@ -20,6 +20,7 @@ import {
   upsertItem,
   upsertPuzzle,
   upsertUI,
+  type UpsertResult,
 } from './tools/upsert.js';
 import { deleteComponent, setLocalization } from './tools/shared.js';
 import { getMapAscii, suggestTileLayout, placeTileRelative } from './tools/map.js';
@@ -37,6 +38,28 @@ function getModel(): ScenarioModel {
   if (!currentModel) throw new Error('No scenario loaded. Use create_scenario or load_scenario first.');
   return currentModel;
 }
+
+function formatUpsertResult(r: UpsertResult): string {
+  if (!r.success) {
+    return `Failed: ${r.errors.map(e => e.message).join('; ')}`;
+  }
+  const parts = ['Success'];
+  if (r.warnings.length > 0) {
+    parts.push(`Warnings: ${r.warnings.map(w => w.message).join('; ')}`);
+  }
+  return parts.join('. ');
+}
+
+/** Upsert tool definitions driven by data */
+const UPSERT_TOOLS = [
+  { name: 'upsert_event',  desc: 'Create or update an event component',      prefix: 'Event',  fn: upsertEvent },
+  { name: 'upsert_tile',   desc: 'Create or update a tile component',        prefix: 'Tile',   fn: upsertTile },
+  { name: 'upsert_token',  desc: 'Create or update a token component',       prefix: 'Token',  fn: upsertToken },
+  { name: 'upsert_spawn',  desc: 'Create or update a spawn component',       prefix: 'Spawn',  fn: upsertSpawn },
+  { name: 'upsert_item',   desc: 'Create or update a quest item component',  prefix: 'QItem',  fn: upsertItem },
+  { name: 'upsert_puzzle', desc: 'Create or update a puzzle component',      prefix: 'Puzzle', fn: upsertPuzzle },
+  { name: 'upsert_ui',     desc: 'Create or update a UI component',          prefix: 'UI',     fn: upsertUI },
+] as const;
 
 export function createServer(): McpServer {
   const server = new McpServer({
@@ -128,79 +151,21 @@ export function createServer(): McpServer {
     },
   );
 
-  // ── Component Upsert Tools ──
+  // ── Component Upsert Tools (data-driven) ──
 
   const dataSchema = z.record(z.string()).describe('Component field key-value pairs');
 
-  server.tool(
-    'upsert_event',
-    'Create or update an event component',
-    { name: z.string().describe('Event name (must start with "Event")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertEvent(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
-
-  server.tool(
-    'upsert_tile',
-    'Create or update a tile component',
-    { name: z.string().describe('Tile name (must start with "Tile")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertTile(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
-
-  server.tool(
-    'upsert_token',
-    'Create or update a token component',
-    { name: z.string().describe('Token name (must start with "Token")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertToken(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
-
-  server.tool(
-    'upsert_spawn',
-    'Create or update a spawn component',
-    { name: z.string().describe('Spawn name (must start with "Spawn")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertSpawn(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
-
-  server.tool(
-    'upsert_item',
-    'Create or update a quest item component',
-    { name: z.string().describe('Item name (must start with "QItem")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertItem(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
-
-  server.tool(
-    'upsert_puzzle',
-    'Create or update a puzzle component',
-    { name: z.string().describe('Puzzle name (must start with "Puzzle")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertPuzzle(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
-
-  server.tool(
-    'upsert_ui',
-    'Create or update a UI component',
-    { name: z.string().describe('UI name (must start with "UI")'), data: dataSchema },
-    async ({ name, data }) => {
-      const r = upsertUI(getModel(), name, data);
-      return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
-    },
-  );
+  for (const tool of UPSERT_TOOLS) {
+    server.tool(
+      tool.name,
+      tool.desc,
+      { name: z.string().describe(`${tool.name.replace('upsert_', '').replace(/^\w/, c => c.toUpperCase())} name (must start with "${tool.prefix}")`), data: dataSchema },
+      async ({ name, data }) => {
+        const r = tool.fn(getModel(), name, data);
+        return { content: [{ type: 'text', text: formatUpsertResult(r) }] };
+      },
+    );
+  }
 
   // ── Shared Tools ──
 
@@ -363,15 +328,4 @@ Use validate_scenario first, then get_scenario_state and get_map_ascii for analy
   );
 
   return server;
-}
-
-function formatUpsertResult(r: { success: boolean; warnings: any[]; errors: any[] }): string {
-  if (!r.success) {
-    return `Failed: ${r.errors.map((e: any) => e.message).join('; ')}`;
-  }
-  const parts = ['Success'];
-  if (r.warnings.length > 0) {
-    parts.push(`Warnings: ${r.warnings.map((w: any) => w.message).join('; ')}`);
-  }
-  return parts.join('. ');
 }

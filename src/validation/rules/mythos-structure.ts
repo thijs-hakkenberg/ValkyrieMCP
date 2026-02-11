@@ -11,16 +11,29 @@ export function checkMythosStructure(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
   const allComponents = model.getAll();
 
-  // Check Mythos events for missing conditions
+  // Check Mythos events for missing conditions and buttons=0 auto-skip
   for (const comp of allComponents) {
-    if (comp.data.trigger === 'Mythos' && !comp.data.conditions) {
-      results.push({
-        rule: 'mythos-structure',
-        severity: 'warning',
-        message: `"${comp.name}" has trigger=Mythos but no conditions — will fire every Mythos phase`,
-        component: comp.name,
-        field: 'conditions',
-      });
+    if (comp.data.trigger === 'Mythos') {
+      if (!comp.data.conditions) {
+        results.push({
+          rule: 'mythos-structure',
+          severity: 'warning',
+          message: `"${comp.name}" has trigger=Mythos but no conditions — will fire every Mythos phase`,
+          component: comp.name,
+          field: 'conditions',
+        });
+      }
+
+      const buttons = comp.data.buttons;
+      if (!buttons || buttons === '0') {
+        results.push({
+          rule: 'mythos-structure',
+          severity: 'warning',
+          message: `"${comp.name}" has trigger=Mythos with buttons=${buttons ?? '0'} — Valkyrie auto-confirms, skipping sub-events. Set buttons>=1`,
+          component: comp.name,
+          field: 'buttons',
+        });
+      }
     }
   }
 

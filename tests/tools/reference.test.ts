@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { searchGameContent, getCatalogStore } from '../../src/tools/reference.js';
+import { searchGameContent } from '../../src/tools/reference.js';
+import { getSharedCatalog } from '../../src/catalogs/catalog-store.js';
 
 describe('reference tools', () => {
   describe('searchGameContent', () => {
@@ -33,11 +34,17 @@ describe('reference tools', () => {
     });
   });
 
-  describe('getCatalogStore', () => {
+  describe('getSharedCatalog', () => {
     it('returns a CatalogStore instance', () => {
-      const store = getCatalogStore();
+      const store = getSharedCatalog();
       expect(store).toBeDefined();
       expect(store.getById('MonsterCultist')).toBeDefined();
+    });
+
+    it('returns the same instance on repeated calls', () => {
+      const store1 = getSharedCatalog();
+      const store2 = getSharedCatalog();
+      expect(store1).toBe(store2);
     });
   });
 });

@@ -1,6 +1,5 @@
 import type { ValidationResult } from '../model/component-types.js';
 import type { ScenarioModel } from '../model/scenario-model.js';
-import { checkUniqueNames } from './rules/unique-names.js';
 import { checkRequiredFields } from './rules/required-fields.js';
 import { checkCrossReferences } from './rules/cross-references.js';
 import { checkEventGraph } from './rules/event-graph.js';
@@ -9,9 +8,9 @@ import { checkFormatRules } from './rules/format-rules.js';
 import { checkCatalogReferences } from './rules/catalog-references.js';
 import { checkMythosStructure } from './rules/mythos-structure.js';
 import { checkExploreTokenPattern } from './rules/explore-token-pattern.js';
+import { checkInvestigatorTokenPattern } from './rules/investigator-token-pattern.js';
 
 const ALL_RULES = [
-  checkUniqueNames,
   checkRequiredFields,
   checkCrossReferences,
   checkEventGraph,
@@ -20,6 +19,7 @@ const ALL_RULES = [
   checkCatalogReferences,
   checkMythosStructure,
   checkExploreTokenPattern,
+  checkInvestigatorTokenPattern,
 ];
 
 /**

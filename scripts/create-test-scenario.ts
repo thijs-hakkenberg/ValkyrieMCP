@@ -58,8 +58,15 @@ upsertEvent(model, 'EventStart', {
 upsertEvent(model, 'EventSetup', {
   display: 'false',
   buttons: '0',
-  event1: 'EventMythos',
+  event1: 'EventRemoveInvestigators',
   add: 'TileEntryHall TileStudy TokenInvestigators TokenExploreStudy TokenSearchHall',
+});
+
+// EventRemoveInvestigators - remove start position marker (no dialog)
+upsertEvent(model, 'EventRemoveInvestigators', {
+  display: 'false',
+  buttons: '0',
+  remove: 'TokenInvestigators',
 });
 
 // EventExploreStudy - player explores the study, finds stairs down
@@ -196,7 +203,7 @@ upsertEvent(model, 'EventMythos', {
   trigger: 'Mythos',
   conditions: 'MythosCount,<,3',
   display: 'false',
-  buttons: '0',
+  buttons: '1',
   randomevents: 'true',
   event1: 'EventMythosCreak',
   event2: 'EventMythosWhisper',
@@ -221,7 +228,7 @@ upsertEvent(model, 'EventMythosChill', {
   event1: '',
 });
 
-console.log('✓ 22 events created');
+console.log('✓ 23 events created');
 
 // ── Step 4: Tokens ──
 
@@ -260,13 +267,13 @@ console.log('✓ 1 spawn configured');
 // ── Step 6: Items ──
 
 upsertItem(model, 'QItemFlashlight', {
-  starting: 'True', traits: 'lightsource', itemname: 'Flashlight',
+  starting: 'True', traits: 'lightsource', itemname: 'ItemCommonBullseyeLantern',
 });
 upsertItem(model, 'QItemKnife', {
-  starting: 'True', traits: 'weapon', itemname: 'Knife',
+  starting: 'True', traits: 'weapon', itemname: 'ItemCommonKnife',
 });
 upsertItem(model, 'QItemOldKey', {
-  starting: 'False', traits: 'equipment', itemname: 'Old Key',
+  starting: 'False', traits: 'equipment', itemname: 'ItemUniqueOldKeys',
 });
 console.log('✓ 3 items configured');
 

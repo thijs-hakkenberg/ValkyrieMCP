@@ -45,7 +45,7 @@ describe('Integration: full scenario pipeline', () => {
     expect(t1.success).toBe(true);
 
     const t2 = upsertTile(model, 'TileCorridor', {
-      side: 'TileSideCorridor',
+      side: 'TileSideHall1',
       xposition: String(positions[1].x),
       yposition: String(positions[1].y),
       rotation: '0',
@@ -149,14 +149,14 @@ describe('Integration: full scenario pipeline', () => {
     const item1 = upsertItem(model, 'QItemFlashlight', {
       starting: 'True',
       traits: 'lightsource',
-      itemname: 'Flashlight',
+      itemname: 'ItemCommonKeroseneLantern',
     });
     expect(item1.success).toBe(true);
 
     const item2 = upsertItem(model, 'QItemKnife', {
       starting: 'True',
       traits: 'weapon',
-      itemname: 'Knife',
+      itemname: 'ItemCommonKnife',
     });
     expect(item2.success).toBe(true);
 

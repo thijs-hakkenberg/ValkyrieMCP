@@ -15,14 +15,14 @@ describe('checkCatalogReferences', () => {
     expect(tileWarnings).toHaveLength(0);
   });
 
-  it('warns for unknown tile side', () => {
+  it('errors for unknown tile side', () => {
     const model = makeModel();
     model.upsert('TileHall', { side: 'TileSideNonexistent999' });
     const results = checkCatalogReferences(model);
-    const tileWarnings = results.filter(r => r.component === 'TileHall');
-    expect(tileWarnings).toHaveLength(1);
-    expect(tileWarnings[0].severity).toBe('warning');
-    expect(tileWarnings[0].field).toBe('side');
+    const tileErrors = results.filter(r => r.component === 'TileHall');
+    expect(tileErrors).toHaveLength(1);
+    expect(tileErrors[0].severity).toBe('error');
+    expect(tileErrors[0].field).toBe('side');
   });
 
   it('passes for valid monster reference', () => {
@@ -98,14 +98,53 @@ describe('checkCatalogReferences', () => {
     expect(spawnWarnings[0].message).toContain('MonsterFake');
   });
 
-  it('all results have severity warning, not error', () => {
+  it('tile side is error, monster and audio are warnings', () => {
     const model = makeModel();
     model.upsert('TileHall', { side: 'FakeTileSide' });
     model.upsert('SpawnEnemy', { monster: 'FakeMonster' });
     model.upsert('EventScare', { audio: 'FakeAudio' });
     const results = checkCatalogReferences(model);
-    for (const r of results) {
-      expect(r.severity).toBe('warning');
-    }
+    const tileResult = results.find(r => r.component === 'TileHall');
+    const monsterResult = results.find(r => r.component === 'SpawnEnemy');
+    const audioResult = results.find(r => r.component === 'EventScare');
+    expect(tileResult!.severity).toBe('error');
+    expect(monsterResult!.severity).toBe('warning');
+    expect(audioResult!.severity).toBe('warning');
+  });
+
+  it('passes for valid itemname', () => {
+    const model = makeModel();
+    model.upsert('QItemLantern', { itemname: 'ItemCommonKeroseneLantern' });
+    const results = checkCatalogReferences(model);
+    const itemWarnings = results.filter(r => r.component === 'QItemLantern');
+    expect(itemWarnings).toHaveLength(0);
+  });
+
+  it('warns for unknown itemname', () => {
+    const model = makeModel();
+    model.upsert('QItemFake', { itemname: 'Flashlight' });
+    const results = checkCatalogReferences(model);
+    const itemWarnings = results.filter(r => r.component === 'QItemFake');
+    expect(itemWarnings).toHaveLength(1);
+    expect(itemWarnings[0].severity).toBe('warning');
+    expect(itemWarnings[0].field).toBe('itemname');
+    expect(itemWarnings[0].message).toContain('ItemCommonKnife');
+  });
+
+  it('passes for space-separated itemnames all valid', () => {
+    const model = makeModel();
+    model.upsert('QItemMulti', { itemname: 'ItemCommonKnife ItemCommonKeroseneLantern' });
+    const results = checkCatalogReferences(model);
+    const itemWarnings = results.filter(r => r.component === 'QItemMulti');
+    expect(itemWarnings).toHaveLength(0);
+  });
+
+  it('warns for one unknown in space-separated itemname list', () => {
+    const model = makeModel();
+    model.upsert('QItemMixed', { itemname: 'ItemCommonKnife FakeItem' });
+    const results = checkCatalogReferences(model);
+    const itemWarnings = results.filter(r => r.component === 'QItemMixed');
+    expect(itemWarnings).toHaveLength(1);
+    expect(itemWarnings[0].message).toContain('FakeItem');
   });
 });

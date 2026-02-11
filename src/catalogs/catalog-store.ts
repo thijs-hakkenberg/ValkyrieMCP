@@ -68,3 +68,13 @@ export class CatalogStore {
     return new Set(source.map(e => e.id));
   }
 }
+
+/** Shared singleton instance — avoids re-indexing 846 entries multiple times */
+let sharedInstance: CatalogStore | null = null;
+
+export function getSharedCatalog(): CatalogStore {
+  if (!sharedInstance) {
+    sharedInstance = new CatalogStore();
+  }
+  return sharedInstance;
+}

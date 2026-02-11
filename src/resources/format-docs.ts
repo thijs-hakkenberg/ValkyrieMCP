@@ -37,9 +37,18 @@ Format: \`VarOperation:variable,comparator,value\`
 - Comparators: ==, !=, >, <, >=, <=
 - Logical operators: \`VarTestsLogicalOperator:AND\`, \`VarTestsLogicalOperator:OR\`
 
+## Common Patterns
+
+### TokenInvestigators Removal
+Community quests always remove TokenInvestigators after setup so the start position marker doesn't stay interactable:
+\`\`\`
+EventSetup: add=TokenInvestigators, event1=EventRemoveInv
+EventRemoveInv: display=false, buttons=0, remove=TokenInvestigators
+\`\`\`
+
 ## Triggers
 - **EventStart**: Fires when scenario begins
-- **Mythos**: Fires during mythos phase
+- **Mythos**: Fires during mythos phase. **IMPORTANT**: Must have buttons>=1, otherwise Valkyrie auto-confirms and skips sub-events entirely
 - **StartRound**: Fires at start of each round
 - **EndRound**: Fires at end of each round
 - **Eliminated**: Fires when all investigators eliminated
@@ -98,7 +107,7 @@ export const COMPONENT_FORMAT_DOC = `# Valkyrie Component Types
 Prefix: \`Tile\`
 | Field | Required | Description |
 |-------|----------|-------------|
-| side | Yes | TileSide name from game content |
+| side | Yes | TileSide name from game content. **Must be a valid catalog ID** — invalid sides crash Valkyrie |
 | xposition | Yes | X board position |
 | yposition | Yes | Y board position |
 | rotation | No | 0, 90, 180, or 270 degrees |
@@ -131,6 +140,7 @@ Prefix: \`Spawn\`
 Prefix: \`QItem\`
 | Field | Required | Description |
 |-------|----------|-------------|
+| itemname | No | Space-separated catalog item IDs (e.g., ItemCommonKnife, ItemCommonKeroseneLantern). Must use catalog IDs, not display names |
 | starting | No | True if given at start |
 | traits | No | Space-separated: weapon, lightsource, equipment, common, spell |
 | traitpool | No | Alternative trait matching |

@@ -7,6 +7,23 @@ export interface UpsertResult {
   errors: ValidationResult[];
 }
 
+/** Per-component-type upsert configuration */
+interface ComponentConfig {
+  prefix: string;
+  requiredFields?: string[];
+  checkLocalization?: boolean;
+}
+
+const COMPONENT_CONFIGS: Record<string, ComponentConfig> = {
+  Event:  { prefix: 'Event', checkLocalization: true },
+  Tile:   { prefix: 'Tile', requiredFields: ['side'] },
+  Token:  { prefix: 'Token', requiredFields: ['type'] },
+  Spawn:  { prefix: 'Spawn' },
+  QItem:  { prefix: 'QItem' },
+  Puzzle: { prefix: 'Puzzle' },
+  UI:     { prefix: 'UI' },
+};
+
 function prefixError(name: string, expected: string): ValidationResult {
   return {
     rule: 'prefix',
@@ -41,7 +58,6 @@ function checkEventLocalization(
   data: Record<string, string>,
 ): ValidationResult[] {
   const warnings: ValidationResult[] = [];
-  // Only warn if display is not explicitly false
   const merged = model.get(name);
   const display = data.display ?? merged?.data.display;
   if (display === 'false') return warnings;
@@ -54,139 +70,64 @@ function checkEventLocalization(
   return warnings;
 }
 
-export function upsertEvent(
+function upsertGeneric(
   model: ScenarioModel,
   name: string,
   data: Record<string, string>,
+  config: ComponentConfig,
 ): UpsertResult {
   const errors: ValidationResult[] = [];
   const warnings: ValidationResult[] = [];
 
-  if (!name.startsWith('Event')) {
-    errors.push(prefixError(name, 'Event'));
+  if (!name.startsWith(config.prefix)) {
+    errors.push(prefixError(name, config.prefix));
     return { success: false, warnings, errors };
   }
 
+  if (config.requiredFields) {
+    for (const field of config.requiredFields) {
+      const existing = model.get(name);
+      const mergedValue = data[field] ?? existing?.data[field];
+      if (!mergedValue) {
+        errors.push(requiredFieldError(name, field));
+        return { success: false, warnings, errors };
+      }
+    }
+  }
+
   model.upsert(name, data);
-  warnings.push(...checkEventLocalization(model, name, data));
+
+  if (config.checkLocalization) {
+    warnings.push(...checkEventLocalization(model, name, data));
+  }
 
   return { success: true, warnings, errors };
 }
 
-export function upsertTile(
-  model: ScenarioModel,
-  name: string,
-  data: Record<string, string>,
-): UpsertResult {
-  const errors: ValidationResult[] = [];
-  const warnings: ValidationResult[] = [];
-
-  if (!name.startsWith('Tile')) {
-    errors.push(prefixError(name, 'Tile'));
-    return { success: false, warnings, errors };
-  }
-
-  // side is required for tiles (check merged data)
-  const existing = model.get(name);
-  const mergedSide = data.side ?? existing?.data.side;
-  if (!mergedSide) {
-    errors.push(requiredFieldError(name, 'side'));
-    return { success: false, warnings, errors };
-  }
-
-  model.upsert(name, data);
-  return { success: true, warnings, errors };
+export function upsertEvent(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Event);
 }
 
-export function upsertToken(
-  model: ScenarioModel,
-  name: string,
-  data: Record<string, string>,
-): UpsertResult {
-  const errors: ValidationResult[] = [];
-  const warnings: ValidationResult[] = [];
-
-  if (!name.startsWith('Token')) {
-    errors.push(prefixError(name, 'Token'));
-    return { success: false, warnings, errors };
-  }
-
-  // type is required for tokens
-  const existing = model.get(name);
-  const mergedType = data.type ?? existing?.data.type;
-  if (!mergedType) {
-    errors.push(requiredFieldError(name, 'type'));
-    return { success: false, warnings, errors };
-  }
-
-  model.upsert(name, data);
-  return { success: true, warnings, errors };
+export function upsertTile(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Tile);
 }
 
-export function upsertSpawn(
-  model: ScenarioModel,
-  name: string,
-  data: Record<string, string>,
-): UpsertResult {
-  const errors: ValidationResult[] = [];
-  const warnings: ValidationResult[] = [];
-
-  if (!name.startsWith('Spawn')) {
-    errors.push(prefixError(name, 'Spawn'));
-    return { success: false, warnings, errors };
-  }
-
-  model.upsert(name, data);
-  return { success: true, warnings, errors };
+export function upsertToken(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Token);
 }
 
-export function upsertItem(
-  model: ScenarioModel,
-  name: string,
-  data: Record<string, string>,
-): UpsertResult {
-  const errors: ValidationResult[] = [];
-  const warnings: ValidationResult[] = [];
-
-  if (!name.startsWith('QItem')) {
-    errors.push(prefixError(name, 'QItem'));
-    return { success: false, warnings, errors };
-  }
-
-  model.upsert(name, data);
-  return { success: true, warnings, errors };
+export function upsertSpawn(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Spawn);
 }
 
-export function upsertPuzzle(
-  model: ScenarioModel,
-  name: string,
-  data: Record<string, string>,
-): UpsertResult {
-  const errors: ValidationResult[] = [];
-  const warnings: ValidationResult[] = [];
-
-  if (!name.startsWith('Puzzle')) {
-    errors.push(prefixError(name, 'Puzzle'));
-    return { success: false, warnings, errors };
-  }
-
-  model.upsert(name, data);
-  return { success: true, warnings, errors };
+export function upsertItem(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.QItem);
 }
 
-export function upsertUI(
-  model: ScenarioModel,
-  name: string,
-  data: Record<string, string>,
-): UpsertResult {
-  const errors: ValidationResult[] = [];
-  const warnings: ValidationResult[] = [];
+export function upsertPuzzle(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Puzzle);
+}
 
-  if (!name.startsWith('UI')) {
-    errors.push(prefixError(name, 'UI'));
-    return { success: false, warnings, errors };
-  }
-
-  model.upsert(name, data);
-  return { success: true, warnings, errors };
+export function upsertUI(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.UI);
 }

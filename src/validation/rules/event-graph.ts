@@ -1,7 +1,6 @@
 import type { ValidationResult } from '../../model/component-types.js';
+import { EVENT_FIELDS } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
-
-const EVENT_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6'];
 
 /**
  * Checks the event graph for structural issues:

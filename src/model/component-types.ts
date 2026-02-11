@@ -1,4 +1,4 @@
-// Component types for Valkyrie Mansions of Madness scenario format
+// Component types and shared constants for Valkyrie Mansions of Madness scenario format
 // Derived from QuestData.cs inner classes and ExoticMaterial fixture analysis
 
 /** The INI file a component belongs to */
@@ -24,20 +24,27 @@ export function getIniFileForSection(sectionName: string): IniFile {
   return 'other.ini';
 }
 
-/** Valid event triggers (includes dynamic Defeated* patterns) */
-export type EventTrigger = 'EventStart' | 'Mythos' | 'StartRound' | 'EndRound' | 'Eliminated' | 'NoMoM' | string;
+/** Determine the component type prefix from a component name */
+export function getTypePrefix(name: string): string {
+  for (const prefix of Object.keys(COMPONENT_FILE_MAP)) {
+    if (name.startsWith(prefix)) return prefix;
+  }
+  return 'Other';
+}
 
-/** Valid token types */
-export type TokenType =
-  | 'TokenSearch'
-  | 'TokenExplore'
-  | 'TokenInteract'
-  | 'TokenInvestigators'
-  | 'TokenWallOutside'
-  | 'TokenWallInside';
+/** Reference fields that may contain space-separated component names */
+export const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster', 'inspect'] as const;
 
-/** Valid puzzle classes */
-export type PuzzleClass = 'code' | 'slide' | 'image' | 'tower';
+/** Event-specific reference fields (event1..event6) */
+export const EVENT_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6'] as const;
+
+/** Split a space-separated reference value into individual names */
+export function parseRefList(value: string): string[] {
+  return value.split(/\s+/).filter(s => s.length > 0);
+}
+
+/** INI sections that contain bare keys (filenames) instead of key=value pairs */
+export const BARE_KEY_SECTIONS = new Set(['QuestData', 'QuestText']);
 
 /** A single INI section: key-value pairs (undefined for absent keys) */
 export interface IniSection {
@@ -63,12 +70,6 @@ export interface QuestConfig {
   version: string;
 }
 
-/** Files listed in quest.ini [QuestData] */
-export interface QuestDataFiles {
-  dataFiles: string[];
-  textFiles: string[];
-}
-
 /** A generic scenario component (any INI section) */
 export interface ScenarioComponent {
   /** Section name (unique ID) e.g. "EventStart", "TileTownSquare" */
@@ -77,107 +78,6 @@ export interface ScenarioComponent {
   file: IniFile;
   /** Raw key-value data */
   data: IniSection;
-}
-
-/** Event component fields */
-export interface EventData extends IniSection {
-  display?: string;
-  buttons?: string;
-  event1?: string;
-  event2?: string;
-  event3?: string;
-  event4?: string;
-  event5?: string;
-  event6?: string;
-  trigger?: string;
-  conditions?: string;
-  highlight?: string;
-  mincam?: string;
-  maxcam?: string;
-  xposition?: string;
-  yposition?: string;
-  operations?: string;
-  vartests?: string;
-  randomevents?: string;
-  add?: string;
-  remove?: string;
-  audio?: string;
-  quota?: string;
-  buttoncolor1?: string;
-  buttoncolor2?: string;
-  buttoncolor3?: string;
-  buttoncolor4?: string;
-  buttoncolor5?: string;
-  buttoncolor6?: string;
-}
-
-/** Tile component fields */
-export interface TileData extends IniSection {
-  xposition?: string;
-  yposition?: string;
-  side: string;
-  rotation?: string;
-}
-
-/** Token component fields */
-export interface TokenData extends IniSection {
-  xposition?: string;
-  yposition?: string;
-  buttons?: string;
-  event1?: string;
-  type: string;
-  conditions?: string;
-  display?: string;
-  rotation?: string;
-}
-
-/** Spawn component fields */
-export interface SpawnData extends IniSection {
-  operations?: string;
-  buttons?: string;
-  event1?: string;
-  conditions?: string;
-  add?: string;
-  remove?: string;
-  audio?: string;
-  monster?: string;
-  uniquehealth?: string;
-  uniquehealthhero?: string;
-  vartests?: string;
-  display?: string;
-}
-
-/** Item component fields */
-export interface ItemData extends IniSection {
-  starting?: string;
-  traits?: string;
-  traitpool?: string;
-  itemname?: string;
-  inspect?: string;
-}
-
-/** UI component fields */
-export interface UIData extends IniSection {
-  xposition?: string;
-  yposition?: string;
-  display?: string;
-  buttons?: string;
-  image?: string;
-  size?: string;
-  vunits?: string;
-}
-
-/** Puzzle component fields */
-export interface PuzzleData extends IniSection {
-  display?: string;
-  buttons?: string;
-  event1?: string;
-  conditions?: string;
-  audio?: string;
-  class?: string;
-  skill?: string;
-  puzzlelevel?: string;
-  puzzlealtlevel?: string;
 }
 
 /** Validation severity */
@@ -190,12 +90,6 @@ export interface ValidationResult {
   message: string;
   component?: string;
   field?: string;
-}
-
-/** Localization entry: key -> value */
-export interface LocalizationEntry {
-  key: string;
-  value: string;
 }
 
 /** Default quest config for new scenarios */
@@ -211,3 +105,20 @@ export const DEFAULT_QUEST_CONFIG: QuestConfig = {
   image: '',
   version: '',
 };
+
+/** Serialize a QuestConfig into key-value pairs for INI writing */
+export function serializeQuestConfig(config: QuestConfig): Record<string, string> {
+  const result: Record<string, string> = {
+    format: String(config.format),
+    type: config.type,
+    hidden: String(config.hidden),
+    defaultlanguage: config.defaultlanguage,
+    defaultmusicon: String(config.defaultmusicon),
+    difficulty: String(config.difficulty),
+    lengthmin: String(config.lengthmin),
+    lengthmax: String(config.lengthmax),
+  };
+  if (config.image) result.image = config.image;
+  if (config.version) result.version = config.version;
+  return result;
+}

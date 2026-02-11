@@ -1,7 +1,6 @@
 import type { ValidationResult } from '../../model/component-types.js';
+import { REFERENCE_FIELDS, parseRefList } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
-
-const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster'];
 
 /** Prefixes for built-in game content that should not be flagged as missing */
 const BUILTIN_PREFIXES = ['Monster', 'Audio', 'TileSide'];
@@ -23,7 +22,7 @@ export function checkCrossReferences(model: ScenarioModel): ValidationResult[] {
       const value = comp.data[field];
       if (value === undefined || value.trim() === '') continue;
 
-      const refs = value.split(/\s+/).filter(s => s.length > 0);
+      const refs = parseRefList(value);
       for (const ref of refs) {
         if (isBuiltin(ref)) continue;
         if (!model.get(ref)) {
