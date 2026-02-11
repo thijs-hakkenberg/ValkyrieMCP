@@ -79,6 +79,28 @@ describe('event-graph', () => {
     expect(deadEnd).toHaveLength(0);
   });
 
+  it('does not warn about unreachable for event with Defeated* trigger', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventMinCam', { buttons: '1', event1: 'EventMain', trigger: 'EventStart' });
+    model.upsert('EventMain', { buttons: '1', event1: '' });
+    model.upsert('EventDefeatedCultist', { buttons: '1', event1: '', trigger: 'DefeatedMonsterCultist' });
+
+    const results = checkEventGraph(model);
+    const defeatedWarnings = results.filter(r => r.component === 'EventDefeatedCultist');
+    expect(defeatedWarnings).toHaveLength(0);
+  });
+
+  it('does not warn about unreachable for event with DefeatedCustomMonster trigger', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventMinCam', { buttons: '1', event1: 'EventMain', trigger: 'EventStart' });
+    model.upsert('EventMain', { buttons: '1', event1: '' });
+    model.upsert('EventDefeatBoss', { buttons: '1', event1: '', trigger: 'DefeatedCustomMonsterBoss' });
+
+    const results = checkEventGraph(model);
+    const defeatedWarnings = results.filter(r => r.component === 'EventDefeatBoss');
+    expect(defeatedWarnings).toHaveLength(0);
+  });
+
   it('does not flag non-Event components as unreachable', () => {
     const model = new ScenarioModel();
     model.upsert('EventMinCam', { buttons: '1', event1: '', trigger: 'EventStart' });

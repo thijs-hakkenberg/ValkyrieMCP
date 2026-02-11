@@ -45,12 +45,13 @@ console.log('\n' + getMapAscii(model) + '\n');
 
 // ── Step 3: Event chain ──
 
-// EventStart - scenario introduction
+// EventStart - scenario introduction, initialize state vars
 upsertEvent(model, 'EventStart', {
   trigger: 'EventStart',
   display: 'true',
   buttons: '1',
   event1: 'EventSetup',
+  operations: 'MythosCount,=,0',
 });
 
 // EventSetup - place initial tiles and tokens (no dialog)
@@ -115,6 +116,7 @@ upsertEvent(model, 'EventFightCultist', {
   event1: 'EventExploreCellar',
   event2: 'EventTakeDamage',
   vartests: 'VarOperation:{strength},>=,2',
+  buttoncolor1: '"red"',
 });
 
 // EventTakeDamage - failed the test
@@ -131,6 +133,7 @@ upsertEvent(model, 'EventSneakPast', {
   event1: 'EventExploreCellar',
   event2: 'EventCaughtSneaking',
   vartests: 'VarOperation:{agility},>=,2',
+  buttoncolor1: '"red"',
 });
 
 // EventCaughtSneaking - failed sneak
@@ -163,6 +166,7 @@ upsertEvent(model, 'EventPuzzleLock', {
   event1: 'EventPuzzleSolved',
   event2: 'EventPuzzleFailed',
   vartests: 'VarOperation:{lore},>=,2',
+  buttoncolor1: '"red"',
 });
 
 // EventPuzzleSolved - victory path
@@ -187,15 +191,17 @@ upsertEvent(model, 'EventVictory', {
   operations: '$end,=,1',
 });
 
-// EventMythos - recurring tension event (trigger, no dialog — sub-events display text)
+// EventMythos - recurring tension event with conditions to limit repetitions
 upsertEvent(model, 'EventMythos', {
   trigger: 'Mythos',
+  conditions: 'MythosCount,<,3',
   display: 'false',
   buttons: '0',
   randomevents: 'true',
   event1: 'EventMythosCreak',
   event2: 'EventMythosWhisper',
   event3: 'EventMythosChill',
+  operations: 'MythosCount,+,1',
 });
 
 // Mythos flavor events (event1='' signals valid terminal button)

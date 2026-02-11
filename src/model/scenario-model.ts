@@ -10,7 +10,7 @@ import { LocalizationStore } from './localization-store.js';
 import { parseIni } from '../io/ini-parser.js';
 
 /** Reference fields that may contain space-separated component names */
-const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster'];
+const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster', 'inspect'];
 
 /** Extract all component name references from a field value (space-separated) */
 function extractRefs(value: string): string[] {
@@ -119,14 +119,18 @@ export class ScenarioModel {
     return [...refs];
   }
 
-  /** Serialize all components grouped by INI file */
-  serializeToIniData(): Record<string, Record<string, IniSection>> {
-    const result: Record<string, Record<string, IniSection>> = {};
+  /** Serialize all components grouped by INI file (strips undefined values) */
+  serializeToIniData(): Record<string, Record<string, Record<string, string>>> {
+    const result: Record<string, Record<string, Record<string, string>>> = {};
     for (const comp of this.components.values()) {
       if (!result[comp.file]) {
         result[comp.file] = {};
       }
-      result[comp.file][comp.name] = { ...comp.data };
+      const clean: Record<string, string> = {};
+      for (const [k, v] of Object.entries(comp.data)) {
+        if (v !== undefined) clean[k] = v;
+      }
+      result[comp.file][comp.name] = clean;
     }
     return result;
   }

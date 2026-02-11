@@ -7,6 +7,8 @@ import { checkEventGraph } from './rules/event-graph.js';
 import { checkLocalizationCompleteness } from './rules/localization-completeness.js';
 import { checkFormatRules } from './rules/format-rules.js';
 import { checkCatalogReferences } from './rules/catalog-references.js';
+import { checkMythosStructure } from './rules/mythos-structure.js';
+import { checkExploreTokenPattern } from './rules/explore-token-pattern.js';
 
 const ALL_RULES = [
   checkUniqueNames,
@@ -16,6 +18,8 @@ const ALL_RULES = [
   checkLocalizationCompleteness,
   checkFormatRules,
   checkCatalogReferences,
+  checkMythosStructure,
+  checkExploreTokenPattern,
 ];
 
 /**

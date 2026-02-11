@@ -11,7 +11,9 @@ Events are the core quest logic mechanism. Each event is an INI section starting
 | display | bool | Whether to show dialog (default: true) |
 | buttons | int | Number of buttons (1-6) |
 | event1..6 | string | Space-separated event/spawn names triggered by each button |
-| trigger | string | Auto-trigger condition: EventStart, Mythos, StartRound, EndRound, Eliminated |
+| trigger | string | Auto-trigger condition: EventStart, Mythos, StartRound, EndRound, Eliminated, DefeatedMonster*, DefeatedCustomMonster* |
+| conditions | string | AND-only variable gating (format: "var,comparator,value var2,comparator,value2"). Unlike vartests, conditions are checked BEFORE the event displays — if false, the event is silently skipped |
+| highlight | bool | Camera focuses on the event's board position |
 | xposition | float | X position on board (for token placement) |
 | yposition | float | Y position on board |
 | operations | string | Space-separated variable operations (e.g., "$end,=,1") |
@@ -21,6 +23,7 @@ Events are the core quest logic mechanism. Each event is an INI section starting
 | audio | string | Audio clip name to play |
 | randomevents | bool | Randomly select from event list instead of showing all |
 | quota | int | Success threshold for skill tests |
+| buttoncolor1..6 | string | Skill test button color override (e.g., "red") |
 | mincam | bool | Set minimum camera position |
 | maxcam | bool | Set maximum camera position |
 
@@ -40,6 +43,8 @@ Format: \`VarOperation:variable,comparator,value\`
 - **StartRound**: Fires at start of each round
 - **EndRound**: Fires at end of each round
 - **Eliminated**: Fires when all investigators eliminated
+- **DefeatedMonster***: Fires when a specific monster type is defeated (e.g., DefeatedMonsterCultist)
+- **DefeatedCustomMonster***: Fires when a custom monster is defeated (e.g., DefeatedCustomMonsterBoss)
 
 ## Button Labels
 Set via localization: \`EventName.button1\`, \`EventName.button2\`, etc.
@@ -107,6 +112,7 @@ Prefix: \`Token\`
 | yposition | Yes | Y position |
 | buttons | No | Number of interaction buttons |
 | event1 | No | Event triggered on interaction |
+| conditions | No | AND-only variable gating — token hidden when false |
 | rotation | No | Rotation for wall tokens |
 
 ## Spawns (spawns.ini)
@@ -116,6 +122,8 @@ Prefix: \`Spawn\`
 | monster | Yes | Monster type name(s), space-separated |
 | buttons | No | Button count |
 | event1 | No | Next event |
+| conditions | No | AND-only variable gating — spawn hidden when false |
+| add | No | Space-separated component names to show |
 | uniquehealth | No | Base health override |
 | uniquehealthhero | No | Per-hero health modifier |
 
@@ -126,6 +134,7 @@ Prefix: \`QItem\`
 | starting | No | True if given at start |
 | traits | No | Space-separated: weapon, lightsource, equipment, common, spell |
 | traitpool | No | Alternative trait matching |
+| inspect | No | Event reference triggered on item inspection |
 
 ## Puzzles (other.ini)
 Prefix: \`Puzzle\`
@@ -133,6 +142,8 @@ Prefix: \`Puzzle\`
 |-------|----------|-------------|
 | class | No | code, slide, image, tower (default: slide) |
 | skill | No | Skill test: {observation}, {agility}, etc. |
+| conditions | No | AND-only variable gating — puzzle hidden when false |
+| puzzlelevel | No | Puzzle difficulty level |
 | puzzlealtlevel | No | Alternative difficulty level |
 
 ## UI Elements (ui.ini)

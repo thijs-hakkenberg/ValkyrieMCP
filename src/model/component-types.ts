@@ -24,8 +24,8 @@ export function getIniFileForSection(sectionName: string): IniFile {
   return 'other.ini';
 }
 
-/** Valid event triggers */
-export type EventTrigger = 'EventStart' | 'Mythos' | 'StartRound' | 'EndRound' | 'Eliminated' | 'NoMoM';
+/** Valid event triggers (includes dynamic Defeated* patterns) */
+export type EventTrigger = 'EventStart' | 'Mythos' | 'StartRound' | 'EndRound' | 'Eliminated' | 'NoMoM' | string;
 
 /** Valid token types */
 export type TokenType =
@@ -39,9 +39,9 @@ export type TokenType =
 /** Valid puzzle classes */
 export type PuzzleClass = 'code' | 'slide' | 'image' | 'tower';
 
-/** A single INI section: key-value pairs */
+/** A single INI section: key-value pairs (undefined for absent keys) */
 export interface IniSection {
-  [key: string]: string;
+  [key: string]: string | undefined;
 }
 
 /** Parsed INI file: section name -> key-value pairs */
@@ -90,6 +90,8 @@ export interface EventData extends IniSection {
   event5?: string;
   event6?: string;
   trigger?: string;
+  conditions?: string;
+  highlight?: string;
   mincam?: string;
   maxcam?: string;
   xposition?: string;
@@ -101,6 +103,12 @@ export interface EventData extends IniSection {
   remove?: string;
   audio?: string;
   quota?: string;
+  buttoncolor1?: string;
+  buttoncolor2?: string;
+  buttoncolor3?: string;
+  buttoncolor4?: string;
+  buttoncolor5?: string;
+  buttoncolor6?: string;
 }
 
 /** Tile component fields */
@@ -118,6 +126,7 @@ export interface TokenData extends IniSection {
   buttons?: string;
   event1?: string;
   type: string;
+  conditions?: string;
   display?: string;
   rotation?: string;
 }
@@ -127,6 +136,8 @@ export interface SpawnData extends IniSection {
   operations?: string;
   buttons?: string;
   event1?: string;
+  conditions?: string;
+  add?: string;
   remove?: string;
   audio?: string;
   monster?: string;
@@ -142,6 +153,7 @@ export interface ItemData extends IniSection {
   traits?: string;
   traitpool?: string;
   itemname?: string;
+  inspect?: string;
 }
 
 /** UI component fields */
@@ -160,9 +172,11 @@ export interface PuzzleData extends IniSection {
   display?: string;
   buttons?: string;
   event1?: string;
+  conditions?: string;
   audio?: string;
   class?: string;
   skill?: string;
+  puzzlelevel?: string;
   puzzlealtlevel?: string;
 }
 

@@ -158,6 +158,21 @@ describe('ScenarioModel', () => {
       expect(refs).toContain('TileTown');
       expect(refs).toContain('TokenSearch1');
     });
+
+    it('getReferencesTo tracks inspect field references', () => {
+      model.upsert('QItemSpyglass', { starting: 'True', inspect: 'EventInspect' });
+      model.upsert('EventInspect', { display: 'true', buttons: '1', event1: '' });
+
+      const refs = model.getReferencesTo('EventInspect');
+      expect(refs.some(r => r.from === 'QItemSpyglass' && r.field === 'inspect')).toBe(true);
+    });
+
+    it('getReferencesFrom includes inspect field references', () => {
+      model.upsert('QItemSpyglass', { starting: 'True', inspect: 'EventInspect' });
+
+      const refs = model.getReferencesFrom('QItemSpyglass');
+      expect(refs).toContain('EventInspect');
+    });
   });
 
   describe('delete cascade', () => {
@@ -183,6 +198,16 @@ describe('ScenarioModel', () => {
       const start = model.get('EventStart');
       expect(start!.data.add).not.toContain('TileA');
       expect(start!.data.add).toContain('TokenB');
+    });
+
+    it('removing an event cleans inspect refs on items', () => {
+      model.upsert('QItemSpyglass', { starting: 'True', inspect: 'EventInspectSpyglass' });
+      model.upsert('EventInspectSpyglass', { display: 'true', buttons: '1', event1: '' });
+
+      model.delete('EventInspectSpyglass');
+
+      const item = model.get('QItemSpyglass');
+      expect(item!.data.inspect).not.toContain('EventInspectSpyglass');
     });
 
     it('removing a component cleans monster refs in spawns', () => {
