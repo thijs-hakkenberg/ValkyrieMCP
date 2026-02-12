@@ -1,23 +1,30 @@
 # valkyrie-mom-mcp
 
-MCP (Model Context Protocol) server for AI-assisted Mansions of Madness 2nd Edition scenario creation with [Valkyrie](https://github.com/NPBruce/valkyrie).
+[![npm](https://img.shields.io/npm/v/@thijshakkenberg/valkyrie-mom-mcp)](https://www.npmjs.com/package/@thijshakkenberg/valkyrie-mom-mcp)
+
+MCP (Model Context Protocol) server and Claude Code plugin for AI-assisted Mansions of Madness 2nd Edition scenario creation with [Valkyrie](https://github.com/NPBruce/valkyrie).
 
 ## What it does
 
 This server exposes Valkyrie scenario editing as MCP tools, enabling AI assistants (Claude, etc.) to create, modify, validate, and build complete MoM scenarios. It auto-detects the Valkyrie editor directory so scenarios appear directly in the app.
 
-## Prerequisites
+The plugin bundles 7 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, etc.) and an autonomous scenario designer agent.
 
-- [Node.js](https://nodejs.org/) >= 18
-- [Valkyrie](https://github.com/NPBruce/valkyrie) (optional, for playing built scenarios)
+## Install
 
-## Setup
+### As a Claude Code plugin (recommended)
 
 ```bash
-npm install
+claude plugin add @thijshakkenberg/valkyrie-mom-mcp
 ```
 
-### As an MCP server (Claude Code, Claude Desktop, etc.)
+This gives you:
+- **MCP server** with 16 tools for scenario editing
+- **7 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`
+- **Scenario designer agent** for autonomous scenario creation
+- **5 MCP resources** for format documentation
+
+### As a standalone MCP server
 
 Add to your `.mcp.json` or MCP client config:
 
@@ -26,21 +33,31 @@ Add to your `.mcp.json` or MCP client config:
   "mcpServers": {
     "valkyrie-mom": {
       "command": "npx",
-      "args": ["tsx", "src/index.ts"],
-      "cwd": "/path/to/valkyrie_mom_mcp"
+      "args": ["-y", "@thijshakkenberg/valkyrie-mom-mcp"]
     }
   }
 }
 ```
 
-### Development
+### From source
 
 ```bash
-npm test          # Run all tests
-npm run test:watch # Watch mode
-npm run lint       # Type check
-npm run build      # Compile to dist/
+git clone https://github.com/thijs-hakkenberg/ValkyrieMCP.git
+cd ValkyrieMCP
+npm install
 ```
+
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `/scenario` | Guided end-to-end scenario creation workflow |
+| `/event-patterns` | Event loops, multi-question dialogues, silent events, token swaps, random events, variable branching |
+| `/tile-placement` | Standard placement chains, multi-entry tiles, naming conventions |
+| `/variables-and-mythos` | Variable system, mythos scaling formula, random generation, hero detection, content pack gating |
+| `/custom-monsters` | Custom activations, evade/horror events, round-based spawn triggering |
+| `/ui-and-puzzles` | Prologues, interactive journals, combination locks, built-in puzzle types |
+| `/items-and-distribution` | Random items, unique items, starting items, inspection events |
 
 ## MCP Tools
 
@@ -77,7 +94,7 @@ npm run build      # Compile to dist/
 ### Reference
 | Tool | Description |
 |------|-------------|
-| `search_game_content` | Search game content catalogs |
+| `search_game_content` | Search game content catalogs (846 entries across tiles, monsters, items, audio) |
 
 ## MCP Resources
 
@@ -86,6 +103,7 @@ npm run build      # Compile to dist/
 | Event format docs | `valkyrie://format/events` |
 | Localization format docs | `valkyrie://format/localization` |
 | Component format docs | `valkyrie://format/components` |
+| Pattern reference | `valkyrie://format/patterns` |
 | Current scenario state | `valkyrie://scenario/current` |
 
 ## MCP Prompts
@@ -122,25 +140,44 @@ Built scenarios are ZIP archives with a `.valkyrie` extension.
 
 ## Validation Rules
 
-The server validates scenarios against 6 rule sets:
+The server validates scenarios against 12 rule categories:
 
 1. **Unique names** - No duplicate component names
 2. **Required fields** - Tiles have `side`, displayed events have `buttons`
-3. **Cross-references** - All referenced components exist (built-in game content like `Monster*` is exempt)
+3. **Cross-references** - All referenced components exist
 4. **Event graph** - `EventStart` trigger exists, no unreachable/dead-end events
-5. **Localization completeness** - `quest.name`, `quest.description`, event text, button labels
-6. **Format rules** - Valid format version, type=MoM, tile rotations in {0, 90, 180, 270}
+5. **Event flow** - Buttons vs event-ref consistency, silent event rules
+6. **Localization completeness** - Event text, button labels, quest metadata
+7. **Format rules** - Valid format version, type=MoM, tile rotations
+8. **Catalog references** - Tile sides, monster names, items match game content
+9. **Tile connectivity** - Tiles are spatially connected
+10. **Mythos structure** - Proper mythos trigger configuration
+11. **Investigator token** - TokenInvestigators setup and removal
+12. **Explore token** - Explore tokens linked to tile reveal events
+
+## Development
+
+```bash
+npm test          # Run all tests (1015 tests across 30 files)
+npm run test:watch # Watch mode
+npm run lint       # Type check
+npm run build      # Compile to dist/
+```
 
 ## Project Structure
 
 ```
+.claude-plugin/    Plugin manifest
+skills/            7 skill SKILL.md files
+agents/            Scenario designer agent
 src/
   io/              INI parser/writer, localization CSV, ZIP packager
   model/           ScenarioModel, LocalizationStore, component types
-  validation/      6 rules + orchestrator
+  validation/      12 rules + orchestrator
     rules/         Individual validation rule implementations
   tools/           MCP tool implementations
   resources/       Format documentation resources
+  catalogs/        846-entry game content catalog
   server.ts        MCP server registration
   index.ts         Entry point (stdio transport)
 tests/
@@ -161,4 +198,4 @@ tests/
 
 ## License
 
-ISC
+MIT
