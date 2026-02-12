@@ -15,18 +15,30 @@ The plugin bundles 7 skills covering advanced patterns (event loops, mythos scal
 ### As a Claude Code plugin (recommended)
 
 ```bash
-claude plugin add @thijshakkenberg/valkyrie-mom-mcp
+claude plugin marketplace add thijs-hakkenberg/ValkyrieMCP
+claude plugin install valkyrie-mom
 ```
 
 This gives you:
-- **MCP server** with 16 tools for scenario editing
+- **MCP server** with 16 tools for scenario editing (auto-started)
 - **7 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`
 - **Scenario designer agent** for autonomous scenario creation
 - **5 MCP resources** for format documentation
 
-### As a standalone MCP server
+To update to the latest version:
+```bash
+claude plugin marketplace update valkyrie-mom
+claude plugin update valkyrie-mom
+```
 
-Add to your `.mcp.json` or MCP client config:
+To uninstall:
+```bash
+claude plugin uninstall valkyrie-mom
+```
+
+### As a standalone MCP server (Claude Desktop, other MCP clients)
+
+Add to your MCP client config (e.g., `~/.claude/mcp.json` or Claude Desktop settings):
 
 ```json
 {
@@ -39,12 +51,15 @@ Add to your `.mcp.json` or MCP client config:
 }
 ```
 
+This gives you the MCP tools and resources, but not the skills or agent (those require Claude Code).
+
 ### From source
 
 ```bash
 git clone https://github.com/thijs-hakkenberg/ValkyrieMCP.git
 cd ValkyrieMCP
 npm install
+npx tsx src/index.ts   # Run MCP server via stdio
 ```
 
 ## Skills
