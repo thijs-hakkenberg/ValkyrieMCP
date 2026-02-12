@@ -81,6 +81,27 @@ describe('CatalogStore', () => {
     });
   });
 
+  describe('tile geometry merge', () => {
+    it('tile entries include grid, edges, desc after construction', () => {
+      const tile = store.getById('TileSideAlley1');
+      expect(tile).toBeDefined();
+      expect(tile!.grid).toBeDefined();
+      expect(tile!.edges).toBeDefined();
+      expect(tile!.desc).toBeDefined();
+    });
+
+    it('search matches tiles via desc field', () => {
+      // Pick a word that only appears in desc fields, not in tile IDs or traits
+      const tile = store.getById('TileSideAlley1');
+      expect(tile).toBeDefined();
+      const desc = tile!.desc as string;
+      // Use the first word of the desc to search
+      const searchWord = desc.split(/\s+/)[0].toLowerCase();
+      const results = store.search(searchWord, 'tile');
+      expect(results.length).toBeGreaterThan(0);
+    });
+  });
+
   describe('getAllIds', () => {
     it('returns a set of all IDs', () => {
       const ids = store.getAllIds();

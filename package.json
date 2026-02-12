@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "extract-catalogs": "tsx src/catalogs/extract-catalogs.ts",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "convert-tiles": "tsx scripts/convert-tile-images.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@types/archiver": "^6.0.3",
     "@types/node": "^22.13.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

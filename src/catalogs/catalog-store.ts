@@ -8,6 +8,7 @@ import {
   PUZZLES,
   TOKENS,
 } from './data/all-catalogs.js';
+import { TILE_GEOMETRY } from './data/tile-geometry.js';
 
 export class CatalogStore {
   private entries: CatalogEntry[];
@@ -24,6 +25,18 @@ export class CatalogStore {
       ...PUZZLES,
       ...TOKENS,
     ];
+
+    // Merge tile geometry data into tile entries
+    for (const entry of this.entries) {
+      if (entry.type === 'tile') {
+        const geo = TILE_GEOMETRY[entry.id];
+        if (geo) {
+          entry.grid = geo.grid;
+          entry.edges = geo.edges;
+          entry.desc = geo.desc;
+        }
+      }
+    }
 
     this.byId = new Map();
     this.byType = new Map();
@@ -48,6 +61,7 @@ export class CatalogStore {
       if (entry.id.toLowerCase().includes(q)) return true;
       if (entry.name.toLowerCase().includes(q)) return true;
       if (entry.traits.some(t => t.toLowerCase().includes(q))) return true;
+      if (typeof entry.desc === 'string' && entry.desc.toLowerCase().includes(q)) return true;
       return false;
     });
   }
