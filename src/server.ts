@@ -52,7 +52,7 @@ function formatUpsertResult(r: UpsertResult): string {
 
 /** Upsert tool definitions driven by data */
 const UPSERT_TOOLS = [
-  { name: 'upsert_event',  desc: 'Create or update an event component',      prefix: 'Event',  fn: upsertEvent },
+  { name: 'upsert_event',  desc: 'Create or update an event component. IMPORTANT: buttons must be >= highest populated eventN index (1-6) or Valkyrie will silently drop the excess event references on re-save',  prefix: 'Event',  fn: upsertEvent },
   { name: 'upsert_tile',   desc: 'Create or update a tile component',        prefix: 'Tile',   fn: upsertTile },
   { name: 'upsert_token',  desc: 'Create or update a token component',       prefix: 'Token',  fn: upsertToken },
   { name: 'upsert_spawn',  desc: 'Create or update a spawn component',       prefix: 'Spawn',  fn: upsertSpawn },

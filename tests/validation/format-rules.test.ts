@@ -105,4 +105,75 @@ describe('format-rules', () => {
     const rotWarnings = results.filter(r => r.field === 'rotation');
     expect(rotWarnings).toHaveLength(0);
   });
+
+  // --- buttons vs event refs ---
+
+  it('returns no error when buttons >= highest event ref index', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventChoice', { buttons: '2', event1: 'EventA', event2: 'EventB' });
+
+    const results = checkFormatRules(model);
+    const btnErrors = results.filter(r => r.component === 'EventChoice' && r.field === 'buttons');
+    expect(btnErrors).toHaveLength(0);
+  });
+
+  it('returns error when buttons=0 but event1 is set', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventBroken', { buttons: '0', event1: 'EventNext', display: 'false' });
+
+    const results = checkFormatRules(model);
+    const btnError = results.find(r => r.component === 'EventBroken' && r.field === 'buttons');
+    expect(btnError).toBeDefined();
+    expect(btnError!.severity).toBe('error');
+    expect(btnError!.message).toContain('event1');
+    expect(btnError!.message).toContain('silently dropped');
+  });
+
+  it('returns error when buttons=1 but event2 is also set', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventBranch', { buttons: '1', event1: 'EventA', event2: 'EventB' });
+
+    const results = checkFormatRules(model);
+    const btnError = results.find(r => r.component === 'EventBranch' && r.field === 'buttons');
+    expect(btnError).toBeDefined();
+    expect(btnError!.severity).toBe('error');
+    expect(btnError!.message).toContain('event2');
+  });
+
+  it('returns no error when buttons=3 and only event1 is set', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventSimple', { buttons: '3', event1: 'EventNext' });
+
+    const results = checkFormatRules(model);
+    const btnErrors = results.filter(r => r.component === 'EventSimple' && r.field === 'buttons');
+    expect(btnErrors).toHaveLength(0);
+  });
+
+  it('returns error when buttons field is missing but event1 is set', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventNoButtons', { event1: 'EventNext' });
+
+    const results = checkFormatRules(model);
+    const btnError = results.find(r => r.component === 'EventNoButtons' && r.field === 'buttons');
+    expect(btnError).toBeDefined();
+    expect(btnError!.severity).toBe('error');
+  });
+
+  it('does not check buttons vs event refs for non-Event components', () => {
+    const model = new ScenarioModel();
+    model.upsert('TokenSearch', { type: 'TokenSearch', buttons: '0', event1: 'EventFound' });
+
+    const results = checkFormatRules(model);
+    const btnErrors = results.filter(r => r.component === 'TokenSearch' && r.field === 'buttons');
+    expect(btnErrors).toHaveLength(0);
+  });
+
+  it('returns no error when buttons=0 and no event refs are set', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventRemove', { buttons: '0', display: 'false', remove: 'TokenInvestigators' });
+
+    const results = checkFormatRules(model);
+    const btnErrors = results.filter(r => r.component === 'EventRemove' && r.field === 'buttons');
+    expect(btnErrors).toHaveLength(0);
+  });
 });

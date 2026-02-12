@@ -9,8 +9,8 @@ Events are the core quest logic mechanism. Each event is an INI section starting
 | Field | Type | Description |
 |-------|------|-------------|
 | display | bool | Whether to show dialog (default: true) |
-| buttons | int | Number of buttons (1-6) |
-| event1..6 | string | Space-separated event/spawn names triggered by each button |
+| buttons | int | Number of buttons (1-6). **CRITICAL**: Valkyrie only parses event1..eventN where N=buttons. If buttons < highest eventN index, higher event references are silently dropped on re-save |
+| event1..6 | string | Space-separated event/spawn names triggered by each button. Only parsed up to the buttons count |
 | trigger | string | Auto-trigger condition: EventStart, Mythos, StartRound, EndRound, Eliminated, DefeatedMonster*, DefeatedCustomMonster* |
 | conditions | string | AND-only variable gating (format: "var,comparator,value var2,comparator,value2"). Unlike vartests, conditions are checked BEFORE the event displays — if false, the event is silently skipped |
 | highlight | bool | Camera focuses on the event's board position |
@@ -39,12 +39,20 @@ Format: \`VarOperation:variable,comparator,value\`
 
 ## Common Patterns
 
+### Buttons vs Event References
+Valkyrie only parses event1 through eventN where N = buttons. This means:
+- buttons=2 → only event1 and event2 are loaded
+- If event3 is set but buttons=2, event3 is **silently ignored and dropped on re-save**
+- Even display=false auto-advancing events need buttons=1 if they have event1
+- buttons=0 is only safe when there are NO eventN fields (e.g. a terminal remove-only event)
+
 ### TokenInvestigators Removal
 Community quests always remove TokenInvestigators after setup so the start position marker doesn't stay interactable:
 \`\`\`
-EventSetup: add=TokenInvestigators, event1=EventRemoveInv
+EventSetup: buttons=1, add=TokenInvestigators, event1=EventRemoveInv
 EventRemoveInv: display=false, buttons=0, remove=TokenInvestigators
 \`\`\`
+Note: EventRemoveInv uses buttons=0 because it has no event1. EventSetup needs buttons=1 for its event1 to be parsed.
 
 ## Triggers
 - **EventStart**: Fires when scenario begins

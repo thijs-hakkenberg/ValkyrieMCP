@@ -44,5 +44,26 @@ export function checkFormatRules(model: ScenarioModel): ValidationResult[] {
     }
   }
 
+  // Check buttons vs event refs for Event components
+  for (const comp of model.getByType('Event')) {
+    const buttons = parseInt(comp.data.buttons ?? '0', 10) || 0;
+    let highestEventRef = 0;
+    for (let i = 1; i <= 6; i++) {
+      const val = comp.data[`event${i}`];
+      if (val !== undefined && val !== '') {
+        highestEventRef = i;
+      }
+    }
+    if (highestEventRef > buttons) {
+      results.push({
+        rule: 'format-rules',
+        severity: 'error',
+        message: `Event "${comp.name}" has buttons=${buttons} but event${highestEventRef} is set — Valkyrie only parses event1..eventN based on buttons count, so event${highestEventRef} will be silently dropped on re-save`,
+        component: comp.name,
+        field: 'buttons',
+      });
+    }
+  }
+
   return results;
 }
