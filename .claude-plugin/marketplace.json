@@ -1,0 +1,17 @@
+{
+  "name": "valkyrie-mom",
+  "description": "Valkyrie Mansions of Madness scenario editor plugin and MCP server",
+  "owner": {
+    "name": "Thijs Hakkenberg"
+  },
+  "plugins": [
+    {
+      "name": "valkyrie-mom",
+      "source": {
+        "source": "github",
+        "repo": "thijs-hakkenberg/ValkyrieMCP"
+      },
+      "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie — MCP server, 7 skills, and scenario designer agent"
+    }
+  ]
+}
