@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] - 2026-02-12
+
+### Fixed
+
+- **MCP server startup**: Plugin now uses `npx -y @thijshakkenberg/valkyrie-mom-mcp` instead of running from source, fixing the missing `node_modules` issue in the plugin cache directory.
+- **`package.json`**: Added `bin` field so the npm package is directly executable via `npx`.
+
 ## [1.0.0] - 2026-02-12
 
 ### Added

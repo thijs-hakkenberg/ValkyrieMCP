@@ -1,9 +1,12 @@
 {
   "name": "@thijshakkenberg/valkyrie-mom-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for AI-assisted Mansions of Madness scenario creation with Valkyrie",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "valkyrie-mom-mcp": "dist/index.js"
+  },
   "author": {
     "name": "Thijs Hakkenberg"
   },
