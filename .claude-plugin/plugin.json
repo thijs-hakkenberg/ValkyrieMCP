@@ -3,8 +3,15 @@
   "version": "1.0.0",
   "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie",
   "author": {
-    "name": "hakketh"
+    "name": "Thijs Hakkenberg"
   },
-  "repository": "https://github.com/hakketh/valkyrie-mom-mcp",
-  "keywords": ["valkyrie", "mansions-of-madness", "scenario-editor", "mcp", "board-game"]
+  "repository": "https://github.com/thijs-hakkenberg/ValkyrieMCP",
+  "keywords": ["valkyrie", "mansions-of-madness", "scenario-editor", "mcp", "board-game"],
+  "mcpServers": {
+    "valkyrie-mom": {
+      "command": "npx",
+      "args": ["tsx", "${CLAUDE_PLUGIN_ROOT}/src/index.ts"],
+      "cwd": "${CLAUDE_PLUGIN_ROOT}"
+    }
+  }
 }

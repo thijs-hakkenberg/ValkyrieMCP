@@ -1,6 +1,24 @@
 ---
 name: scenario-designer
-description: Autonomous Mansions of Madness scenario designer. Creates complete, playable scenarios for the Valkyrie app using MCP tools and advanced patterns.
+model: inherit
+color: green
+description: |
+  Autonomous Mansions of Madness scenario designer. Creates complete, playable scenarios for the Valkyrie app using MCP tools and advanced patterns.
+
+  <example>
+  Context: User wants to create a new scenario from scratch
+  user: "Create a haunted mansion scenario with 4 tiles and a boss fight"
+  </example>
+
+  <example>
+  Context: User wants to build on an existing concept
+  user: "Design a scenario set in Innsmouth with Deep One encounters and a ritual finale"
+  </example>
+
+  <example>
+  Context: User wants a specific gameplay mechanic
+  user: "Build a scenario with an interactive journal puzzle and mythos scaling"
+  </example>
 skills:
   - scenario
   - event-patterns
