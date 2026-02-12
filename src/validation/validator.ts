@@ -9,6 +9,8 @@ import { checkCatalogReferences } from './rules/catalog-references.js';
 import { checkMythosStructure } from './rules/mythos-structure.js';
 import { checkExploreTokenPattern } from './rules/explore-token-pattern.js';
 import { checkInvestigatorTokenPattern } from './rules/investigator-token-pattern.js';
+import { checkTileConnectivity } from './rules/tile-connectivity.js';
+import { checkEventFlow } from './rules/event-flow.js';
 
 const ALL_RULES = [
   checkRequiredFields,
@@ -20,6 +22,8 @@ const ALL_RULES = [
   checkMythosStructure,
   checkExploreTokenPattern,
   checkInvestigatorTokenPattern,
+  checkTileConnectivity,
+  checkEventFlow,
 ];
 
 /**

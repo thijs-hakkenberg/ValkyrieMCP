@@ -35,7 +35,7 @@ export const TILE_GEOMETRY: Record<string, TileGeometry> = {
   TileSideHouseBoat: { grid: [4, 2], edges: { N: "wwww", E: "ww", S: "wwww", W: "ww" }, desc: "Small wooden houseboat deck cluttered with rope and supplies" },
   TileSideInteriorHall: { grid: [4, 4], edges: { N: "wdww", E: "wwdw", S: "wwww", W: "dwww" }, desc: "Interior hall with parquet floor, ornate clock, and bed alcove" },
   TileSideLibrary: { grid: [4, 2], edges: { N: "wdww", E: "ww", S: "wwdw", W: "ww" }, desc: "Library with bookshelves, ornate rug, and reading furniture" },
-  TileSideLobby: { grid: [4, 4], edges: { N: "wwww", E: "wwdw", S: "wddw", W: "wdww" }, desc: "Grand lobby with red walls, checkered floor, and chandelier" },
+  TileSideLobby: { grid: [4, 4], edges: { N: "wdww", E: "wwdw", S: "wddw", W: "wdww" }, desc: "Grand lobby with red walls, checkered floor, and chandelier" },
   TileSideLounge: { grid: [4, 4], edges: { N: "wwww", E: "dwwd", S: "wwww", W: "dwwd" }, desc: "Elegant lounge with sofas, armchairs, and herringbone parquet floors" },
   TileSideOffice: { grid: [4, 2], edges: { N: "wwww", E: "ww", S: "wwww", W: "dw" }, desc: "Cluttered office with desk, chair, stairs, and filing cabinets" },
   TileSideParkPond: { grid: [4, 4], edges: { N: "oooo", E: "oooo", S: "oooo", W: "oooo" }, desc: "Dark park pond surrounded by grass, trees, and a gravel path" },
