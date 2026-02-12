@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "valkyrie-mom",
   "description": "Valkyrie Mansions of Madness scenario editor plugin and MCP server",
   "owner": {
@@ -7,11 +8,13 @@
   "plugins": [
     {
       "name": "valkyrie-mom",
-      "source": {
-        "source": "github",
-        "repo": "thijs-hakkenberg/ValkyrieMCP"
+      "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie — MCP server, 7 skills, and scenario designer agent",
+      "version": "1.0.0",
+      "author": {
+        "name": "Thijs Hakkenberg"
       },
-      "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie — MCP server, 7 skills, and scenario designer agent"
+      "source": "./",
+      "category": "development"
     }
   ]
 }
