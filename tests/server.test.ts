@@ -67,8 +67,9 @@ describe('MCP Server', () => {
       expect(uris).toContain('valkyrie://format/events');
       expect(uris).toContain('valkyrie://format/localization');
       expect(uris).toContain('valkyrie://format/components');
+      expect(uris).toContain('valkyrie://format/patterns');
       expect(uris).toContain('valkyrie://scenario/current');
-      expect(uris).toHaveLength(4);
+      expect(uris).toHaveLength(5);
     });
 
     it('reads format/events resource', async () => {

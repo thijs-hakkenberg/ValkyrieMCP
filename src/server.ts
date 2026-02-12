@@ -29,6 +29,7 @@ import {
   EVENT_FORMAT_DOC,
   LOCALIZATION_FORMAT_DOC,
   COMPONENT_FORMAT_DOC,
+  PATTERN_REFERENCE_DOC,
 } from './resources/format-docs.js';
 
 /** Singleton scenario model for the current session */
@@ -263,6 +264,10 @@ export function createServer(): McpServer {
 
   server.resource('valkyrie-format-components', 'valkyrie://format/components', async () => ({
     contents: [{ uri: 'valkyrie://format/components', text: COMPONENT_FORMAT_DOC, mimeType: 'text/markdown' }],
+  }));
+
+  server.resource('valkyrie-format-patterns', 'valkyrie://format/patterns', async () => ({
+    contents: [{ uri: 'valkyrie://format/patterns', text: PATTERN_REFERENCE_DOC, mimeType: 'text/markdown' }],
   }));
 
   server.resource('valkyrie-scenario-current', 'valkyrie://scenario/current', async () => {

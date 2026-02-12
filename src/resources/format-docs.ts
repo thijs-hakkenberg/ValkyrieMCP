@@ -109,6 +109,87 @@ key,"value with, commas"
 Use \\n for newlines within values.
 `;
 
+export const PATTERN_REFERENCE_DOC = `# Valkyrie Scenario Pattern Reference
+
+## Standard Tile Placement Chain
+Every tile reveal follows this sequence — each phase ALWAYS calls the next:
+\`\`\`
+PlaceTile → PlaceDecoration → PlaceConnections → PlaceItems → PlacePeople → MoveOneSpace
+\`\`\`
+- PlaceTile: add=TileX, display=false, buttons=1
+- PlaceDecoration: add walls/barriers
+- PlaceConnections: add explore tokens to adjacent areas
+- PlaceItems: add search/interact tokens
+- PlacePeople: add spawns/NPCs
+- MoveOneSpace: operations=moveOneSpace,=,1, buttons=0 (terminal)
+
+## Silent Event Rules
+- \`display=false\` auto-advances without dialog
+- If \`event1\` is set, MUST have \`buttons>=1\`
+- \`buttons=0\` only safe when NO eventN fields exist
+
+## Mythos Initialization Formula
+\`\`\`
+deadlyRound = 20 - #heroes
+majorRound  = deadlyRound / 2
+\`\`\`
+Initialize in EventStart chain. Use StartRound triggers with \`>=\` (not \`==\`) for round checks.
+
+## Event Loop Structure
+\`\`\`
+Init (set counter=0) → Controller (vartest counter>=limit) → Body (increment, loop back) → Exit
+\`\`\`
+- Controller event1 (test FAILS) → Body
+- Controller event2 (test PASSES) → Exit
+
+## Token Swap Pattern
+Replace tokens in a single silent event:
+\`\`\`
+display=false, buttons=1, remove=OldToken, add=NewToken, event1=NextEvent
+\`\`\`
+
+## Variable Types Quick Reference
+| Prefix | Type | Examples |
+|--------|------|----------|
+| (none) | Quest variable | cluesFound, doorUnlocked |
+| $ | System variable | $end, $mythosMinor, $mythosMajor, $mythosDeadly |
+| # | Read-only | #round, #heroes, #heroName, #rand6, #BtT |
+| @ | Trigger | Set by game events |
+
+## Vartests Button Mapping
+- \`event1\` = test **FAILS** (condition not met)
+- \`event2\` = test **PASSES** (condition met)
+
+## conditions vs vartests
+| | conditions | vartests |
+|---|-----------|----------|
+| Timing | Before display | After display |
+| False | Silently skipped | Routes to event1 |
+| True | Proceeds | Routes to event2 |
+| Format | var,op,val (AND) | VarOperation:var,op,val |
+
+## UI Layering Order
+Elements render in add order. Buttons MUST be added LAST to remain clickable.
+Always use \`vunits=True\` for resolution independence.
+
+## Item Distribution Modes
+| Mode | Fields | Behavior |
+|------|--------|----------|
+| Random by trait | traits=weapon | Random item matching trait |
+| Specific item | itemname=ItemCommonKnife | Exact item |
+| Pool | itemname=Item1 Item2 Item3 | Random from list |
+| Trait with exclusion | traits=common, itemname=Excluded1 | Random trait, exclude listed |
+| Starting | starting=True | Given at scenario start |
+
+## Multi-Question Dialogue Structure
+N questions with pass/fail → 2^N permutation events.
+For 3 questions: Q1 → Q2(pass/fail) → Q3(PP/PF/FP/FF) → 8 outcomes.
+Alternative: track successes with a variable, check threshold at end.
+
+## One-Shot Events
+Use \`conditions=fired,==,0\` to gate, \`operations=fired,=,1\` in the fire event.
+`;
+
 export const COMPONENT_FORMAT_DOC = `# Valkyrie Component Types
 
 ## Tiles (tiles.ini)

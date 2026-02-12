@@ -2,8 +2,8 @@
   "mcpServers": {
     "valkyrie-mom": {
       "command": "npx",
-      "args": ["tsx", "src/index.ts"],
-      "cwd": "."
+      "args": ["tsx", "${CLAUDE_PLUGIN_ROOT}/src/index.ts"],
+      "cwd": "${CLAUDE_PLUGIN_ROOT}"
     }
   }
 }

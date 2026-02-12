@@ -1,0 +1,10 @@
+{
+  "name": "valkyrie-mom",
+  "version": "1.0.0",
+  "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie",
+  "author": {
+    "name": "hakketh"
+  },
+  "repository": "https://github.com/hakketh/valkyrie-mom-mcp",
+  "keywords": ["valkyrie", "mansions-of-madness", "scenario-editor", "mcp", "board-game"]
+}
