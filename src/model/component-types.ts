@@ -68,6 +68,7 @@ export interface QuestConfig {
   lengthmax: number;
   image: string;
   version: string;
+  packs: string;
 }
 
 /** A generic scenario component (any INI section) */
@@ -104,6 +105,7 @@ export const DEFAULT_QUEST_CONFIG: QuestConfig = {
   lengthmax: 90,
   image: '',
   version: '',
+  packs: '',
 };
 
 /** Serialize a QuestConfig into key-value pairs for INI writing */
@@ -120,5 +122,6 @@ export function serializeQuestConfig(config: QuestConfig): Record<string, string
   };
   if (config.image) result.image = config.image;
   if (config.version) result.version = config.version;
+  if (config.packs) result.packs = config.packs;
   return result;
 }

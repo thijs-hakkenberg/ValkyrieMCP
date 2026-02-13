@@ -52,6 +52,26 @@ describe('lifecycle tools', () => {
       expect(fs.existsSync(path.join(tmp, 'Localization.English.txt'))).toBe(true);
     });
 
+    it('seeds CONTINUE, PASS, FAIL in localization', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('SeedTest', { dir: tmp });
+
+      expect(model.localization.has('CONTINUE')).toBe(true);
+      expect(model.localization.get('CONTINUE')).toBe('Continue');
+      expect(model.localization.has('PASS')).toBe(true);
+      expect(model.localization.get('PASS')).toBe('Pass');
+      expect(model.localization.has('FAIL')).toBe(true);
+      expect(model.localization.get('FAIL')).toBe('Fail');
+
+      // Also verify written to disk
+      const locContent = fs.readFileSync(path.join(tmp, 'Localization.English.txt'), 'utf-8');
+      expect(locContent).toContain('CONTINUE');
+      expect(locContent).toContain('PASS');
+      expect(locContent).toContain('FAIL');
+    });
+
     it('creates a subdirectory when dir not provided', async () => {
       const tmp = makeTmpDir();
       tmpDirs.push(tmp);
@@ -131,6 +151,58 @@ describe('lifecycle tools', () => {
       expect(reloaded.get('EventStart')!.data.buttons).toBe('1');
       expect(reloaded.get('TileTown')!.data.side).toBe('TileSideTown');
       expect(reloaded.localization.get('quest.name')).toBe('Save Test');
+    });
+
+    it('auto-computes packs for SoA tile', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('PackTest', { dir: tmp });
+      model.upsert('TileExhibit', { xposition: '0', yposition: '0', side: 'TileSideExhibitEntrance' });
+
+      await saveScenario(model);
+
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).toContain('packs=SoA');
+    });
+
+    it('does not emit packs for base-only tiles', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('BaseOnly', { dir: tmp });
+      model.upsert('TileAlley', { xposition: '0', yposition: '0', side: 'TileSideAlley1' });
+
+      await saveScenario(model);
+
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).not.toContain('packs=');
+    });
+
+    it('auto-computes packs for expansion monster', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('MonsterPack', { dir: tmp });
+      model.upsert('SpawnSkeleton', { monster: 'MonsterSkeleton', buttons: '1', event1: '' });
+
+      await saveScenario(model);
+
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).toContain('packs=SoA');
+    });
+
+    it('packs field round-trips through save/load', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('RoundTrip', { dir: tmp });
+      model.upsert('TileExhibit', { xposition: '0', yposition: '0', side: 'TileSideExhibitEntrance' });
+
+      await saveScenario(model);
+      const reloaded = await loadScenario(tmp);
+
+      expect(reloaded.questConfig.packs).toBe('SoA');
     });
   });
 

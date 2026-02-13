@@ -10,6 +10,21 @@ import {
 } from './data/all-catalogs.js';
 import { TILE_GEOMETRY } from './data/tile-geometry.js';
 
+/** Maps lowercase catalog pack IDs to Valkyrie's case-sensitive pack IDs */
+export const PACK_ID_MAP: Record<string, string> = {
+  base: 'MoMBase',
+  btt: 'BtT',
+  hj: 'HJ',
+  pots: 'PotS',
+  soa: 'SoA',
+  sot: 'SoT',
+};
+
+/** Convert a catalog pack ID (lowercase) to Valkyrie's case-sensitive pack ID */
+export function getValkyriePackId(catalogPack: string): string {
+  return PACK_ID_MAP[catalogPack] ?? catalogPack;
+}
+
 export class CatalogStore {
   private entries: CatalogEntry[];
   private byId: Map<string, CatalogEntry>;
@@ -80,6 +95,25 @@ export class CatalogStore {
   getAllIds(type?: CatalogType): Set<string> {
     const source = type ? (this.byType.get(type) ?? []) : this.entries;
     return new Set(source.map(e => e.id));
+  }
+
+  /** Get the Valkyrie pack ID for a catalog pack string */
+  getPackId(catalogPack: string): string {
+    return getValkyriePackId(catalogPack);
+  }
+
+  /** Look up a tile side's pack from catalog, return Valkyrie pack ID */
+  getPackForTileSide(tileId: string): string | undefined {
+    const entry = this.byId.get(tileId);
+    if (!entry || entry.type !== 'tile') return undefined;
+    return getValkyriePackId(entry.pack);
+  }
+
+  /** Look up a monster's pack from catalog, return Valkyrie pack ID */
+  getPackForMonster(monsterId: string): string | undefined {
+    const entry = this.byId.get(monsterId);
+    if (!entry || entry.type !== 'monster') return undefined;
+    return getValkyriePackId(entry.pack);
   }
 }
 

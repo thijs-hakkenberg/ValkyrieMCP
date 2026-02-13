@@ -89,5 +89,21 @@ export function checkLocalizationCompleteness(model: ScenarioModel): ValidationR
     }
   }
 
+  // Check {qst:KEY} references within localization values
+  const qstRefPattern = /\{qst:(\w+)\}/g;
+  for (const [key, value] of loc.entries()) {
+    let match: RegExpExecArray | null;
+    while ((match = qstRefPattern.exec(value)) !== null) {
+      const referencedKey = match[1];
+      if (!loc.has(referencedKey)) {
+        results.push({
+          rule: 'localization-completeness',
+          severity: 'warning',
+          message: `Localization key "${key}" references {qst:${referencedKey}} but "${referencedKey}" is not defined`,
+        });
+      }
+    }
+  }
+
   return results;
 }

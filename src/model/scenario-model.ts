@@ -149,6 +149,7 @@ export class ScenarioModel {
       lengthmax: questSection.lengthmax ? parseInt(questSection.lengthmax, 10) : 90,
       image: questSection.image ?? '',
       version: questSection.version ?? '',
+      packs: questSection.packs ?? '',
     };
 
     const model = new ScenarioModel(config);

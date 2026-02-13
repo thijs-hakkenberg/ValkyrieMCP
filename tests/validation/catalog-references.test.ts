@@ -147,4 +147,43 @@ describe('checkCatalogReferences', () => {
     expect(itemWarnings).toHaveLength(1);
     expect(itemWarnings[0].message).toContain('FakeItem');
   });
+
+  it('warns for SoA tile without packs declared', () => {
+    const model = makeModel();
+    // packs is empty by default
+    model.upsert('TileExhibit', { side: 'TileSideExhibitEntrance' });
+    const results = checkCatalogReferences(model);
+    const packWarning = results.find(r => r.component === 'TileExhibit' && r.message.includes('pack'));
+    expect(packWarning).toBeDefined();
+    expect(packWarning!.severity).toBe('warning');
+    expect(packWarning!.message).toContain('SoA');
+  });
+
+  it('no pack warning for SoA tile when packs=SoA', () => {
+    const model = makeModel();
+    model.questConfig.packs = 'SoA';
+    model.upsert('TileExhibit', { side: 'TileSideExhibitEntrance' });
+    const results = checkCatalogReferences(model);
+    const packWarning = results.find(r => r.component === 'TileExhibit' && r.message.includes('pack'));
+    expect(packWarning).toBeUndefined();
+  });
+
+  it('warns for SoA monster without packs declared', () => {
+    const model = makeModel();
+    model.upsert('SpawnSkeleton', { monster: 'MonsterSkeleton' });
+    const results = checkCatalogReferences(model);
+    const packWarning = results.find(r => r.component === 'SpawnSkeleton' && r.message.includes('pack'));
+    expect(packWarning).toBeDefined();
+    expect(packWarning!.severity).toBe('warning');
+    expect(packWarning!.message).toContain('SoA');
+  });
+
+  it('no pack warning for SoA monster when packs=SoA', () => {
+    const model = makeModel();
+    model.questConfig.packs = 'SoA';
+    model.upsert('SpawnSkeleton', { monster: 'MonsterSkeleton' });
+    const results = checkCatalogReferences(model);
+    const packWarning = results.find(r => r.component === 'SpawnSkeleton' && r.message.includes('pack'));
+    expect(packWarning).toBeUndefined();
+  });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CatalogStore } from '../../src/catalogs/catalog-store.js';
+import { CatalogStore, getValkyriePackId, PACK_ID_MAP } from '../../src/catalogs/catalog-store.js';
 
 describe('CatalogStore', () => {
   // Use a single store instance — it loads the generated catalog data
@@ -123,6 +123,65 @@ describe('CatalogStore', () => {
       const tileIds = store.getAllIds('tile');
       // From extraction: 174 tiles
       expect(tileIds.size).toBeGreaterThanOrEqual(100);
+    });
+  });
+
+  describe('pack ID mapping', () => {
+    it('maps soa to SoA', () => {
+      expect(getValkyriePackId('soa')).toBe('SoA');
+    });
+
+    it('maps btt to BtT', () => {
+      expect(getValkyriePackId('btt')).toBe('BtT');
+    });
+
+    it('maps base to MoMBase', () => {
+      expect(getValkyriePackId('base')).toBe('MoMBase');
+    });
+
+    it('maps all known packs', () => {
+      expect(getValkyriePackId('hj')).toBe('HJ');
+      expect(getValkyriePackId('pots')).toBe('PotS');
+      expect(getValkyriePackId('sot')).toBe('SoT');
+    });
+
+    it('returns input unchanged for unknown pack', () => {
+      expect(getValkyriePackId('unknown_pack')).toBe('unknown_pack');
+    });
+  });
+
+  describe('getPackForTileSide', () => {
+    it('returns Valkyrie pack ID for SoA tile', () => {
+      expect(store.getPackForTileSide('TileSideExhibitEntrance')).toBe('SoA');
+    });
+
+    it('returns MoMBase for base tile', () => {
+      expect(store.getPackForTileSide('TileSideAlley1')).toBe('MoMBase');
+    });
+
+    it('returns undefined for unknown tile', () => {
+      expect(store.getPackForTileSide('TileSideNonexistent')).toBeUndefined();
+    });
+  });
+
+  describe('getPackForMonster', () => {
+    it('returns Valkyrie pack ID for SoA monster', () => {
+      expect(store.getPackForMonster('MonsterSkeleton')).toBe('SoA');
+    });
+
+    it('returns MoMBase for base monster', () => {
+      expect(store.getPackForMonster('MonsterCultist')).toBe('MoMBase');
+    });
+
+    it('returns undefined for unknown monster', () => {
+      expect(store.getPackForMonster('MonsterNonexistent')).toBeUndefined();
+    });
+  });
+
+  describe('getPackId', () => {
+    it('delegates to getValkyriePackId', () => {
+      expect(store.getPackId('soa')).toBe('SoA');
+      expect(store.getPackId('btt')).toBe('BtT');
     });
   });
 });

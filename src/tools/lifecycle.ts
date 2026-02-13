@@ -6,6 +6,8 @@ import { DEFAULT_QUEST_CONFIG, getTypePrefix, serializeQuestConfig } from '../mo
 import { writeIni } from '../io/ini-writer.js';
 import { buildPackage } from '../io/package-builder.js';
 import { parseLocalization } from '../io/localization-io.js';
+import { getSharedCatalog } from '../catalogs/catalog-store.js';
+import { parseRefList } from '../model/component-types.js';
 
 const DATA_FILES = ['events.ini', 'tiles.ini', 'tokens.ini', 'spawns.ini', 'items.ini', 'ui.ini', 'other.ini'] as const;
 
@@ -97,8 +99,12 @@ export async function createScenario(
     fs.writeFileSync(path.join(dir, f), writeIni({}));
   }
 
-  // Write empty localization file
-  fs.writeFileSync(path.join(dir, 'Localization.English.txt'), '.,English\n');
+  // Write localization file with common keys
+  const commonKeys: Record<string, string> = { CONTINUE: 'Continue', PASS: 'Pass', FAIL: 'Fail' };
+  for (const [k, v] of Object.entries(commonKeys)) {
+    model.localization.set(k, v);
+  }
+  fs.writeFileSync(path.join(dir, 'Localization.English.txt'), model.localization.toCSV());
 
   return { model, dir };
 }
@@ -157,6 +163,30 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
   for (const f of DATA_FILES) {
     const sections = iniData[f] ?? {};
     fs.writeFileSync(path.join(dir, f), writeIni(sections));
+  }
+
+  // Auto-compute required packs from tile sides and monsters
+  const catalog = getSharedCatalog();
+  const requiredPacks = new Set<string>();
+
+  for (const comp of model.getByType('Tile')) {
+    const side = comp.data.side;
+    if (!side) continue;
+    const pack = catalog.getPackForTileSide(side);
+    if (pack && pack !== 'MoMBase') requiredPacks.add(pack);
+  }
+
+  for (const comp of model.getByType('Spawn')) {
+    const monsterField = comp.data.monster;
+    if (!monsterField) continue;
+    for (const name of parseRefList(monsterField)) {
+      const pack = catalog.getPackForMonster(name);
+      if (pack && pack !== 'MoMBase') requiredPacks.add(pack);
+    }
+  }
+
+  if (requiredPacks.size > 0) {
+    model.questConfig.packs = [...requiredPacks].sort().join(' ');
   }
 
   // Write quest.ini

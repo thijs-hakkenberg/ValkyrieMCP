@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ScenarioModel } from '../../src/model/scenario-model.js';
-import { DEFAULT_QUEST_CONFIG } from '../../src/model/component-types.js';
+import { DEFAULT_QUEST_CONFIG, serializeQuestConfig } from '../../src/model/component-types.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -276,6 +276,20 @@ describe('ScenarioModel', () => {
     });
   });
 
+  describe('loadFromData packs field', () => {
+    it('preserves packs field from quest.ini', () => {
+      const questIni = `[Quest]\nformat=19\ntype=MoM\npacks=BtT SoA\n[QuestData]\nevents.ini\n[QuestText]\nLocalization.English.txt\n`;
+      const loaded = ScenarioModel.loadFromData(questIni, {});
+      expect(loaded.questConfig.packs).toBe('BtT SoA');
+    });
+
+    it('defaults packs to empty string when absent', () => {
+      const questIni = `[Quest]\nformat=19\ntype=MoM\n[QuestData]\nevents.ini\n[QuestText]\nLocalization.English.txt\n`;
+      const loaded = ScenarioModel.loadFromData(questIni, {});
+      expect(loaded.questConfig.packs).toBe('');
+    });
+  });
+
   describe('serialize', () => {
     it('serializes components to INI data by file', () => {
       model.upsert('EventStart', { buttons: '1', event1: 'EventEnd', trigger: 'EventStart' });
@@ -315,6 +329,20 @@ describe('ScenarioModel', () => {
 
       // Verify items in items.ini
       expect(iniData['items.ini']['QItemWeapon']).toBeDefined();
+    });
+  });
+
+  describe('serializeQuestConfig packs', () => {
+    it('emits packs when non-empty', () => {
+      const config = { ...DEFAULT_QUEST_CONFIG, packs: 'BtT SoA' };
+      const result = serializeQuestConfig(config);
+      expect(result.packs).toBe('BtT SoA');
+    });
+
+    it('omits packs when empty', () => {
+      const config = { ...DEFAULT_QUEST_CONFIG, packs: '' };
+      const result = serializeQuestConfig(config);
+      expect(result.packs).toBeUndefined();
     });
   });
 });

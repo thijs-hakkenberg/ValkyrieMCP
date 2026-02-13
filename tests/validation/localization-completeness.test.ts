@@ -114,4 +114,28 @@ describe('localization-completeness', () => {
     const tokenWarnings = results.filter(r => r.component === 'TokenWall');
     expect(tokenWarnings).toHaveLength(0);
   });
+
+  it('warns for {qst:KEY} referencing missing localization key', () => {
+    const model = new ScenarioModel();
+    model.localization.set('quest.name', 'Test');
+    model.localization.set('quest.description', 'Desc');
+    model.localization.set('EventStart.button1', '{qst:CONTINUE}');
+
+    const results = checkLocalizationCompleteness(model);
+    const qstWarning = results.find(r => r.message.includes('{qst:CONTINUE}'));
+    expect(qstWarning).toBeDefined();
+    expect(qstWarning!.severity).toBe('warning');
+  });
+
+  it('does not warn for {qst:KEY} when key exists', () => {
+    const model = new ScenarioModel();
+    model.localization.set('quest.name', 'Test');
+    model.localization.set('quest.description', 'Desc');
+    model.localization.set('CONTINUE', 'Continue');
+    model.localization.set('EventStart.button1', '{qst:CONTINUE}');
+
+    const results = checkLocalizationCompleteness(model);
+    const qstWarning = results.find(r => r.message.includes('{qst:CONTINUE}'));
+    expect(qstWarning).toBeUndefined();
+  });
 });

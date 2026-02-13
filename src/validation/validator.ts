@@ -11,6 +11,7 @@ import { checkExploreTokenPattern } from './rules/explore-token-pattern.js';
 import { checkInvestigatorTokenPattern } from './rules/investigator-token-pattern.js';
 import { checkTileConnectivity } from './rules/tile-connectivity.js';
 import { checkEventFlow } from './rules/event-flow.js';
+import { checkTokenEventWiring } from './rules/token-event-wiring.js';
 
 const ALL_RULES = [
   checkRequiredFields,
@@ -24,6 +25,7 @@ const ALL_RULES = [
   checkInvestigatorTokenPattern,
   checkTileConnectivity,
   checkEventFlow,
+  checkTokenEventWiring,
 ];
 
 /**

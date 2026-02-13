@@ -27,6 +27,10 @@ export function checkCatalogReferences(model: ScenarioModel): ValidationResult[]
     model.getByType('CustomMonster').map(c => c.name),
   );
 
+  const declaredPacks = new Set(
+    (model.questConfig.packs ?? '').split(/\s+/).filter(s => s.length > 0),
+  );
+
   // Check tile side fields
   for (const comp of model.getByType('Tile')) {
     const side = comp.data.side;
@@ -39,6 +43,17 @@ export function checkCatalogReferences(model: ScenarioModel): ValidationResult[]
         component: comp.name,
         field: 'side',
       });
+    } else {
+      const pack = catalog.getPackForTileSide(side);
+      if (pack && pack !== 'MoMBase' && !declaredPacks.has(pack)) {
+        results.push({
+          rule: 'catalog-references',
+          severity: 'warning',
+          message: `Tile "${comp.name}" uses side "${side}" from pack "${pack}" which is not declared in quest packs`,
+          component: comp.name,
+          field: 'side',
+        });
+      }
     }
   }
 
@@ -47,15 +62,27 @@ export function checkCatalogReferences(model: ScenarioModel): ValidationResult[]
     const monsterField = comp.data.monster;
     if (!monsterField) continue;
     for (const name of parseRefList(monsterField)) {
-      if (monsterIds.has(name)) continue;
       if (customMonsterNames.has(name)) continue;
-      results.push({
-        rule: 'catalog-references',
-        severity: 'warning',
-        message: `Spawn "${comp.name}" references unknown monster "${name}"`,
-        component: comp.name,
-        field: 'monster',
-      });
+      if (!monsterIds.has(name)) {
+        results.push({
+          rule: 'catalog-references',
+          severity: 'warning',
+          message: `Spawn "${comp.name}" references unknown monster "${name}"`,
+          component: comp.name,
+          field: 'monster',
+        });
+      } else {
+        const pack = catalog.getPackForMonster(name);
+        if (pack && pack !== 'MoMBase' && !declaredPacks.has(pack)) {
+          results.push({
+            rule: 'catalog-references',
+            severity: 'warning',
+            message: `Spawn "${comp.name}" uses monster "${name}" from pack "${pack}" which is not declared in quest packs`,
+            component: comp.name,
+            field: 'monster',
+          });
+        }
+      }
     }
   }
 
