@@ -20,7 +20,7 @@ claude plugin install valkyrie-mom
 ```
 
 This gives you:
-- **MCP server** with 16 tools for scenario editing (auto-started)
+- **MCP server** with 20 tools for scenario editing (auto-started)
 - **7 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`
 - **Scenario designer agent** for autonomous scenario creation
 - **5 MCP resources** for format documentation
@@ -111,6 +111,11 @@ npx tsx src/index.ts   # Run MCP server via stdio
 |------|-------------|
 | `search_game_content` | Search game content catalogs (846 entries across tiles, monsters, items, audio) |
 
+### Diagnostics
+| Tool | Description |
+|------|-------------|
+| `export_bug_report` | Generate a ZIP bug report with session trace, scenario files, validation results, and Valkyrie logs |
+
 ## MCP Resources
 
 | Resource | URI |
@@ -173,7 +178,7 @@ The server validates scenarios against 12 rule categories:
 ## Development
 
 ```bash
-npm test          # Run all tests (1015 tests across 30 files)
+npm test          # Run all tests (1096 tests across 36 files)
 npm run test:watch # Watch mode
 npm run lint       # Type check
 npm run build      # Compile to dist/
@@ -193,6 +198,7 @@ src/
   tools/           MCP tool implementations
   resources/       Format documentation resources
   catalogs/        846-entry game content catalog
+  diagnostics/     Bug report builder, session trace, ring buffer
   server.ts        MCP server registration
   index.ts         Entry point (stdio transport)
 tests/
@@ -201,6 +207,7 @@ tests/
   model/           Model layer tests
   tools/           Tool tests
   validation/      Validation rule tests
+  diagnostics/     Diagnostics tests
   golden.test.ts   Round-trip integrity tests
   integration.test.ts  Full pipeline tests
 ```

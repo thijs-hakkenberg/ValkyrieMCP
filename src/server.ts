@@ -31,6 +31,9 @@ import {
   COMPONENT_FORMAT_DOC,
   PATTERN_REFERENCE_DOC,
 } from './resources/format-docs.js';
+import { SessionTrace } from './diagnostics/session-trace.js';
+import { wrapAllTools } from './diagnostics/tool-interceptor.js';
+import { buildBugReport } from './diagnostics/bug-report-builder.js';
 
 /** Singleton scenario model for the current session */
 let currentModel: ScenarioModel | null = null;
@@ -67,6 +70,8 @@ export function createServer(): McpServer {
     name: 'valkyrie-mom',
     version: '0.1.0',
   });
+
+  const trace = new SessionTrace('0.1.0');
 
   // ── Lifecycle Tools ──
 
@@ -331,6 +336,33 @@ Use validate_scenario first, then get_scenario_state and get_map_ascii for analy
       }],
     }),
   );
+
+  // ── Diagnostics Tools ──
+
+  server.tool(
+    'export_bug_report',
+    'Generate a ZIP bug report bundle with session trace, scenario files, and validation results',
+    {
+      outputDir: z.string().optional().describe('Directory to write the ZIP to (defaults to OS temp dir)'),
+      includeScenario: z.boolean().optional().describe('Include scenario INI files (default true)'),
+      includeValkyrieLog: z.boolean().optional().describe('Include Valkyrie Player.log (default true)'),
+    },
+    async ({ outputDir, includeScenario, includeValkyrieLog }) => {
+      const result = await buildBugReport(trace, currentModel, {
+        outputDir,
+        includeScenario,
+        includeValkyrieLog,
+      });
+      return {
+        content: [{
+          type: 'text',
+          text: `Bug report saved to: ${result.zipPath}\n\n${result.issueBody}\n\nTo file an issue:\n${result.ghCommand}`,
+        }],
+      };
+    },
+  );
+
+  wrapAllTools(server, trace);
 
   return server;
 }

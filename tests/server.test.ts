@@ -31,7 +31,6 @@ describe('MCP Server', () => {
       const result = await client.listTools();
       const toolNames = result.tools.map(t => t.name);
 
-      // Verify all 18 expected tools are present
       const expectedTools = [
         'list_scenarios',
         'create_scenario',
@@ -52,6 +51,7 @@ describe('MCP Server', () => {
         'suggest_tile_layout',
         'place_tile_relative',
         'search_game_content',
+        'export_bug_report',
       ];
 
       for (const name of expectedTools) {
