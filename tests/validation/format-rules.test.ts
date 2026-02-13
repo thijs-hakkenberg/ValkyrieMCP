@@ -168,6 +168,47 @@ describe('format-rules', () => {
     expect(btnErrors).toHaveLength(0);
   });
 
+  // --- operations format ---
+
+  it('returns error for malformed operation (bare $end)', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventEnd', { buttons: '0', display: 'false', operations: '$end' });
+
+    const results = checkFormatRules(model);
+    const opError = results.find(r => r.component === 'EventEnd' && r.field === 'operations');
+    expect(opError).toBeDefined();
+    expect(opError!.severity).toBe('error');
+    expect(opError!.message).toContain('malformed');
+  });
+
+  it('returns no error for well-formed operation ($end,=,1)', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventEnd', { buttons: '0', display: 'false', operations: '$end,=,1' });
+
+    const results = checkFormatRules(model);
+    const opErrors = results.filter(r => r.component === 'EventEnd' && r.field === 'operations');
+    expect(opErrors).toHaveLength(0);
+  });
+
+  it('returns error for partially malformed multi-operation', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventMulti', { buttons: '0', display: 'false', operations: '$end,=,1 badvar' });
+
+    const results = checkFormatRules(model);
+    const opError = results.find(r => r.component === 'EventMulti' && r.field === 'operations');
+    expect(opError).toBeDefined();
+    expect(opError!.message).toContain('badvar');
+  });
+
+  it('returns no error when no operations field is present', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventSimple', { buttons: '1', event1: 'EventNext' });
+
+    const results = checkFormatRules(model);
+    const opErrors = results.filter(r => r.field === 'operations');
+    expect(opErrors).toHaveLength(0);
+  });
+
   it('returns no error when buttons=0 and no event refs are set', () => {
     const model = new ScenarioModel();
     model.upsert('EventRemove', { buttons: '0', display: 'false', remove: 'TokenInvestigators' });

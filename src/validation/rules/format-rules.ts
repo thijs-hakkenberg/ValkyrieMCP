@@ -44,6 +44,26 @@ export function checkFormatRules(model: ScenarioModel): ValidationResult[] {
     }
   }
 
+  // Check operations field format for Event components
+  const validOps = new Set(['=', '+', '-', '*', '/', '%']);
+  for (const comp of model.getByType('Event')) {
+    const ops = comp.data.operations;
+    if (ops) {
+      for (const tok of ops.split(/\s+/).filter(Boolean)) {
+        const parts = tok.split(',');
+        if (parts.length !== 3 || !validOps.has(parts[1])) {
+          results.push({
+            rule: 'format-rules',
+            severity: 'error',
+            message: `Event "${comp.name}" has malformed operation "${tok}" — expected var,operator,value format (e.g. "$end,=,1")`,
+            component: comp.name,
+            field: 'operations',
+          });
+        }
+      }
+    }
+  }
+
   // Check buttons vs event refs for Event components
   for (const comp of model.getByType('Event')) {
     const buttons = parseInt(comp.data.buttons ?? '0', 10) || 0;

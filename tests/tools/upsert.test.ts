@@ -198,6 +198,43 @@ describe('upsert tools', () => {
     });
   });
 
+  describe('operations normalization', () => {
+    it('auto-corrects bare $end to $end,=,1', () => {
+      const result = upsertEvent(model, 'EventEnd', {
+        buttons: '0',
+        display: 'false',
+        operations: '$end',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('EventEnd')!.data.operations).toBe('$end,=,1');
+      expect(result.warnings.some(w => w.rule === 'operations-normalize')).toBe(true);
+    });
+
+    it('leaves well-formed operations unchanged', () => {
+      const result = upsertEvent(model, 'EventEnd', {
+        buttons: '0',
+        display: 'false',
+        operations: '$end,=,1',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('EventEnd')!.data.operations).toBe('$end,=,1');
+      expect(result.warnings.filter(w => w.rule === 'operations-normalize')).toHaveLength(0);
+    });
+
+    it('normalizes multiple space-separated operations', () => {
+      const result = upsertEvent(model, 'EventMulti', {
+        buttons: '0',
+        display: 'false',
+        operations: '$end fired,=,1',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('EventMulti')!.data.operations).toBe('$end,=,1 fired,=,1');
+    });
+  });
+
   describe('update existing component', () => {
     it('upsert updates existing event preserving fields', () => {
       upsertEvent(model, 'EventStart', { buttons: '2', event1: 'EventA', event2: 'EventB' });

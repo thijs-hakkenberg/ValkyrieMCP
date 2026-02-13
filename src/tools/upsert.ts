@@ -52,6 +52,54 @@ function localizationWarning(name: string, key: string): ValidationResult {
   };
 }
 
+const VALID_OPS = new Set(['=', '+', '-', '*', '/', '%']);
+
+/**
+ * Normalise the space-separated `operations` field so every token is in
+ * the `variable,operator,value` triple that Valkyrie expects.
+ *
+ * Common mistake: bare `$end` instead of `$end,=,1`.
+ * Returns { value, warnings } with the corrected string.
+ */
+function normalizeOperations(
+  eventName: string,
+  raw: string,
+): { value: string; warnings: ValidationResult[] } {
+  const warnings: ValidationResult[] = [];
+  const tokens = raw.split(/\s+/).filter(Boolean);
+  const fixed: string[] = [];
+
+  for (const tok of tokens) {
+    const parts = tok.split(',');
+    if (parts.length === 3 && VALID_OPS.has(parts[1])) {
+      // Already well-formed: var,op,value
+      fixed.push(tok);
+    } else if (parts.length === 1) {
+      // Bare variable like "$end" → auto-correct to "$end,=,1"
+      fixed.push(`${tok},=,1`);
+      warnings.push({
+        rule: 'operations-normalize',
+        severity: 'warning',
+        message: `Event "${eventName}": bare operation "${tok}" auto-corrected to "${tok},=,1" (Valkyrie requires var,op,value format)`,
+        component: eventName,
+        field: 'operations',
+      });
+    } else {
+      // Malformed — pass through but warn
+      fixed.push(tok);
+      warnings.push({
+        rule: 'operations-normalize',
+        severity: 'warning',
+        message: `Event "${eventName}": operation "${tok}" may be malformed — expected var,operator,value format`,
+        component: eventName,
+        field: 'operations',
+      });
+    }
+  }
+
+  return { value: fixed.join(' '), warnings };
+}
+
 function checkEventLocalization(
   model: ScenarioModel,
   name: string,
@@ -93,6 +141,13 @@ function upsertGeneric(
         return { success: false, warnings, errors };
       }
     }
+  }
+
+  // Auto-correct operations field for Event components
+  if (config.prefix === 'Event' && data.operations) {
+    const norm = normalizeOperations(name, data.operations);
+    data.operations = norm.value;
+    warnings.push(...norm.warnings);
   }
 
   model.upsert(name, data);
