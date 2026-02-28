@@ -107,17 +107,26 @@ describe('buildBugReport', () => {
   });
 });
 
-/** List entry names in a ZIP file using Node.js (no external deps) */
+/** List entry names in a ZIP by parsing the central directory (pure Node.js, no unzip binary) */
 async function listZipEntries(zipPath: string): Promise<string[]> {
-  const { execSync } = await import('node:child_process');
-  const output = execSync(`unzip -l "${zipPath}"`, { encoding: 'utf-8' });
-  // Parse unzip -l output: "  Length  Date  Time  Name" — date format varies by platform
+  const buf = fs.readFileSync(zipPath);
   const entries: string[] = [];
-  for (const line of output.split('\n')) {
-    const match = line.match(/^\s+\d+\s+\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}\s+(.+)$/);
-    if (match) {
-      entries.push(match[1]);
-    }
+  // Find End of Central Directory record (signature 0x06054b50)
+  let eocdOffset = -1;
+  for (let i = buf.length - 22; i >= 0; i--) {
+    if (buf.readUInt32LE(i) === 0x06054b50) { eocdOffset = i; break; }
+  }
+  if (eocdOffset === -1) return entries;
+  const cdOffset = buf.readUInt32LE(eocdOffset + 16);
+  const cdCount = buf.readUInt16LE(eocdOffset + 10);
+  let pos = cdOffset;
+  for (let i = 0; i < cdCount; i++) {
+    if (buf.readUInt32LE(pos) !== 0x02014b50) break;
+    const nameLen = buf.readUInt16LE(pos + 28);
+    const extraLen = buf.readUInt16LE(pos + 30);
+    const commentLen = buf.readUInt16LE(pos + 32);
+    entries.push(buf.subarray(pos + 46, pos + 46 + nameLen).toString('utf-8'));
+    pos += 46 + nameLen + extraLen + commentLen;
   }
   return entries;
 }
