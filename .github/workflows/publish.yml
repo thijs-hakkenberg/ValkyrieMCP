@@ -18,6 +18,12 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
+      - name: Ensure npm >= 10.9.1 (required for OIDC trusted publishing)
+        run: |
+          echo "Bundled npm: $(npm --version)"
+          npm install -g npm@latest
+          echo "Updated npm: $(npm --version)"
+
       - run: npm ci
 
       - run: npm run lint
