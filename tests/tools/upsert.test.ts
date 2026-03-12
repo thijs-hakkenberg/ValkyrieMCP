@@ -235,6 +235,165 @@ describe('upsert tools', () => {
     });
   });
 
+  describe('tile auto-corrections', () => {
+    it('renames x to xposition and y to yposition', () => {
+      const result = upsertTile(model, 'TileHall', {
+        x: '5',
+        y: '10',
+        side: 'TileSideHall1',
+      });
+
+      expect(result.success).toBe(true);
+      const data = model.get('TileHall')!.data;
+      expect(data.xposition).toBe('5');
+      expect(data.yposition).toBe('10');
+      expect(data.x).toBeUndefined();
+      expect(data.y).toBeUndefined();
+      expect(result.warnings.some(w => w.rule === 'field-rename' && w.message.includes('x'))).toBe(true);
+      expect(result.warnings.some(w => w.rule === 'field-rename' && w.message.includes('y'))).toBe(true);
+    });
+
+    it('does not overwrite existing xposition/yposition', () => {
+      const result = upsertTile(model, 'TileHall', {
+        x: '5',
+        xposition: '99',
+        side: 'TileSideHall1',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('TileHall')!.data.xposition).toBe('99');
+    });
+  });
+
+  describe('token auto-corrections', () => {
+    it('renames x to xposition and y to yposition', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        x: '3',
+        y: '7',
+        type: 'TokenSearch',
+      });
+
+      expect(result.success).toBe(true);
+      const data = model.get('TokenSearch1')!.data;
+      expect(data.xposition).toBe('3');
+      expect(data.yposition).toBe('7');
+      expect(data.x).toBeUndefined();
+      expect(data.y).toBeUndefined();
+    });
+
+    it('renames tokentype to type', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        tokentype: 'TokenSearch',
+        xposition: '0',
+        yposition: '0',
+      });
+
+      expect(result.success).toBe(true);
+      const data = model.get('TokenSearch1')!.data;
+      expect(data.type).toBe('TokenSearch');
+      expect(data.tokentype).toBeUndefined();
+      expect(result.warnings.some(w => w.rule === 'field-rename' && w.message.includes('tokentype'))).toBe(true);
+    });
+
+    it('does not overwrite existing type with tokentype', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        tokentype: 'TokenExplore',
+        type: 'TokenSearch',
+        xposition: '0',
+        yposition: '0',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('TokenSearch1')!.data.type).toBe('TokenSearch');
+    });
+
+    it('renames event to event1', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        type: 'TokenSearch',
+        xposition: '0',
+        yposition: '0',
+        event: 'EventSearched',
+      });
+
+      expect(result.success).toBe(true);
+      const data = model.get('TokenSearch1')!.data;
+      expect(data.event1).toBe('EventSearched');
+      expect(data.event).toBeUndefined();
+      expect(result.warnings.some(w => w.rule === 'field-rename' && w.message.includes('event'))).toBe(true);
+    });
+
+    it('auto-sets buttons=1 when event1 is set but buttons is missing', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        type: 'TokenSearch',
+        xposition: '0',
+        yposition: '0',
+        event1: 'EventSearched',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('TokenSearch1')!.data.buttons).toBe('1');
+      expect(result.warnings.some(w => w.rule === 'auto-buttons')).toBe(true);
+    });
+
+    it('auto-sets buttons=1 when buttons is 0 but event1 exists', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        type: 'TokenSearch',
+        xposition: '0',
+        yposition: '0',
+        event1: 'EventSearched',
+        buttons: '0',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('TokenSearch1')!.data.buttons).toBe('1');
+    });
+
+    it('does not overwrite buttons > 0', () => {
+      const result = upsertToken(model, 'TokenSearch1', {
+        type: 'TokenSearch',
+        xposition: '0',
+        yposition: '0',
+        event1: 'EventSearched',
+        buttons: '2',
+      });
+
+      expect(result.success).toBe(true);
+      expect(model.get('TokenSearch1')!.data.buttons).toBe('2');
+    });
+  });
+
+  describe('spawn auto-corrections', () => {
+    it('removes xposition/yposition from spawns with warning', () => {
+      const result = upsertSpawn(model, 'SpawnCultist', {
+        monster: 'MonsterCultist',
+        xposition: '5',
+        yposition: '10',
+      });
+
+      expect(result.success).toBe(true);
+      const data = model.get('SpawnCultist')!.data;
+      expect(data.xposition).toBeUndefined();
+      expect(data.yposition).toBeUndefined();
+      expect(result.warnings.some(w => w.rule === 'spawn-no-position')).toBe(true);
+    });
+
+    it('also removes x/y shorthand from spawns', () => {
+      const result = upsertSpawn(model, 'SpawnCultist', {
+        monster: 'MonsterCultist',
+        x: '5',
+        y: '10',
+      });
+
+      expect(result.success).toBe(true);
+      const data = model.get('SpawnCultist')!.data;
+      expect(data.x).toBeUndefined();
+      expect(data.y).toBeUndefined();
+      expect(data.xposition).toBeUndefined();
+      expect(data.yposition).toBeUndefined();
+      expect(result.warnings.some(w => w.rule === 'spawn-no-position')).toBe(true);
+    });
+  });
+
   describe('update existing component', () => {
     it('upsert updates existing event preserving fields', () => {
       upsertEvent(model, 'EventStart', { buttons: '2', event1: 'EventA', event2: 'EventB' });

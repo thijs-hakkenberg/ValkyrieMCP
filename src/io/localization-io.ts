@@ -50,7 +50,9 @@ export function parseLocalization(content: string): ParsedLocalization {
 export function writeLocalization(language: string, entries: Map<string, string>): string {
   const lines: string[] = [`.,${language}`];
 
-  for (const [key, value] of entries) {
+  for (const [key, rawValue] of entries) {
+    // Valkyrie's CSV parser doesn't support "" escaped quotes, so replace " with '
+    const value = rawValue.replace(/"/g, "'");
     if (value.includes(',')) {
       lines.push(`${key},"${value}"`);
     } else {

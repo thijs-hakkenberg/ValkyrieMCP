@@ -100,6 +100,104 @@ function normalizeOperations(
   return { value: fixed.join(' '), warnings };
 }
 
+/**
+ * Auto-correct common field name mistakes, returning warnings for each rename.
+ */
+function renameField(
+  data: Record<string, string>,
+  componentName: string,
+  from: string,
+  to: string,
+): ValidationResult | undefined {
+  if (data[from] !== undefined && data[to] === undefined) {
+    data[to] = data[from];
+    delete data[from];
+    return {
+      rule: 'field-rename',
+      severity: 'warning',
+      message: `"${componentName}": "${from}" auto-corrected to "${to}"`,
+      component: componentName,
+      field: to,
+    };
+  }
+  // If both are set, just drop the wrong one silently
+  if (data[from] !== undefined) {
+    delete data[from];
+  }
+  return undefined;
+}
+
+/** Auto-correct x→xposition, y→yposition on tiles and tokens */
+function autoCorrectPositionFields(
+  data: Record<string, string>,
+  name: string,
+): ValidationResult[] {
+  const warnings: ValidationResult[] = [];
+  const w1 = renameField(data, name, 'x', 'xposition');
+  if (w1) warnings.push(w1);
+  const w2 = renameField(data, name, 'y', 'yposition');
+  if (w2) warnings.push(w2);
+  return warnings;
+}
+
+/** Auto-correct token-specific fields: tokentype→type, event→event1, buttons */
+function autoCorrectTokenFields(
+  data: Record<string, string>,
+  name: string,
+  model: ScenarioModel,
+): ValidationResult[] {
+  const warnings: ValidationResult[] = [];
+
+  // tokentype → type
+  const w1 = renameField(data, name, 'tokentype', 'type');
+  if (w1) warnings.push(w1);
+
+  // event → event1
+  const w2 = renameField(data, name, 'event', 'event1');
+  if (w2) warnings.push(w2);
+
+  // If event1 is set (in data or existing), ensure buttons >= 1
+  const existing = model.get(name);
+  const event1 = data.event1 ?? existing?.data.event1;
+  if (event1) {
+    const buttons = data.buttons ?? existing?.data.buttons;
+    if (!buttons || buttons === '0') {
+      data.buttons = '1';
+      warnings.push({
+        rule: 'auto-buttons',
+        severity: 'warning',
+        message: `"${name}": buttons auto-set to 1 (required when event1 is set)`,
+        component: name,
+        field: 'buttons',
+      });
+    }
+  }
+
+  return warnings;
+}
+
+/** Remove position fields from spawns (they are positioned via event add fields) */
+function autoCorrectSpawnFields(
+  data: Record<string, string>,
+  name: string,
+): ValidationResult[] {
+  const warnings: ValidationResult[] = [];
+  const posFields = ['xposition', 'yposition', 'x', 'y'];
+  const found = posFields.filter(f => data[f] !== undefined);
+  for (const f of found) {
+    delete data[f];
+  }
+  if (found.length > 0) {
+    warnings.push({
+      rule: 'spawn-no-position',
+      severity: 'warning',
+      message: `"${name}": position fields (${found.join(', ')}) removed — spawns are positioned via an event's "add" field, not by their own coordinates`,
+      component: name,
+    });
+  }
+  return warnings;
+}
+
 function checkEventLocalization(
   model: ScenarioModel,
   name: string,
@@ -164,15 +262,27 @@ export function upsertEvent(model: ScenarioModel, name: string, data: Record<str
 }
 
 export function upsertTile(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
-  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Tile);
+  const preWarnings = autoCorrectPositionFields(data, name);
+  const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.Tile);
+  result.warnings.unshift(...preWarnings);
+  return result;
 }
 
 export function upsertToken(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
-  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Token);
+  const preWarnings = [
+    ...autoCorrectPositionFields(data, name),
+    ...autoCorrectTokenFields(data, name, model),
+  ];
+  const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.Token);
+  result.warnings.unshift(...preWarnings);
+  return result;
 }
 
 export function upsertSpawn(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
-  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Spawn);
+  const preWarnings = autoCorrectSpawnFields(data, name);
+  const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.Spawn);
+  result.warnings.unshift(...preWarnings);
+  return result;
 }
 
 export function upsertItem(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {

@@ -88,16 +88,13 @@ export async function createScenario(
   const questSections: Record<string, Record<string, string>> = {
     Quest: serializeQuestConfig(DEFAULT_QUEST_CONFIG),
   };
+  // New scenarios start empty — no data files listed or written.
+  // They get populated on the first saveScenario() call.
   const bareKeySections: Record<string, string[]> = {
     QuestText: ['Localization.English.txt'],
-    QuestData: [...DATA_FILES],
+    QuestData: [],
   };
   fs.writeFileSync(path.join(dir, 'quest.ini'), writeIni(questSections, bareKeySections));
-
-  // Write empty data files
-  for (const f of DATA_FILES) {
-    fs.writeFileSync(path.join(dir, f), writeIni({}));
-  }
 
   // Write localization file with common keys
   const commonKeys: Record<string, string> = { CONTINUE: 'Continue', PASS: 'Pass', FAIL: 'Fail' };
@@ -159,10 +156,18 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
   // Serialize components by file
   const iniData = model.serializeToIniData();
 
-  // Write each data file
+  // Only write data files that have components; delete stale empty files
+  const populatedFiles: string[] = [];
   for (const f of DATA_FILES) {
-    const sections = iniData[f] ?? {};
-    fs.writeFileSync(path.join(dir, f), writeIni(sections));
+    const sections = iniData[f];
+    const filePath = path.join(dir, f);
+    if (sections && Object.keys(sections).length > 0) {
+      fs.writeFileSync(filePath, writeIni(sections));
+      populatedFiles.push(f);
+    } else {
+      // Remove stale empty file from a prior save
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
   }
 
   // Auto-compute required packs from tile sides and monsters
@@ -189,13 +194,13 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
     model.questConfig.packs = [...requiredPacks].sort().join(' ');
   }
 
-  // Write quest.ini
+  // Write quest.ini — only list populated data files
   const questSections: Record<string, Record<string, string>> = {
     Quest: serializeQuestConfig(model.questConfig),
   };
   const bareKeySections: Record<string, string[]> = {
     QuestText: ['Localization.English.txt'],
-    QuestData: [...DATA_FILES],
+    QuestData: populatedFiles,
   };
   fs.writeFileSync(path.join(dir, 'quest.ini'), writeIni(questSections, bareKeySections));
 

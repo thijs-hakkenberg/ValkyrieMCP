@@ -28,7 +28,7 @@ describe('lifecycle tools', () => {
   });
 
   describe('createScenario', () => {
-    it('creates directory with quest.ini and empty data files', async () => {
+    it('creates directory with quest.ini and localization (no empty data files)', async () => {
       const tmp = makeTmpDir();
       tmpDirs.push(tmp);
 
@@ -43,9 +43,9 @@ describe('lifecycle tools', () => {
       const questContent = fs.readFileSync(questPath, 'utf-8');
       expect(questContent).toContain('[Quest]');
 
-      // Data files should exist
+      // Empty data files should NOT be written
       for (const f of ['events.ini', 'tiles.ini', 'tokens.ini', 'spawns.ini', 'items.ini', 'ui.ini', 'other.ini']) {
-        expect(fs.existsSync(path.join(tmp, f))).toBe(true);
+        expect(fs.existsSync(path.join(tmp, f))).toBe(false);
       }
 
       // Localization file should exist
@@ -190,6 +190,36 @@ describe('lifecycle tools', () => {
 
       const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
       expect(questContent).toContain('packs=SoA');
+    });
+
+    it('only writes and lists populated data files', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('PopTest', { dir: tmp });
+      // Only add an event and a tile — tokens, spawns, items, ui, other should be skipped
+      model.upsert('EventStart', { buttons: '1', trigger: 'EventStart' });
+      model.upsert('TileHall', { xposition: '0', yposition: '0', side: 'TileSideHall1' });
+
+      await saveScenario(model);
+
+      // quest.ini should only list populated files
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).toContain('events.ini');
+      expect(questContent).toContain('tiles.ini');
+      expect(questContent).not.toContain('tokens.ini');
+      expect(questContent).not.toContain('spawns.ini');
+      expect(questContent).not.toContain('items.ini');
+      expect(questContent).not.toContain('ui.ini');
+      expect(questContent).not.toContain('other.ini');
+
+      // Empty data files should not exist on disk
+      expect(fs.existsSync(path.join(tmp, 'tokens.ini'))).toBe(false);
+      expect(fs.existsSync(path.join(tmp, 'spawns.ini'))).toBe(false);
+
+      // Populated files should exist
+      expect(fs.existsSync(path.join(tmp, 'events.ini'))).toBe(true);
+      expect(fs.existsSync(path.join(tmp, 'tiles.ini'))).toBe(true);
     });
 
     it('packs field round-trips through save/load', async () => {

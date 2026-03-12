@@ -27,10 +27,12 @@ Events are the core quest logic mechanism. Each event is an INI section starting
 | mincam | bool | Set minimum camera position |
 | maxcam | bool | Set maximum camera position |
 
-## Variable Operations
+## Variable Operations (the \`operations\` field)
 Format: \`variable,operator,value\`
 - Operators: =, +, -, *, /
 - Special variables: $end (ends scenario), $mythosMinor, $mythosMajor, $mythosDeadly, #round, #heroes
+
+**IMPORTANT:** \`operations\` is for **variable assignment** only (e.g., \`counter,+,1\`). It is NOT for placing components on the board. Use the \`add\` field (space-separated component names) to show tiles, tokens, and spawns, and the \`remove\` field to hide them.
 
 ## Variable Tests
 Format: \`VarOperation:variable,comparator,value\`
@@ -124,9 +126,11 @@ PlaceTile → PlaceDecoration → PlaceConnections → PlaceItems → PlacePeopl
 - MoveOneSpace: operations=moveOneSpace,=,1, buttons=0 (terminal)
 
 ## Silent Event Rules
-- \`display=false\` auto-advances without dialog
-- If \`event1\` is set, MUST have \`buttons>=1\`
+- Silent events MUST have BOTH \`display=false\` AND \`buttons=0\` (when no eventN fields). \`buttons=0\` alone is not sufficient — Valkyrie still tries to render the event dialog without \`display=false\`.
+- If \`event1\` is set, MUST have \`buttons>=1\` (even with \`display=false\`)
 - \`buttons=0\` only safe when NO eventN fields exist
+- Example silent passthrough: \`display=false, buttons=1, event1=EventNext\`
+- Example silent terminal: \`display=false, buttons=0, remove=TokenOld\`
 
 ## Mythos Initialization Formula
 \`\`\`
@@ -213,8 +217,23 @@ Prefix: \`Token\`
 | conditions | No | AND-only variable gating — token hidden when false |
 | rotation | No | Rotation for wall tokens |
 
+### Token-Event Linking
+To make a token interactive, set BOTH \`buttons\` and \`event1\`:
+\`\`\`
+[TokenSearch1]
+type=TokenSearch
+xposition=5
+yposition=10
+buttons=1
+event1=EventSearched
+\`\`\`
+**Common mistake:** Setting \`event1\` without \`buttons=1\`. Valkyrie only reads event1..eventN up to the buttons count, so \`event1\` without \`buttons>=1\` is silently ignored.
+
 ## Spawns (spawns.ini)
 Prefix: \`Spawn\`
+
+**IMPORTANT:** Spawns do NOT have position fields (\`xposition\`/\`yposition\`). They are placed on the board via an event's \`add\` field. They need \`monster\`, \`buttons\` (usually 1), and optionally \`event1\`.
+
 | Field | Required | Description |
 |-------|----------|-------------|
 | monster | Yes | Monster type name(s), space-separated |

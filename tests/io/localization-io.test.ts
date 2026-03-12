@@ -105,6 +105,28 @@ describe('writeLocalization', () => {
     const output = writeLocalization('English', new Map());
     expect(output).toBe('.,English\n');
   });
+
+  it('replaces double quotes with single quotes in values', () => {
+    const entries = new Map<string, string>();
+    entries.set('key', 'He said "hello" to them');
+
+    const output = writeLocalization('English', entries);
+    const lines = output.split('\n');
+
+    // Double quotes must not appear inside the value
+    expect(lines[1]).toBe("key,He said 'hello' to them");
+  });
+
+  it('replaces double quotes in comma-containing values', () => {
+    const entries = new Map<string, string>();
+    entries.set('key', 'He said "hello", then left');
+
+    const output = writeLocalization('English', entries);
+    const lines = output.split('\n');
+
+    // Value has commas → quoted, but internal " replaced with '
+    expect(lines[1]).toBe(`key,"He said 'hello', then left"`);
+  });
 });
 
 describe('round-trip', () => {

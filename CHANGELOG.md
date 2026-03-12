@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-03-12
+
+### Fixed
+
+- **Localization CSV quoting**: `writeLocalization()` now replaces `"` with `'` in values before writing, preventing Valkyrie's CSV parser from breaking on escaped quotes.
+- **QuestData empty files**: `saveScenario()` only writes and lists data files that contain components. `createScenario()` no longer writes empty data files.
+
+### Added
+
+- **Upsert auto-corrections** with warnings for common AI mistakes:
+  - Tiles/Tokens: `x`→`xposition`, `y`→`yposition`
+  - Tokens: `tokentype`→`type`, `event`→`event1`, auto-set `buttons=1` when `event1` is present
+  - Spawns: strip position fields (spawns are positioned via event `add` fields)
+- **Format doc improvements**: token-event linking example, `operations` vs `add`/`remove` clarification, silent event rules (`display=false` + `buttons=0`), spawn positioning notes.
+
 ## [1.0.1] - 2026-02-12
 
 ### Fixed

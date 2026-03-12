@@ -30,7 +30,6 @@ describe('Integration: full scenario pipeline', () => {
     const scenarioDir = path.join(tmpDir, 'TestScenario');
     const { model } = await createScenario('TestScenario', { dir: scenarioDir });
     expect(fs.existsSync(path.join(scenarioDir, 'quest.ini'))).toBe(true);
-    expect(fs.existsSync(path.join(scenarioDir, 'events.ini'))).toBe(true);
 
     // Step 2: Add tiles using suggested layout
     const positions = suggestTileLayout(3, 'linear');
