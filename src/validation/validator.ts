@@ -9,9 +9,12 @@ import { checkCatalogReferences } from './rules/catalog-references.js';
 import { checkMythosStructure } from './rules/mythos-structure.js';
 import { checkExploreTokenPattern } from './rules/explore-token-pattern.js';
 import { checkInvestigatorTokenPattern } from './rules/investigator-token-pattern.js';
-import { checkTileConnectivity } from './rules/tile-connectivity.js';
+import { checkTileConnectivity, checkTokenPlacement } from './rules/tile-connectivity.js';
 import { checkEventFlow } from './rules/event-flow.js';
 import { checkTokenEventWiring } from './rules/token-event-wiring.js';
+import { checkFieldSchema } from './rules/field-schema.js';
+import { checkEventSemantics } from './rules/event-semantics.js';
+import { checkCustomImages } from './rules/custom-images.js';
 
 const ALL_RULES = [
   checkRequiredFields,
@@ -24,8 +27,12 @@ const ALL_RULES = [
   checkExploreTokenPattern,
   checkInvestigatorTokenPattern,
   checkTileConnectivity,
+  checkTokenPlacement,
   checkEventFlow,
   checkTokenEventWiring,
+  checkFieldSchema,
+  checkEventSemantics,
+  checkCustomImages,
 ];
 
 /**

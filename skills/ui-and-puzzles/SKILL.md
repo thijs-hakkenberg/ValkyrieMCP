@@ -122,7 +122,7 @@ A multi-page document the player can browse back and forth. Uses an event loop w
 1. **Open Event**: Initialize page counter, display first page
 2. **Page Display**: Show UI for current page (background + text + nav buttons)
 3. **Navigation**: "Next" increments page, "Prev" decrements, "Close" exits
-4. **Loop Controller**: Routes to correct page based on counter
+4. **Loop Controller**: Lists every page; each page's vartests make only the current one runnable
 5. **Close Event**: Removes all UI elements
 
 ### Example — 3-page journal
@@ -136,24 +136,15 @@ upsert_event("EventJournalOpen", {
   event1: "EventJournalController"
 })
 
-# Controller — route to correct page
+# Controller — Valkyrie runs the FIRST listed page whose vartests pass,
+# so list the highest page first and leave page 1 untested as the fallback
 upsert_event("EventJournalController", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:journalPage,>=,2",
-  event1: "EventJournalPage1",    # page < 2 → show page 1
-  event2: "EventJournalCheck2"    # page >= 2 → check for page 2 or 3
+  buttons: "1",
+  event1: "EventJournalPage3 EventJournalPage2 EventJournalPage1"
 })
 
-upsert_event("EventJournalCheck2", {
-  display: "false",
-  buttons: "2",
-  vartests: "VarOperation:journalPage,>=,3",
-  event1: "EventJournalPage2",    # page < 3 → show page 2
-  event2: "EventJournalPage3"     # page >= 3 → show page 3
-})
-
-# Page 1 — show UI, offer Next/Close
+# Page 1 — show UI, offer Next/Close (fallback: no vartests)
 upsert_event("EventJournalPage1", {
   buttons: "2",
   remove: "UIJournalPage2 UIJournalPage3",
@@ -165,6 +156,7 @@ upsert_event("EventJournalPage1", {
 # Page 2 — show UI, offer Prev/Next/Close
 upsert_event("EventJournalPage2", {
   buttons: "3",
+  vartests: "VarOperation:journalPage,>=,2",
   remove: "UIJournalPage1 UIJournalPage3",
   add: "UIJournalBG UIJournalPage2 UIJournalNavPrev UIJournalNavNext UIJournalNavClose",
   event1: "EventJournalPrev",
@@ -175,6 +167,7 @@ upsert_event("EventJournalPage2", {
 # Page 3 — show UI, offer Prev/Close
 upsert_event("EventJournalPage3", {
   buttons: "2",
+  vartests: "VarOperation:journalPage,>=,3",
   remove: "UIJournalPage1 UIJournalPage2",
   add: "UIJournalBG UIJournalPage3 UIJournalNavPrev UIJournalNavClose",
   event1: "EventJournalPrev",
@@ -237,30 +230,28 @@ upsert_event("EventLockDisplay", {
   event4: "EventLockCheck"
 })
 
-# Cycle digit 1 (increment with wrap 0-9)
+# Cycle digit 1 (increment with wrap 0-9): the wrap event only runs once
+# the digit reaches 10, otherwise Valkyrie falls through to the redisplay
 upsert_event("EventLockCycleDigit1", {
   display: "false",
-  buttons: "2",
+  buttons: "1",
   operations: "digit1,+,1",
-  vartests: "VarOperation:digit1,>=,10",
-  event1: "EventLockDisplay",          # digit < 10, redisplay
-  event2: "EventLockDigit1Wrap"        # digit >= 10, wrap to 0
+  event1: "EventLockDigit1Wrap EventLockDisplay"
 })
 
 upsert_event("EventLockDigit1Wrap", {
   display: "false",
   buttons: "1",
+  vartests: "VarOperation:digit1,>=,10",
   operations: "digit1,=,0",
   event1: "EventLockDisplay"
 })
 
-# Check solution (7-4-2)
+# Check solution (7-4-2): correct only runs when all digits match
 upsert_event("EventLockCheck", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:digit1,==,7 VarOperation:digit2,==,4 VarOperation:digit3,==,2 VarTestsLogicalOperator:AND",
-  event1: "EventLockWrong",
-  event2: "EventLockCorrect"
+  buttons: "1",
+  event1: "EventLockCorrect EventLockWrong"
 })
 
 upsert_event("EventLockWrong", {
@@ -270,6 +261,7 @@ upsert_event("EventLockWrong", {
 
 upsert_event("EventLockCorrect", {
   buttons: "1",
+  vartests: "VarOperation:digit1,==,7 VarTestsLogicalOperator:AND VarOperation:digit2,==,4 VarTestsLogicalOperator:AND VarOperation:digit3,==,2",
   remove: "UILockBG UILockDigit1 UILockDigit2 UILockDigit3 UILockUp1 UILockUp2 UILockUp3 UILockDown1 UILockDown2 UILockDown3 UILockSubmit",
   event1: "EventLockOpened"
 })

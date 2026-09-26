@@ -9,17 +9,24 @@ describe('mythos-structure', () => {
     model.upsert('EventMythos', { trigger: 'Mythos', buttons: '1', event1: '', conditions: 'MythosCount,<,3' });
 
     const results = checkMythosStructure(model);
-    const mythosWarnings = results.filter(r => r.message.includes('conditions'));
+    const mythosWarnings = results.filter(r => r.message.includes('no vartests'));
     expect(mythosWarnings).toHaveLength(0);
   });
 
-  it('warning when Mythos event has no conditions', () => {
+  it('no warning when Mythos event is gated by vartests', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventMythos', { trigger: 'Mythos', buttons: '1', event1: '', vartests: 'VarOperation:rock,>,0' });
+
+    expect(checkMythosStructure(model).filter(r => r.message.includes('no vartests'))).toHaveLength(0);
+  });
+
+  it('warning when Mythos event has no vartests or conditions', () => {
     const model = new ScenarioModel();
     model.upsert('EventStart', { trigger: 'EventStart', buttons: '1', event1: '' });
     model.upsert('EventMythos', { trigger: 'Mythos', buttons: '1', event1: '' });
 
     const results = checkMythosStructure(model);
-    const mythosWarning = results.find(r => r.component === 'EventMythos' && r.message.includes('conditions'));
+    const mythosWarning = results.find(r => r.component === 'EventMythos' && r.message.includes('no vartests'));
     expect(mythosWarning).toBeDefined();
     expect(mythosWarning!.severity).toBe('warning');
   });
@@ -75,7 +82,7 @@ describe('mythos-structure', () => {
     model.upsert('EventEnd', { buttons: '1', operations: '$end,=,1' });
 
     const results = checkMythosStructure(model);
-    const mythosWarnings = results.filter(r => r.message.includes('Mythos') && r.message.includes('conditions'));
+    const mythosWarnings = results.filter(r => r.message.includes('Mythos') && r.message.includes('no vartests'));
     expect(mythosWarnings).toHaveLength(0);
   });
 

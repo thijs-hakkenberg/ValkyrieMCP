@@ -6,6 +6,7 @@ const SKIP_TOKEN_TYPES = new Set(['TokenInvestigator', 'TokenWallOutside', 'Toke
 /**
  * Checks that non-investigator, non-wall tokens have an event1 wired up.
  * Tokens without event1 are silently unclickable in-game.
+ * Tokens with clickeffect=false are decorative by design and skipped.
  */
 export function checkTokenEventWiring(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
@@ -13,6 +14,7 @@ export function checkTokenEventWiring(model: ScenarioModel): ValidationResult[] 
   for (const comp of model.getByType('Token')) {
     const tokenType = comp.data.type;
     if (tokenType && SKIP_TOKEN_TYPES.has(tokenType)) continue;
+    if (comp.data.clickeffect?.toLowerCase() === 'false') continue;
 
     const event1 = comp.data.event1;
     if (!event1) {

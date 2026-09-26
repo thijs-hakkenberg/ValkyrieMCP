@@ -57,3 +57,12 @@ describe('checkTokenEventWiring', () => {
     expect(results).toHaveLength(2);
   });
 });
+
+describe('checkTokenEventWiring: decorative tokens', () => {
+  it('skips tokens with clickeffect=false', () => {
+    const model = new ScenarioModel();
+    model.upsert('TokenRug', { type: 'TokenSearch', clickeffect: 'false' });
+
+    expect(checkTokenEventWiring(model)).toHaveLength(0);
+  });
+});

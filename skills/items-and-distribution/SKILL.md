@@ -173,13 +173,18 @@ upsert_event("EventFindKey", {
   event1: "EventKeyNarrative"
 })
 
-# Later, check the flag
+# Later, check the flag: the unlock event only runs with the key,
+# otherwise Valkyrie falls through to the locked message
 upsert_event("EventTryDoor", {
   display: "false",
-  buttons: "2",
+  buttons: "1",
+  event1: "EventDoorUnlock EventDoorLocked"
+})
+
+upsert_event("EventDoorUnlock", {
+  buttons: "1",
   vartests: "VarOperation:hasKey,>=,1",
-  event1: "EventDoorLocked",     # no key
-  event2: "EventDoorUnlock"      # has key
+  event1: "EventDoorOpened"
 })
 ```
 

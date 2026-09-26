@@ -8,6 +8,7 @@ import { buildPackage } from '../io/package-builder.js';
 import { parseLocalization } from '../io/localization-io.js';
 import { getSharedCatalog } from '../catalogs/catalog-store.js';
 import { parseRefList } from '../model/component-types.js';
+import { requiredQuestFormat } from '../model/format-features.js';
 
 const DATA_FILES = ['events.ini', 'tiles.ini', 'tokens.ini', 'spawns.ini', 'items.ini', 'ui.ini', 'other.ini'] as const;
 
@@ -194,6 +195,10 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
     model.questConfig.packs = [...requiredPacks].sort().join(' ');
   }
 
+  // Declare the quest format the scenario's features need, so older Valkyrie
+  // versions refuse it cleanly instead of ignoring fields (or crashing on custom tiles)
+  model.questConfig.format = Math.max(model.questConfig.format, requiredQuestFormat(model.getAll()));
+
   // Write quest.ini — only list populated data files
   const questSections: Record<string, Record<string, string>> = {
     Quest: serializeQuestConfig(model.questConfig),
@@ -215,4 +220,37 @@ export async function buildScenario(model: ScenarioModel, outputPath: string): P
   if (!dir) throw new Error('Model has no scenarioDir set');
 
   await buildPackage(dir, outputPath);
+}
+
+/** [Quest] settings an author may change; format, type and packs are managed automatically on save */
+export interface QuestConfigUpdate {
+  difficulty?: number;
+  lengthmin?: number;
+  lengthmax?: number;
+  minhero?: number;
+  maxhero?: number;
+  image?: string;
+  hidden?: boolean;
+  defaultmusicon?: boolean;
+}
+
+/** Apply quest settings after checking them against Valkyrie's ranges. Nothing is applied if any value is invalid. */
+export function setQuestConfig(model: ScenarioModel, update: QuestConfigUpdate): { success: boolean; errors: string[] } {
+  const next = { ...model.questConfig, ...update };
+  const errors: string[] = [];
+
+  if (next.difficulty < 0 || next.difficulty > 1) errors.push(`difficulty must be between 0 and 1 (got ${next.difficulty})`);
+  if (next.lengthmin <= 0 || next.lengthmax <= 0) errors.push('lengthmin and lengthmax must be positive minutes');
+  if (next.lengthmin > next.lengthmax) errors.push(`lengthmin (${next.lengthmin}) must not exceed lengthmax (${next.lengthmax})`);
+  for (const k of ['minhero', 'maxhero'] as const) {
+    const v = next[k];
+    if (v !== undefined && (!Number.isInteger(v) || v < 1 || v > 5)) errors.push(`${k} must be a whole number from 1 to 5 (got ${v})`);
+  }
+  if (next.minhero !== undefined && next.maxhero !== undefined && next.minhero > next.maxhero) {
+    errors.push(`minhero (${next.minhero}) must not exceed maxhero (${next.maxhero})`);
+  }
+
+  if (errors.length > 0) return { success: false, errors };
+  model.questConfig = next;
+  return { success: true, errors };
 }

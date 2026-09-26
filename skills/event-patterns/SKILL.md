@@ -59,13 +59,12 @@ upsert_event("EventLoopInit", {
   event1: "EventLoopController"
 })
 
-# Controller — check if done
+# Controller — pick exit or body. Valkyrie runs the FIRST listed event whose
+# vartests pass, so the tested exit goes first and the untested body is the fallback.
 upsert_event("EventLoopController", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:loopCount,>=,3",
-  event1: "EventLoopBody",    # button1 = test FAILS (keep looping)
-  event2: "EventLoopExit"     # button2 = test PASSES (exit)
+  buttons: "1",
+  event1: "EventLoopExit EventLoopBody"
 })
 
 # Body — do work, increment, return to controller
@@ -76,17 +75,20 @@ upsert_event("EventLoopBody", {
   event1: "EventLoopController"
 })
 
-# Exit
+# Exit — only enabled once the limit is reached
 upsert_event("EventLoopExit", {
   display: "true",
   buttons: "1",
+  vartests: "VarOperation:loopCount,>=,3",
   event1: "EventNextScene"
 })
 ```
 
-**Important — vartests button mapping:**
-- `button1` / `event1` = test **FAILS** (condition not met)
-- `button2` / `event2` = test **PASSES** (condition met)
+**Important — how vartests branch:**
+- vartests on an event decide whether *that* event runs. If they fail, the event is skipped.
+- They never route between event1 and event2. A hidden event (`display: "false"`) always follows button 1, so its event2+ never run.
+- Branch by listing candidates in one button (`event1: "EventA EventB"`). Valkyrie runs the first one whose vartests pass.
+- `validate_scenario` flags hidden events with unreachable event2+ (rule `event-semantics`).
 
 ### Infinite Loop Avoidance
 
@@ -183,38 +185,33 @@ upsert_event("EventUnlockDoor", {
 
 ## Random Event Selection
 
-Use `randomevents=true` to randomly pick one event from the event list instead of showing all buttons.
+Use `randomevents=true` to pick one event at random from a button's list. Put **all candidates in event1**: a hidden event always follows button 1, so candidates in event2+ are never picked.
 
 ```
 upsert_event("EventRandomEncounter", {
   display: "false",
-  buttons: "3",
+  buttons: "1",
   randomevents: "true",
-  event1: "EventEncounterGhost",
-  event2: "EventEncounterCultist",
-  event3: "EventEncounterHorror"
+  event1: "EventEncounterGhost EventEncounterCultist EventEncounterHorror"
 })
 ```
 
 ### Preventing Repeats with Flag Variables
 
-Use a flag variable per outcome to skip already-seen events:
+Only events whose vartests pass are candidates, so a "seen" flag per outcome removes it from the pool:
 
 ```
-# Random selector with conditions on sub-events
 upsert_event("EventRandomEncounter", {
   display: "false",
-  buttons: "3",
+  buttons: "1",
   randomevents: "true",
-  event1: "EventEncA",
-  event2: "EventEncB",
-  event3: "EventEncC"
+  event1: "EventEncA EventEncB EventEncC"
 })
 
-# Each encounter sets a "seen" flag
+# Each encounter is only a candidate while unseen, and marks itself seen
 upsert_event("EventEncA", {
   buttons: "1",
-  conditions: "seenA,==,0",    # skip if already seen
+  vartests: "VarOperation:seenA,==,0",
   operations: "seenA,=,1",
   event1: "EventContinue"
 })
@@ -222,39 +219,49 @@ upsert_event("EventEncA", {
 
 ## Variable-Controlled Branching
 
-Use vartests to route events based on game state. Events are evaluated in button order.
+An event's vartests decide whether that event runs; they never choose a button. Branch by listing the candidates in one button — Valkyrie runs the **first** one whose vartests pass (list the most specific first and end with an untested fallback).
 
 ### Ordered vartests (Multiple Thresholds)
 
 ```
 upsert_event("EventCheckProgress", {
   display: "false",
+  buttons: "1",
+  event1: "EventAllClues EventSomeClues EventNoClues"
+})
+
+upsert_event("EventAllClues",  { buttons: "1", vartests: "VarOperation:cluesFound,>=,3", event1: "EventContinue" })
+upsert_event("EventSomeClues", { buttons: "1", vartests: "VarOperation:cluesFound,>=,1", event1: "EventContinue" })
+upsert_event("EventNoClues",   { buttons: "1", event1: "EventContinue" })   # fallback, no tests
+```
+
+### Button-Level Conditions
+
+To enable or hide a *button* on a displayed event, put the test on the button:
+
+```
+upsert_event("EventLockedDoor", {
   buttons: "2",
-  vartests: "VarOperation:cluesFound,>=,3",
-  event1: "EventNotEnoughClues",    # test FAILS (< 3 clues)
-  event2: "EventEnoughClues"        # test PASSES (>= 3 clues)
+  event1: "EventUseKey",
+  event1Condition: "VarOperation:hasKey,==,1",
+  event1ConditionAction: "hide",     # disable (default) | hide | none
+  event2: "EventLeave"
 })
 ```
 
-### conditions vs vartests
+### conditions is legacy
 
-| Feature | `conditions` | `vartests` |
-|---------|-------------|------------|
-| Check timing | Before event displays | After event displays |
-| If false | Event silently skipped | Routes to button1/event1 |
-| If true | Event proceeds normally | Routes to button2/event2 |
-| Format | `var,comparator,value` (space-separated, AND logic) | `VarOperation:var,comparator,value` |
-| Use case | Gate tokens, spawns, events | Branch event flow |
+`conditions: "var,op,val"` is the old AND-only form of vartests. Valkyrie **ignores it whenever vartests is set**, so never combine them (validate_scenario reports this as an error). Write everything in vartests.
 
 ### Multi-variable Check
 
+Logical operators go *between* tests:
+
 ```
-upsert_event("EventFinalCheck", {
-  display: "false",
-  buttons: "2",
-  vartests: "VarOperation:key1Found,>=,1 VarOperation:key2Found,>=,1 VarTestsLogicalOperator:AND",
-  event1: "EventMissingKeys",
-  event2: "EventBothKeysFound"
+upsert_event("EventBothKeys", {
+  buttons: "1",
+  vartests: "VarOperation:key1Found,>=,1 VarTestsLogicalOperator:AND VarOperation:key2Found,>=,1",
+  event1: "EventOpenVault"
 })
 ```
 

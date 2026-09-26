@@ -7,6 +7,9 @@ import {
   upsertItem,
   upsertPuzzle,
   upsertUI,
+  upsertCustomMonster,
+  upsertMPlace,
+  upsertActivation,
 } from '../../src/tools/upsert.js';
 import { ScenarioModel } from '../../src/model/scenario-model.js';
 
@@ -84,14 +87,21 @@ describe('upsert tools', () => {
       expect(result.errors[0].rule).toBe('prefix');
     });
 
-    it('fails without side field', () => {
+    it('fails without side or customImage', () => {
       const result = upsertTile(model, 'TileTest', {
         xposition: '0',
         yposition: '0',
       });
 
       expect(result.success).toBe(false);
-      expect(result.errors.some(e => e.field === 'side')).toBe(true);
+      expect(result.errors[0].message).toContain('"side" or "customImage"');
+    });
+
+    it('accepts customImage instead of side', () => {
+      const result = upsertTile(model, 'TileCustom', { xposition: '0', yposition: '0', customImage: 'img/map.png' });
+
+      expect(result.success).toBe(true);
+      expect(model.get('TileCustom')!.data.side).toBeUndefined();
     });
   });
 
@@ -363,34 +373,21 @@ describe('upsert tools', () => {
   });
 
   describe('spawn auto-corrections', () => {
-    it('removes xposition/yposition from spawns with warning', () => {
-      const result = upsertSpawn(model, 'SpawnCultist', {
-        monster: 'MonsterCultist',
-        xposition: '5',
-        yposition: '10',
-      });
+    it('keeps xposition/yposition on spawns (Valkyrie highlights the placement there)', () => {
+      const result = upsertSpawn(model, 'SpawnCultist', { monster: 'MonsterCultist', xposition: '5', yposition: '10' });
 
       expect(result.success).toBe(true);
-      const data = model.get('SpawnCultist')!.data;
-      expect(data.xposition).toBeUndefined();
-      expect(data.yposition).toBeUndefined();
-      expect(result.warnings.some(w => w.rule === 'spawn-no-position')).toBe(true);
+      expect(model.get('SpawnCultist')!.data.xposition).toBe('5');
     });
 
-    it('also removes x/y shorthand from spawns', () => {
-      const result = upsertSpawn(model, 'SpawnCultist', {
-        monster: 'MonsterCultist',
-        x: '5',
-        y: '10',
-      });
+    it('renames x/y shorthand on spawns', () => {
+      const result = upsertSpawn(model, 'SpawnCultist', { monster: 'MonsterCultist', x: '5', y: '10' });
 
-      expect(result.success).toBe(true);
       const data = model.get('SpawnCultist')!.data;
       expect(data.x).toBeUndefined();
-      expect(data.y).toBeUndefined();
-      expect(data.xposition).toBeUndefined();
-      expect(data.yposition).toBeUndefined();
-      expect(result.warnings.some(w => w.rule === 'spawn-no-position')).toBe(true);
+      expect(data.xposition).toBe('5');
+      expect(data.yposition).toBe('10');
+      expect(result.warnings.some(w => w.rule === 'field-rename')).toBe(true);
     });
   });
 
@@ -404,5 +401,49 @@ describe('upsert tools', () => {
       expect(model.get('EventStart')!.data.buttons).toBe('2');
       expect(model.get('EventStart')!.data.event2).toBe('EventB');
     });
+  });
+});
+
+describe('upsert tools: Valkyrie 3.20+ components and fields', () => {
+  let model: ScenarioModel;
+
+  beforeEach(() => {
+    model = new ScenarioModel();
+  });
+
+  it('upsertCustomMonster accepts CustomMonster names', () => {
+    const r = upsertCustomMonster(model, 'CustomMonsterBoss', { base: 'MonsterCultist', health: '8' });
+
+    expect(r.success).toBe(true);
+    expect(model.get('CustomMonsterBoss')!.data.base).toBe('MonsterCultist');
+  });
+
+  it('upsertToken rejects CustomMonster names (the old skill example)', () => {
+    expect(upsertToken(model, 'CustomMonsterBoss', { type: 'TokenSearch' }).success).toBe(false);
+  });
+
+  it('upsertMPlace stores tokensize', () => {
+    const r = upsertMPlace(model, 'MPlaceBoss', { xposition: '2', yposition: '3', tokensize: 'huge' });
+
+    expect(r.success).toBe(true);
+    expect(r.warnings).toHaveLength(0);
+  });
+
+  it('upsertActivation accepts Activation names', () => {
+    expect(upsertActivation(model, 'ActivationBossRage', { masterfirst: 'true' }).success).toBe(true);
+  });
+
+  it('defaults token type to TokenSearch when only a customImage is given', () => {
+    const r = upsertToken(model, 'TokenRug', { xposition: '0', yposition: '0', customImage: 'rug.png', clickeffect: 'false' });
+
+    expect(r.success).toBe(true);
+    expect(model.get('TokenRug')!.data.type).toBe('TokenSearch');
+  });
+
+  it('returns field-schema warnings for the fields just set', () => {
+    const r = upsertToken(model, 'TokenClue', { type: 'TokenSearch', tokensize: 'Huge', xpos: '1' });
+
+    expect(r.success).toBe(true);
+    expect(r.warnings.map(w => w.field).sort()).toEqual(['tokensize', 'xpos']);
   });
 });

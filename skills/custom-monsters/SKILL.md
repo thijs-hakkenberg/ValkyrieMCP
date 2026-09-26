@@ -5,224 +5,173 @@ description: Custom monster creation for Valkyrie MoM. Use when creating scenari
 
 # /custom-monsters - Custom Monster Creation
 
-Create scenario-specific monsters with unique behaviors, activations, and stat overrides.
+Create scenario-specific monsters with their own stats, attack cards, evade/horror events, and spawn timing.
 
 ## Component Structure
 
-Custom monsters use the `CustomMonster` prefix and require a `base` field referencing a catalog monster.
+A custom monster is a `CustomMonster` component, created with `upsert_custom_monster`. It is only a monster *type*: to put one on the board you still need a `Spawn` that references it.
 
 ```
-upsert_token("CustomMonsterBoss", {
-  base: "MonsterCultist",
-  health: "8",
-  healthperhero: "2"
+upsert_custom_monster("CustomMonsterCultLeader", {
+  base: "MonsterCultist",        # appearance and defaults for anything not overridden
+  health: "4",
+  healthperhero: "2",
+  horror: "2",
+  awareness: "4",
+  activation: "CultLeaderRitual CultLeaderStrike",   # see Custom Activations
+  evadeevent: "EventCultLeaderEvade",                # see Evade & Horror
+  horrorevent: "EventCultLeaderHorror"
+})
+
+set_localization({
+  "CustomMonsterCultLeader.monstername": "The Cult Leader",
+  "CustomMonsterCultLeader.info": "Robed in crimson, he speaks in a voice not his own."
 })
 ```
 
-**Note:** Custom monsters are created via the spawn system. The `base` field determines the visual appearance and default stats. Override any field to customize.
-
-### Required Fields
+### Fields
 
 | Field | Description |
 |-------|-------------|
-| `base` | Base monster type from catalog (e.g., MonsterCultist, MonsterGhost) |
-
-### Optional Stat Overrides
-
-| Field | Description |
-|-------|-------------|
-| `health` | Base health points |
-| `healthperhero` | Additional health per investigator |
-| `horror` | Horror value for horror checks |
-| `awareness` | Detection range |
-| `traits` | Space-separated trait keywords |
+| `base` | Catalog monster used for appearance and any stat not overridden (e.g. MonsterCultist) |
+| `health` / `healthperhero` | Health = health + healthperhero × investigators |
+| `horror` / `awareness` | Horror check and awareness values |
+| `traits` | Space-separated traits (humanoid, spirit, beast, …) |
+| `image` / `imageplace` | Own portrait / board image (file in the scenario folder). imageplace is drawn at its own size |
+| `activation` | Activation names **without** the `Activation` prefix. Empty = base monster's activations |
+| `evadeevent` / `horrorevent` | Event queued instead of the standard evade / horror check |
 
 ## Custom Activations
 
-Override the default monster activation with a custom event sequence. When the monster activates during the mythos phase, your custom event fires instead of the standard AI behavior.
-
-### Activation Event Structure
+Activations are the attack/move cards Valkyrie draws when the monster activates in the Monster phase. Create each one with `upsert_activation` and list it on the monster **without** its prefix: `activation=CultLeaderStrike` uses the component `ActivationCultLeaderStrike`. Valkyrie picks one at random among those whose vartests pass.
 
 ```
-# Monster definition with custom activation
-upsert_spawn("SpawnBoss", {
-  monster: "CustomMonsterCultLeader",
-  uniquehealth: "10",
-  uniquehealthhero: "3"
+upsert_activation("ActivationCultLeaderStrike", { masterfirst: "true" })
+
+set_localization({
+  "ActivationCultLeaderStrike.ability": "The Cult Leader raises a jagged dagger.",
+  "ActivationCultLeaderStrike.movebutton": "Unengaged",
+  "ActivationCultLeaderStrike.move": "The Cult Leader moves 2 spaces toward the nearest investigator.",
+  "ActivationCultLeaderStrike.master": "The investigator tests {strength}. On a failure, suffer 3 damage.",
+  "ActivationCultLeaderStrike.minion": "The investigator tests {agility}. On a failure, suffer 1 damage."
 })
 
-# Activation event — triggered when the monster activates
-upsert_event("EventCultLeaderActivation", {
-  trigger: "Mythos",
-  buttons: "2",
-  randomevents: "true",
-  event1: "EventCultLeaderAttack",
-  event2: "EventCultLeaderSummon"
-})
-
-# Attack pattern
-upsert_event("EventCultLeaderAttack", {
-  buttons: "1",
-  event1: "EventCultLeaderMoveAndStrike"
-})
-
-# Summon pattern — spawns a minion
-upsert_event("EventCultLeaderSummon", {
-  buttons: "1",
-  add: "SpawnCultistMinion",
-  event1: "EventCultLeaderDone"
+# Only available once the ritual has begun
+upsert_activation("ActivationCultLeaderRitual", {
+  vartests: "VarOperation:ritualStarted,==,1"
 })
 ```
 
-### Random Move + Attack Patterns
-
-Use `randomevents=true` to vary monster behavior each activation:
-
-```
-upsert_event("EventBossActivation", {
-  display: "false",
-  buttons: "3",
-  randomevents: "true",
-  event1: "EventBossAggressive",     # charge and attack
-  event2: "EventBossDefensive",      # retreat and heal
-  event3: "EventBossSpecial"         # unique ability
-})
-```
+validate_scenario reports `activation=ActivationCultLeaderStrike` (prefix repeated) as an error.
 
 ## Evade & Horror Events
 
-### Custom Evade
-
-When an investigator attempts to evade, the custom evade event fires:
+Set `evadeevent` / `horrorevent` on the monster to replace the standard check with your own event. These events are normal events. Use `quota` for a skill test with pass/fail buttons:
 
 ```
-upsert_event("EventBossEvade", {
+upsert_event("EventCultLeaderEvade", {
   buttons: "2",
-  quota: "2",                        # difficulty threshold
-  event1: "EventBossEvadeSuccess",   # pass → escape
-  event2: "EventBossEvadeFail"       # fail → consequence
+  quota: "2",
+  event1: "EventCultLeaderEvadePass",
+  event2: "EventCultLeaderEvadeFail"
 })
 
 set_localization({
-  "EventBossEvade.text": "The cult leader blocks your path. Test {agility} to slip past.",
-  "EventBossEvade.button1": "{qst:PASS}",
-  "EventBossEvade.button2": "{qst:FAIL}",
-  "EventBossEvadeSuccess.text": "You dart past the robed figure.",
-  "EventBossEvadeFail.text": "The cult leader grabs your arm. Suffer 1 damage."
+  "EventCultLeaderEvade.text": "The cult leader blocks your path. Test {agility}.",
+  "EventCultLeaderEvade.button1": "{qst:PASS}",
+  "EventCultLeaderEvade.button2": "{qst:FAIL}",
+  "EventCultLeaderEvadePass.text": "You dart past the robed figure.",
+  "EventCultLeaderEvadeFail.text": "He grabs your arm. Suffer 1 damage."
 })
 ```
 
-### Custom Horror
+## Spawning
 
-When an investigator encounters the monster, the custom horror event fires:
+A `Spawn` is an event: it runs when it is listed in another event's `eventN`. **Never put a spawn in `add`**: Valkyrie ignores it there, so the monster never appears. validate_scenario reports it as an error.
 
 ```
-upsert_event("EventBossHorror", {
-  buttons: "2",
-  quota: "1",
-  event1: "EventBossHorrorPass",
-  event2: "EventBossHorrorFail"
+upsert_spawn("SpawnCultLeader", {
+  monster: "CustomMonsterCultLeader",
+  unique: "true",                  # optional: a named unique monster...
+  uniquehealth: "10",              # ...with its own health
+  uniquehealthhero: "3",
+  xposition: "4", yposition: "2",  # optional: where the figure is shown
+  buttons: "1",
+  event1: "EventCultLeaderArrives"
 })
 
-set_localization({
-  "EventBossHorror.text": "The creature's true form is revealed. Test {will} to resist the madness.",
-  "EventBossHorror.button1": "{qst:PASS}",
-  "EventBossHorror.button2": "{qst:FAIL}"
+upsert_event("EventOpenCoffin", {
+  buttons: "1",
+  event1: "SpawnCultLeader"
 })
 ```
 
-## Spawn Triggering
+### Chaining a spawn in a silent sequence
 
-### Round-Based Spawning
-
-Use `EndRound` trigger with `#round` vartests and one-shot flags:
+Put the spawn first and the next step as fallback. The spawn continues the chain from its own `event1`, and if the spawn's vartests fail Valkyrie falls through to the next step:
 
 ```
-# Check if it's time to spawn
+upsert_event("EventAwaken", {
+  display: "false",
+  buttons: "1",
+  event1: "SpawnCultLeader EventAwakenContinue"
+})
+# SpawnCultLeader has event1: "EventAwakenContinue"
+```
+
+### Round-Based Spawning (one-shot)
+
+Gate a spawn by round and a fired flag in **one** vartests. Don't also set `conditions`: Valkyrie ignores `conditions` whenever vartests is set.
+
+```
 upsert_event("EventRound3Spawn", {
   trigger: "EndRound",
   display: "false",
-  buttons: "2",
-  conditions: "round3Spawned,==,0",
-  vartests: "VarOperation:#round,>=,3",
-  event1: "EventRound3SpawnSkip",    # not time yet
-  event2: "EventRound3SpawnFire"     # round >= 3, spawn!
-})
-
-upsert_event("EventRound3SpawnFire", {
   buttons: "1",
+  vartests: "VarOperation:#round,>=,3 VarTestsLogicalOperator:AND VarOperation:round3Spawned,==,0",
   operations: "round3Spawned,=,1",
-  add: "SpawnHallwayGhost",
-  event1: "EventRound3SpawnNarrative"
+  event1: "SpawnHallwayGhost"
 })
 ```
+
+Once `round3Spawned` is 1, the vartests fail and the event is skipped every later round. Don't split this into a two-button "Skip / Fire" event: a hidden event always follows button 1.
 
 ### Progressive Spawning
 
-Spawn increasingly dangerous monsters as the scenario progresses:
+Repeat the same shape with later rounds and tougher monsters:
 
 ```
-# Early game — minor enemies
-upsert_event("EventEarlySpawn", {
-  trigger: "EndRound",
-  display: "false",
-  buttons: "2",
-  conditions: "earlySpawnDone,==,0",
-  vartests: "VarOperation:#round,>=,2",
-  event1: "EventEarlySpawnSkip",
-  event2: "EventEarlySpawnFire"
-})
-
-# Mid game — tougher enemies
 upsert_event("EventMidSpawn", {
   trigger: "EndRound",
   display: "false",
-  buttons: "2",
-  conditions: "midSpawnDone,==,0",
-  vartests: "VarOperation:#round,>=,6",
-  event1: "EventMidSpawnSkip",
-  event2: "EventMidSpawnFire"
+  buttons: "1",
+  vartests: "VarOperation:#round,>=,6 VarTestsLogicalOperator:AND VarOperation:midSpawnDone,==,0",
+  operations: "midSpawnDone,=,1",
+  event1: "SpawnMidGame"
 })
 
-# Late game — boss
 upsert_event("EventBossSpawn", {
   trigger: "EndRound",
   display: "false",
-  buttons: "2",
-  conditions: "bossSpawnDone,==,0",
-  vartests: "VarOperation:#round,>=,10",
-  event1: "EventBossSpawnSkip",
-  event2: "EventBossSpawnFire"
-})
-```
-
-### Event-Triggered Spawns
-
-Spawn monsters in response to player actions:
-
-```
-upsert_event("EventOpenCoffin", {
   buttons: "1",
-  add: "SpawnCoffinZombie",
-  event1: "EventCoffinNarrative"
+  vartests: "VarOperation:#round,>=,10 VarTestsLogicalOperator:AND VarOperation:bossSpawnDone,==,0",
+  operations: "bossSpawnDone,=,1",
+  event1: "SpawnCultLeader"
 })
 ```
 
 ## Monster Stats Reference
 
-Common base monsters for the `base` field:
+Catalog values for common `base` monsters (from the plugin's game-content catalog):
 
-| Monster | Health | Per Hero | Notes |
-|---------|--------|----------|-------|
-| MonsterCultist | 2 | 1 | Basic human enemy |
-| MonsterGhost | 3 | 1 | Incorporeal, horror focus |
-| MonsterZombie | 3 | 1 | Slow but tough |
-| MonsterManiac | 2 | 1 | Fast, aggressive |
-| MonsterWitch | 3 | 1 | Spell-based attacks |
-| MonsterHuntingHorror | 5 | 2 | Flying, strong |
-| MonsterRiotOfFlesh | 4 | 2 | Resilient |
-| MonsterStarSpawn | 6 | 2 | Boss-tier |
-| MonsterDeepOne | 3 | 1 | Aquatic areas |
-| MonsterThrall | 2 | 1 | Swarm enemy |
+| Monster | Pack | Health | Per Hero | Horror | Awareness | Traits |
+|---------|------|--------|----------|--------|-----------|--------|
+| MonsterCultist | base | 1 | 1 | 1 | 3 | small, humanoid |
+| MonsterGhost | base | 1 | 1 | 5 | 2 | spirit |
+| MonsterDeepOne | base | 2 | 1 | 4 | 3 | humanoid |
+| MonsterHuntingHorror | base | 3 | 1 | 6 | 5 | beast |
+| MonsterRiot | base | 5 | 3 | 4 | 7 | humanoid |
+| MonsterStarSpawn | base | 9 | 3 | 8 | 5 | beast |
+| MonsterThrall | btt | 2 | 1 | 4 | 3 | humanoid |
 
-Use `search_game_content` with query "Monster" to find all available monsters including expansion content.
+Use `search_game_content` with query "Monster" to find all monsters, including expansions. Monsters from packs other than base are added to the quest's `packs` automatically on save.

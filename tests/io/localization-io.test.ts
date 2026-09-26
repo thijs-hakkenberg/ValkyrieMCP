@@ -106,26 +106,53 @@ describe('writeLocalization', () => {
     expect(output).toBe('.,English\n');
   });
 
-  it('replaces double quotes with single quotes in values', () => {
-    const entries = new Map<string, string>();
-    entries.set('key', 'He said "hello" to them');
-
-    const output = writeLocalization('English', entries);
-    const lines = output.split('\n');
-
-    // Double quotes must not appear inside the value
-    expect(lines[1]).toBe("key,He said 'hello' to them");
-  });
-
-  it('replaces double quotes in comma-containing values', () => {
+  it('encloses values containing double quotes in ||| (Valkyrie format)', () => {
     const entries = new Map<string, string>();
     entries.set('key', 'He said "hello", then left');
 
-    const output = writeLocalization('English', entries);
-    const lines = output.split('\n');
+    const lines = writeLocalization('English', entries).split('\n');
+    expect(lines[1]).toBe('key,|||He said "hello", then left|||');
+  });
 
-    // Value has commas → quoted, but internal " replaced with '
-    expect(lines[1]).toBe(`key,"He said 'hello', then left"`);
+  it('writes real line breaks as literal \\n on one line', () => {
+    const entries = new Map<string, string>([['key', 'line one\nline two']]);
+
+    const lines = writeLocalization('English', entries).split('\n');
+    expect(lines).toHaveLength(3);
+    expect(lines[1]).toBe('key,"line one\\nline two"');
+  });
+});
+
+describe('Valkyrie multi-line formats', () => {
+  it('joins a quoted value that spans several physical lines', () => {
+    const content = '.,English\nEventA.text,"First line, with comma.\n\n\'Quoted\', she said.\nLast line."\nEventA.button1,Go\n';
+    const { entries } = parseLocalization(content);
+
+    expect(entries.get('EventA.text')).toBe("First line, with comma.\\n\\n'Quoted', she said.\\nLast line.");
+    expect(entries.get('EventA.button1')).toBe('Go');
+    expect(entries.size).toBe(2);
+  });
+
+  it('reads |||-enclosed values with double quotes, single and multi-line', () => {
+    const content = '.,English\nk1,|||Say "hi"|||\nk2,|||Say\n"bye"|||\nk3,plain\n';
+    const { entries } = parseLocalization(content);
+
+    expect(entries.get('k1')).toBe('Say "hi"');
+    expect(entries.get('k2')).toBe('Say\\n"bye"');
+    expect(entries.get('k3')).toBe('plain');
+  });
+
+  it('unescapes doubled quotes inside a quoted value', () => {
+    const { entries } = parseLocalization('.,English\nk,"a ""b"" c"\n');
+    expect(entries.get('k')).toBe('a "b" c');
+  });
+
+  it('round-trips multi-line and quoted values without loss', () => {
+    const content = '.,English\nk1,"one\ntwo, three"\nk2,|||He said "x"|||\nk3,simple\n';
+    const first = parseLocalization(content).entries;
+    const second = parseLocalization(writeLocalization('English', first)).entries;
+
+    expect([...second]).toEqual([...first]);
   });
 });
 

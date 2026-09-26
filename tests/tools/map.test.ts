@@ -10,19 +10,27 @@ describe('map tools', () => {
   });
 
   describe('getMapAscii', () => {
-    it('produces readable output for model with tiles', () => {
-      model.upsert('TileTownSquare', { xposition: '0', yposition: '0', side: 'TileSideTownSquare' });
-      model.upsert('TileStorefront', { xposition: '7', yposition: '0', side: 'TileSideStorefront' });
-      model.upsert('TileBasement', { xposition: '7', yposition: '-7', side: 'TileSideBasement' });
+    it('describes tile areas, doors and where they lead', () => {
+      model.upsert('TileHub', { xposition: '0', yposition: '0', side: 'TileSideLobby' });
+      model.upsert('TileStudy', { xposition: '7', yposition: '0', side: 'TileSideStudy' });
 
-      const ascii = getMapAscii(model);
+      const text = getMapAscii(model);
 
-      expect(typeof ascii).toBe('string');
-      expect(ascii.length).toBeGreaterThan(0);
-      // Should contain tile names or abbreviated versions
-      expect(ascii).toContain('TownSquare');
-      expect(ascii).toContain('Storefront');
-      expect(ascii).toContain('Basement');
+      expect(text).toContain('TileHub: TileSideLobby at (0, 0) -> covers x 0..7, y -7..0');
+      expect(text).toContain('TileStudy: TileSideStudy at (7, 0) -> covers x 7..14, y -3.5..0');
+      expect(text).toMatch(/door on east edge \(y -2\.27\.\.-1\.23\) -> connects to TileStudy; token spot \(6\.3, -1\.75\)/);
+      expect(text).toContain('leads off the map');
+    });
+
+    it('reports tokens that are not on any tile', () => {
+      model.upsert('TileHub', { xposition: '0', yposition: '0', side: 'TileSideLobby' });
+      model.upsert('TokenOnHub', { type: 'TokenSearch', xposition: '3', yposition: '-3' });
+      model.upsert('TokenAbove', { type: 'TokenSearch', xposition: '3', yposition: '2' });
+
+      const text = getMapAscii(model);
+
+      expect(text).toContain('TokenOnHub (TokenSearch) at (3, -3) -> on A TileHub');
+      expect(text).toContain('TokenAbove (TokenSearch) at (3, 2) -> NOT ON ANY TILE');
     });
 
     it('returns message for model with no tiles', () => {
@@ -60,48 +68,42 @@ describe('map tools', () => {
   });
 
   describe('placeTileRelative', () => {
-    it('places tile to the north (y+7)', () => {
-      model.upsert('TileCenter', { xposition: '3', yposition: '5', side: 'TileSideCenter' });
-      const pos = placeTileRelative(model, 'TileCenter', 'north');
-
-      expect(pos.x).toBe(3);
-      expect(pos.y).toBe(12);
+    beforeEach(() => {
+      model.upsert('TileHub', { xposition: '0', yposition: '0', side: 'TileSideLobby' });
     });
 
-    it('places tile to the south (y-7)', () => {
-      model.upsert('TileCenter', { xposition: '0', yposition: '0', side: 'TileSideCenter' });
-      const pos = placeTileRelative(model, 'TileCenter', 'south');
-
-      expect(pos.x).toBe(0);
-      expect(pos.y).toBe(-7);
+    it('places a small tile east, flush, with its west door on the hub door', () => {
+      const [best] = placeTileRelative(model, 'TileHub', 'east', 'TileSideStudy');
+      expect(best).toMatchObject({ x: 7, y: 0, rotation: 0 });
+      expect(best.passages.length).toBeGreaterThan(0);
     });
 
-    it('places tile to the east (x+7)', () => {
-      model.upsert('TileCenter', { xposition: '0', yposition: '0', side: 'TileSideCenter' });
-      const pos = placeTileRelative(model, 'TileCenter', 'east');
-
-      expect(pos.x).toBe(7);
-      expect(pos.y).toBe(0);
+    it('rotates a tile whose only door faces away (library north of the hub)', () => {
+      const [best] = placeTileRelative(model, 'TileHub', 'north', 'TileSideLibrary');
+      // Library's door is on its north edge; rotated 180 around its anchor it faces south
+      expect(best).toMatchObject({ x: 7, y: 0, rotation: 180 });
+      expect(best.rect).toEqual({ minX: 0, maxX: 7, minY: 0, maxY: 3.5 });
     });
 
-    it('places tile to the west (x-7)', () => {
-      model.upsert('TileCenter', { xposition: '0', yposition: '0', side: 'TileSideCenter' });
-      const pos = placeTileRelative(model, 'TileCenter', 'west');
-
-      expect(pos.x).toBe(-7);
-      expect(pos.y).toBe(0);
+    it('places a large tile south and west', () => {
+      expect(placeTileRelative(model, 'TileHub', 'south', 'TileSideRootCellar')[0]).toMatchObject({ x: 0, y: -7, rotation: 0 });
+      expect(placeTileRelative(model, 'TileHub', 'west', 'TileSideAttic')[0]).toMatchObject({ x: -7, y: 0, rotation: 0 });
     });
 
-    it('uses custom tile size', () => {
-      model.upsert('TileCenter', { xposition: '0', yposition: '0', side: 'TileSideCenter' });
-      const pos = placeTileRelative(model, 'TileCenter', 'east', 3.5);
-
-      expect(pos.x).toBe(3.5);
-      expect(pos.y).toBe(0);
+    it('respects a forced rotation', () => {
+      const candidates = placeTileRelative(model, 'TileHub', 'east', 'TileSideStudy', 90);
+      expect(candidates.every(c => c.rotation === 90)).toBe(true);
     });
 
-    it('throws for non-existent tile', () => {
-      expect(() => placeTileRelative(model, 'TileNonExistent', 'north')).toThrow();
+    it('reports overlaps with other tiles and ranks them last', () => {
+      model.upsert('TileBlocker', { xposition: '7', yposition: '0', side: 'TileSideAttic' });
+      const candidates = placeTileRelative(model, 'TileHub', 'east', 'TileSideStudy', undefined, 10);
+      expect(candidates[candidates.length - 1].overlaps).toContain('TileBlocker');
+    });
+
+    it('throws for non-existent tile or unknown side', () => {
+      expect(() => placeTileRelative(model, 'TileNope', 'north', 'TileSideStudy')).toThrow('not found');
+      expect(() => placeTileRelative(model, 'TileHub', 'north', 'TileSideNope')).toThrow('Unknown tile side');
     });
   });
 });

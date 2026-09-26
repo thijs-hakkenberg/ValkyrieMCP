@@ -46,8 +46,8 @@ export class CatalogStore {
       if (entry.type === 'tile') {
         const geo = TILE_GEOMETRY[entry.id];
         if (geo) {
-          entry.grid = geo.grid;
-          entry.edges = geo.edges;
+          entry.size = `${geo.width}x${geo.height} units`;
+          entry.openings = geo.openings;
           entry.desc = geo.desc;
         }
       }

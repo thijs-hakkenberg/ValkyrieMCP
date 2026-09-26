@@ -89,83 +89,59 @@ upsert_event("EventMythosInit", {
 })
 ```
 
-**Step 2 — StartRound-triggered events with vartests:**
+**Step 2 — One StartRound-triggered event per tier, gated by its own vartests:**
+
+An event's vartests decide whether it runs — they never pick between event1 and event2. So each tier is a single silent event that simply does nothing until its round arrives:
 
 ```
 # Minor mythos — starts at round 1
-upsert_event("EventMythosMinorCheck", {
+upsert_event("EventMythosMinor", {
   trigger: "StartRound",
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:#round,>=,1",
-  event1: "EventMythosMinorSkip",
-  event2: "EventMythosMinorFire"
-})
-
-upsert_event("EventMythosMinorFire", {
-  display: "false",
   buttons: "0",
+  vartests: "VarOperation:#round,>=,1",
   operations: "$mythosMinor,=,1"
 })
 
 # Major mythos — starts at majorRound
-upsert_event("EventMythosMajorCheck", {
+upsert_event("EventMythosMajor", {
   trigger: "StartRound",
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:#round,>=,majorRound",
-  event1: "EventMythosMajorSkip",
-  event2: "EventMythosMajorFire"
-})
-
-upsert_event("EventMythosMajorFire", {
-  display: "false",
   buttons: "0",
+  vartests: "VarOperation:#round,>=,majorRound",
   operations: "$mythosMajor,=,1"
 })
 
 # Deadly mythos — starts at deadlyRound
-upsert_event("EventMythosDeadlyCheck", {
+upsert_event("EventMythosDeadly", {
   trigger: "StartRound",
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:#round,>=,deadlyRound",
-  event1: "EventMythosDeadlySkip",
-  event2: "EventMythosDeadlyFire"
-})
-
-upsert_event("EventMythosDeadlyFire", {
-  display: "false",
   buttons: "0",
+  vartests: "VarOperation:#round,>=,deadlyRound",
   operations: "$mythosDeadly,=,1"
 })
 ```
 
-**Important:** Use `>=` not `==` for round checks. If a check is skipped for one round (e.g., due to conditions), `>=` will still catch it on the next round.
+**Important:** Use `>=` not `==` for round checks, so a round that is skipped for any reason is caught on the next one.
+
+**Do not** use a two-button "Check → Skip / Fire" event (`event1: Skip, event2: Fire`): a hidden event always follows button 1, so the Fire branch never runs. validate_scenario reports this (rule `event-semantics`).
 
 ### One-Shot Mythos Events
 
-For events that should only fire once (e.g., a story beat at round 5):
+For events that should only fire once (e.g., a story beat at round 5), combine the round test and a fired flag in one vartests — never split them across `conditions` and `vartests` (Valkyrie ignores `conditions` when vartests is set):
 
 ```
 upsert_event("EventRound5Story", {
   trigger: "StartRound",
   display: "false",
-  buttons: "2",
-  conditions: "round5Fired,==,0",
-  vartests: "VarOperation:#round,>=,5",
-  event1: "EventRound5Skip",
-  event2: "EventRound5Fire"
-})
-
-upsert_event("EventRound5Fire", {
   buttons: "1",
+  vartests: "VarOperation:#round,>=,5 VarTestsLogicalOperator:AND VarOperation:round5Fired,==,0",
   operations: "round5Fired,=,1",
   event1: "EventRound5Narrative"
 })
 ```
 
-The `conditions` check ensures the event is silently skipped after it has fired once.
+After it runs once, `round5Fired` is 1, so its vartests fail and it is skipped every later round.
 
 ## Random Number Generation
 
@@ -180,14 +156,18 @@ upsert_event("EventRollDice", {
   event1: "EventCheckRoll"
 })
 
-# Branch on the result
+# Branch on the result: put the test on the target, not on the router
 upsert_event("EventCheckRoll", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:diceResult,>=,4",
-  event1: "EventRollLow",     # 1-3
-  event2: "EventRollHigh"     # 4-6
+  buttons: "1",
+  event1: "EventRollHigh EventRollLow"   # first one whose vartests pass runs
 })
+
+upsert_event("EventRollHigh", {   # 4-6
+  vartests: "VarOperation:diceResult,>=,4",
+  ...
+})
+# EventRollLow (1-3) has no vartests: it is the fallback
 ```
 
 ## Hero Detection
@@ -210,11 +190,15 @@ Check if a specific investigator is in the game:
 ```
 upsert_event("EventAshcanSpecial", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:#heroAshcanPete,>=,1",
-  event1: "EventNoAshcan",
-  event2: "EventAshcanPresent"
+  buttons: "1",
+  event1: "EventAshcanPresent EventNoAshcan"   # first one whose vartests pass runs
 })
+
+upsert_event("EventAshcanPresent", {
+  vartests: "VarOperation:#heroAshcanPete,>=,1",
+  ...
+})
+# EventNoAshcan has no vartests: it is the fallback
 ```
 
 ### Scaling by Hero Count
@@ -223,11 +207,15 @@ upsert_event("EventAshcanSpecial", {
 # Give items based on party size
 upsert_event("EventScaleItems", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:#heroes,>=,4",
-  event1: "EventSmallPartyItems",    # 2-3 heroes
-  event2: "EventLargePartyItems"     # 4-5 heroes
+  buttons: "1",
+  event1: "EventLargePartyItems EventSmallPartyItems"   # first one whose vartests pass runs
 })
+
+upsert_event("EventLargePartyItems", {   # 4-5 heroes
+  vartests: "VarOperation:#heroes,>=,4",
+  ...
+})
+# EventSmallPartyItems (2-3 heroes) has no vartests: it is the fallback
 ```
 
 ## Content Pack Detection
@@ -237,11 +225,15 @@ Gate content on expansion ownership to avoid crashes:
 ```
 upsert_event("EventBtTContent", {
   display: "false",
-  buttons: "2",
-  vartests: "VarOperation:#BtT,>=,1",
-  event1: "EventBaseGameFallback",    # no expansion
-  event2: "EventBtTExclusive"         # has Beyond the Threshold
+  buttons: "1",
+  event1: "EventBtTExclusive EventBaseGameFallback"   # first one whose vartests pass runs
 })
+
+upsert_event("EventBtTExclusive", {   # has Beyond the Threshold
+  vartests: "VarOperation:#BtT,>=,1",
+  ...
+})
+# EventBaseGameFallback (no expansion) has no vartests: it is the fallback
 ```
 
 This is essential when referencing monsters, tiles, or items from expansions. Always provide a base-game fallback.
@@ -276,10 +268,12 @@ operations: "clues,+,1 totalClues,+,1 roundClues,=,0"
 
 ### Logical Operators in vartests
 
-```
-# AND (default) — all must pass
-vartests: "VarOperation:key1,>=,1 VarOperation:key2,>=,1 VarTestsLogicalOperator:AND"
+Operators go **between** tests and apply to the tests after them (evaluated left to right, starting as AND). A trailing operator does nothing — `A B VarTestsLogicalOperator:OR` is evaluated as A AND B.
 
-# OR — any can pass
-vartests: "VarOperation:key1,>=,1 VarOperation:key2,>=,1 VarTestsLogicalOperator:OR"
+```
+# AND — both must pass
+vartests: "VarOperation:key1,>=,1 VarTestsLogicalOperator:AND VarOperation:key2,>=,1"
+
+# OR — either can pass
+vartests: "VarOperation:key1,>=,1 VarTestsLogicalOperator:OR VarOperation:key2,>=,1"
 ```

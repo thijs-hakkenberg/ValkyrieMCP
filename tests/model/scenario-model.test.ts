@@ -346,3 +346,34 @@ describe('ScenarioModel', () => {
     });
   });
 });
+
+describe('ScenarioModel [Quest] round-trip', () => {
+  const questIni = `[Quest]
+format=21
+type=MoM
+minhero=1
+maxhero=4
+url=https://example.com/scenarios
+latest_update=2026-04-01
+`;
+
+  it('reads minhero and maxhero', () => {
+    const model = ScenarioModel.loadFromData(questIni, {});
+    expect(model.questConfig.minhero).toBe(1);
+    expect(model.questConfig.maxhero).toBe(4);
+  });
+
+  it('keeps unknown [Quest] keys and writes them back', () => {
+    const model = ScenarioModel.loadFromData(questIni, {});
+    const out = serializeQuestConfig(model.questConfig);
+
+    expect(out.minhero).toBe('1');
+    expect(out.maxhero).toBe('4');
+    expect(out.url).toBe('https://example.com/scenarios');
+    expect(out.latest_update).toBe('2026-04-01');
+  });
+
+  it('omits player count when the scenario never set it', () => {
+    expect(serializeQuestConfig(DEFAULT_QUEST_CONFIG).minhero).toBeUndefined();
+  });
+});
