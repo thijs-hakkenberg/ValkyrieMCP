@@ -27,8 +27,8 @@ Use `create_scenario` to scaffold the scenario directory. This creates the direc
 1. Use `suggest_tile_layout` with a style (linear, l_shape, hub_spoke) based on the concept
 2. Use `search_game_content` to find appropriate tiles (e.g., "hallway", "study", "garden")
 3. Use `upsert_tile` to place each tile with a `side` from the tile catalog
-4. Use `get_map_ascii` to visualize the layout
-5. Adjust positions with `place_tile_relative` as needed
+4. Place each next tile with `place_tile_relative` (lines up doors), then put tokens on the spots `get_map_ascii` lists
+5. Check the board with `render_map` before playtesting
 
 For systematic placement methodology, see `/tile-placement`.
 
@@ -58,7 +58,7 @@ Place tokens on the map:
 Use `upsert_spawn` for each monster encounter:
 - Reference monsters from catalog (MonsterCultist, MonsterGhost, etc.)
 - Set health scaling with `uniquehealth` and `uniquehealthhero`
-- Use `conditions` to gate spawns on game state
+- Gate spawns on game state with `vartests` on the spawn (never `conditions` together with `vartests`), and trigger spawns from `eventN`, never `add`
 
 For custom monsters with unique behaviors, see `/custom-monsters`.
 

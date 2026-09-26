@@ -33,7 +33,7 @@ export function getTypePrefix(name: string): string {
 }
 
 /** Reference fields that may contain space-separated component names */
-export const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster', 'inspect'] as const;
+export const REFERENCE_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6', 'add', 'remove', 'monster', 'inspect', 'evadeevent', 'horrorevent'] as const;
 
 /** Event-specific reference fields (event1..event6) */
 export const EVENT_FIELDS = ['event1', 'event2', 'event3', 'event4', 'event5', 'event6'] as const;
@@ -56,6 +56,30 @@ export interface IniData {
   [sectionName: string]: IniSection;
 }
 
+/** Oldest quest format Valkyrie will load (QuestData.Quest.minumumFormat) */
+export const MIN_QUEST_FORMAT = 4;
+
+/**
+ * Newest quest format this plugin understands (QuestFormat.CURRENT_VERSION, Valkyrie 3.20+).
+ * Valkyrie refuses to load a quest whose format is above its own current version.
+ */
+export const MAX_QUEST_FORMAT = 21;
+
+/**
+ * Special names accepted in an Event's `remove` field instead of a component name,
+ * mapped to the quest format that introduced them (Quest.Remove / EditorComponentEvent).
+ */
+export const REMOVE_KEYWORDS: Record<string, number> = {
+  '#monsters': MIN_QUEST_FORMAT,
+  '#boardcomponents': MIN_QUEST_FORMAT,
+  '#shop': MIN_QUEST_FORMAT,
+  '#uicomponents': 20,
+  '#doors': 20,
+  '#tiles': 20,
+  '#qitems': 20,
+  '#tokens': 20,
+};
+
 /** Quest config from quest.ini [Quest] section */
 export interface QuestConfig {
   format: number;
@@ -69,6 +93,11 @@ export interface QuestConfig {
   image: string;
   version: string;
   packs: string;
+  /** Supported investigator count (Valkyrie defaults to 2–5 when absent) */
+  minhero?: number;
+  maxhero?: number;
+  /** Any other [Quest] keys, preserved verbatim so a load/save round-trip loses nothing */
+  extra?: Record<string, string>;
 }
 
 /** A generic scenario component (any INI section) */
@@ -123,5 +152,10 @@ export function serializeQuestConfig(config: QuestConfig): Record<string, string
   if (config.image) result.image = config.image;
   if (config.version) result.version = config.version;
   if (config.packs) result.packs = config.packs;
+  if (config.minhero !== undefined) result.minhero = String(config.minhero);
+  if (config.maxhero !== undefined) result.maxhero = String(config.maxhero);
+  for (const [k, v] of Object.entries(config.extra ?? {})) {
+    if (!(k in result)) result[k] = v;
+  }
   return result;
 }

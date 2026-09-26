@@ -9,37 +9,42 @@ describe('TileGeometry', () => {
     const geoIds = Object.keys(TILE_GEOMETRY);
     const missingFromGeo = tileIds.filter(id => !TILE_GEOMETRY[id]);
     expect(missingFromGeo, `tiles missing geometry: ${missingFromGeo.join(', ')}`).toEqual([]);
-    // Also check no extra entries exist in geometry that aren't in catalog
     const extraInGeo = geoIds.filter(id => !tileIds.includes(id));
     expect(extraInGeo, `extra geometry entries: ${extraInGeo.join(', ')}`).toEqual([]);
   });
 
+  it('matches doors verified by eye on the tile artwork', () => {
+    const mids = (id: string, side: 'N' | 'E' | 'S' | 'W') =>
+      TILE_GEOMETRY[id].openings[side].map(o => Math.round((o.from + o.to) / 2 * 4) / 4);
+    expect(TILE_GEOMETRY.TileSideLobby).toMatchObject({ width: 7, height: 7 });
+    expect(mids('TileSideLobby', 'N')).toEqual([1.75, 5.25]);
+    expect(mids('TileSideLobby', 'S')).toEqual([3.5]);
+    expect(mids('TileSideInteriorHall', 'N')).toEqual([]);
+    expect(mids('TileSideInteriorHall', 'W')).toEqual([1.75, 5.25]);
+    expect(TILE_GEOMETRY.TileSideLibrary).toMatchObject({ width: 7, height: 3.5 });
+    expect(TILE_GEOMETRY.TileSideRootCellar.openings.N).toEqual([{ from: 0, to: 7, kind: 'open' }]);
+  });
+
   for (const [id, geo] of Object.entries(TILE_GEOMETRY)) {
     describe(id, () => {
-      it('has positive integer grid dimensions', () => {
-        expect(geo.grid).toHaveLength(2);
-        expect(geo.grid[0]).toBeGreaterThan(0);
-        expect(geo.grid[1]).toBeGreaterThan(0);
-        expect(Number.isInteger(geo.grid[0])).toBe(true);
-        expect(Number.isInteger(geo.grid[1])).toBe(true);
+      it('has a positive size in board units', () => {
+        expect(geo.width).toBeGreaterThan(0);
+        expect(geo.height).toBeGreaterThan(0);
       });
 
-      it('has edge strings with valid characters only', () => {
-        for (const dir of ['N', 'E', 'S', 'W'] as const) {
-          const edge = geo.edges[dir];
-          expect(edge).toMatch(/^[wdo]+$/);
+      it('has openings within its edges', () => {
+        for (const side of ['N', 'E', 'S', 'W'] as const) {
+          const length = side === 'N' || side === 'S' ? geo.width : geo.height;
+          for (const o of geo.openings[side]) {
+            expect(o.from).toBeGreaterThanOrEqual(0);
+            expect(o.to).toBeLessThanOrEqual(length + 0.01);
+            expect(o.to).toBeGreaterThan(o.from);
+          }
         }
       });
 
-      it('has edge string lengths matching grid dimensions', () => {
-        const [width, height] = geo.grid;
-        expect(geo.edges.N).toHaveLength(width);
-        expect(geo.edges.S).toHaveLength(width);
-        expect(geo.edges.E).toHaveLength(height);
-        expect(geo.edges.W).toHaveLength(height);
-      });
-
-      it('has a non-empty description', () => {
+      it('has an image and a non-empty description', () => {
+        expect(geo.image.length).toBeGreaterThan(0);
         expect(geo.desc.length).toBeGreaterThan(0);
       });
     });

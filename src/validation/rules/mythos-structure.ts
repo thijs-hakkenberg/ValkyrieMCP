@@ -3,7 +3,7 @@ import type { ScenarioModel } from '../../model/scenario-model.js';
 
 /**
  * Checks Mythos phase correctness and skill test structure:
- * - Warning: Mythos trigger event without `conditions` — fires every Mythos phase
+ * - Warning: Mythos trigger event without `vartests` (or legacy `conditions`) — fires every Mythos phase
  * - Warning: No `$end` operation in any event — scenario can never finish
  * - Warning: Event with `quota` but `buttons` != 2 — skill test needs pass/fail buttons
  */
@@ -14,13 +14,13 @@ export function checkMythosStructure(model: ScenarioModel): ValidationResult[] {
   // Check Mythos events for missing conditions and buttons=0 auto-skip
   for (const comp of allComponents) {
     if (comp.data.trigger === 'Mythos') {
-      if (!comp.data.conditions) {
+      if (!comp.data.vartests && !comp.data.conditions) {
         results.push({
           rule: 'mythos-structure',
           severity: 'warning',
-          message: `"${comp.name}" has trigger=Mythos but no conditions — will fire every Mythos phase`,
+          message: `"${comp.name}" has trigger=Mythos but no vartests — will fire every Mythos phase`,
           component: comp.name,
-          field: 'conditions',
+          field: 'vartests',
         });
       }
 

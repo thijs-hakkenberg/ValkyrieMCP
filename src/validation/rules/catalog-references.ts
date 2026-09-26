@@ -7,6 +7,7 @@ import { getSharedCatalog } from '../../catalogs/catalog-store.js';
  * Checks that game content references exist in the catalog.
  * - Tile `side` field -> must be a valid TileSide ID
  * - Spawn `monster` field -> must be a valid Monster ID (or a CustomMonster defined in the scenario)
+ * - Token `type` field -> must be a valid Token ID (or Monster ID, format 21+)
  * - Any component `audio` field -> must be a valid Audio ID
  *
  * All issues are **warnings** (not errors) because custom scenarios may define
@@ -84,6 +85,21 @@ export function checkCatalogReferences(model: ScenarioModel): ValidationResult[]
         }
       }
     }
+  }
+
+  // Check token types: a catalog token, or (format 21+) a catalog monster. A custom image replaces the type.
+  const tokenIds = catalog.getAllIds('token');
+  for (const comp of model.getByType('Token')) {
+    const type = comp.data.type;
+    if (!type || comp.data.customImage) continue;
+    if (tokenIds.has(type) || monsterIds.has(type) || customMonsterNames.has(type)) continue;
+    results.push({
+      rule: 'catalog-references',
+      severity: 'warning',
+      message: `Token "${comp.name}" has unknown type "${type}" — Valkyrie shows it as a plain search token. Use a catalog ID such as TokenSearch, TokenExplore, TokenInteract or TokenInvestigators`,
+      component: comp.name,
+      field: 'type',
+    });
   }
 
   // Check audio fields on all components

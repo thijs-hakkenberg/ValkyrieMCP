@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { createScenario, loadScenario, getScenarioState, saveScenario, buildScenario } from '../../src/tools/lifecycle.js';
+import { createScenario, loadScenario, getScenarioState, saveScenario, buildScenario, setQuestConfig } from '../../src/tools/lifecycle.js';
 import { ScenarioModel } from '../../src/model/scenario-model.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -252,5 +252,59 @@ describe('lifecycle tools', () => {
       const stat = fs.statSync(outputPath);
       expect(stat.size).toBeGreaterThan(0);
     });
+  });
+});
+
+describe('lifecycle: quest format and config', () => {
+  const dirs: string[] = [];
+  afterEach(() => {
+    for (const d of dirs) cleanTmpDir(d);
+    dirs.length = 0;
+  });
+
+  it('saveScenario raises the format when format 21 features are used', async () => {
+    const dir = makeTmpDir();
+    dirs.push(dir);
+    const { model } = await createScenario('Fmt', { dir });
+    model.upsert('TokenRug', { type: 'TokenSearch', tokensize: 'huge', xposition: '0', yposition: '0' });
+
+    await saveScenario(model);
+
+    expect(fs.readFileSync(path.join(dir, 'quest.ini'), 'utf-8')).toMatch(/^format=21$/m);
+  });
+
+  it('saveScenario keeps format 19 for classic content', async () => {
+    const dir = makeTmpDir();
+    dirs.push(dir);
+    const { model } = await createScenario('Fmt', { dir });
+    model.upsert('TokenClue', { type: 'TokenSearch', xposition: '0', yposition: '0' });
+
+    await saveScenario(model);
+
+    expect(fs.readFileSync(path.join(dir, 'quest.ini'), 'utf-8')).toMatch(/^format=19$/m);
+  });
+
+  it('setQuestConfig applies valid settings', () => {
+    const model = new ScenarioModel();
+    const r = setQuestConfig(model, { minhero: 1, maxhero: 3, difficulty: 0.7 });
+
+    expect(r.success).toBe(true);
+    expect(model.questConfig.minhero).toBe(1);
+    expect(model.questConfig.difficulty).toBe(0.7);
+  });
+
+  it.each([
+    [{ minhero: 4, maxhero: 2 }, 'must not exceed maxhero'],
+    [{ maxhero: 6 }, 'from 1 to 5'],
+    [{ difficulty: 1.5 }, 'between 0 and 1'],
+    [{ lengthmin: 120, lengthmax: 60 }, 'must not exceed lengthmax'],
+  ])('setQuestConfig rejects %o and changes nothing', (update, message) => {
+    const model = new ScenarioModel();
+    const before = { ...model.questConfig };
+    const r = setQuestConfig(model, update);
+
+    expect(r.success).toBe(false);
+    expect(r.errors.join(' ')).toContain(message);
+    expect(model.questConfig).toEqual(before);
   });
 });

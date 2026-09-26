@@ -20,7 +20,7 @@ claude plugin install valkyrie-mom
 ```
 
 This gives you:
-- **MCP server** with 20 tools for scenario editing (auto-started)
+- **MCP server** with 25 tools for scenario editing (auto-started)
 - **7 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`
 - **Scenario designer agent** for autonomous scenario creation
 - **5 MCP resources** for format documentation
@@ -85,6 +85,7 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `get_scenario_state` | Get current scenario component/localization summary |
 | `validate_scenario` | Run all validation rules |
 | `build_scenario` | Save and build `.valkyrie` package |
+| `set_quest_config` | Set difficulty, play time, investigator count, cover image |
 
 ### Components
 | Tool | Description |
@@ -96,15 +97,19 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `upsert_item` | Create or update an item |
 | `upsert_puzzle` | Create or update a puzzle |
 | `upsert_ui` | Create or update a UI element |
+| `upsert_custom_monster` | Create or update a custom monster |
+| `upsert_mplace` | Create or update a monster placement |
+| `upsert_activation` | Create or update a custom monster activation |
 | `delete_component` | Delete a component with cascade reference cleanup |
 | `set_localization` | Set localization key-value pairs |
 
 ### Map
 | Tool | Description |
 |------|-------------|
-| `get_map_ascii` | Render tile layout as ASCII art |
-| `suggest_tile_layout` | Suggest coordinates for linear, L-shape, or hub-spoke layouts |
-| `place_tile_relative` | Compute position relative to an existing tile |
+| `get_map_ascii` | Describe the board: tile areas, doors and where they lead (with explore-token spots), tokens and their tile, ASCII sketch |
+| `render_map` | Render the board as a PNG with the real tile artwork (from Valkyrie's imported data) or a schematic, tokens numbered |
+| `suggest_tile_layout` | Suggest coordinates for large (7x7) tiles in linear, L-shape, or hub-spoke layouts |
+| `place_tile_relative` | Position and rotation for a new tile against an existing one, with a door lined up |
 
 ### Reference
 | Tool | Description |
@@ -160,25 +165,29 @@ Built scenarios are ZIP archives with a `.valkyrie` extension.
 
 ## Validation Rules
 
-The server validates scenarios against 12 rule categories:
+The server validates scenarios against 16 rule categories, checked against Valkyrie 3.28 (quest format 21):
 
 1. **Unique names** - No duplicate component names
-2. **Required fields** - Tiles have `side`, displayed events have `buttons`
-3. **Cross-references** - All referenced components exist
+2. **Required fields** - Tiles have `side` or `customImage`, displayed events have `buttons`
+3. **Cross-references** - All referenced components exist; `remove` #keywords are valid
 4. **Event graph** - `EventStart` trigger exists, no unreachable/dead-end events
 5. **Event flow** - Buttons vs event-ref consistency, silent event rules
 6. **Localization completeness** - Event text, button labels, quest metadata
-7. **Format rules** - Valid format version, type=MoM, tile rotations
+7. **Format rules** - Valid format version (4-21) and high enough for the features used, type=MoM, tile rotations
 8. **Catalog references** - Tile sides, monster names, items match game content
-9. **Tile connectivity** - Tiles are spatially connected
+9. **Tile connectivity** - Tiles don't overlap, touch at least one other tile, and share a lined-up door or open edge (door data measured from the tile artwork)
 10. **Mythos structure** - Proper mythos trigger configuration
 11. **Investigator token** - TokenInvestigators setup and removal
 12. **Explore token** - Explore tokens linked to tile reveal events
+13. **Field schema** - Only fields Valkyrie reads for each component type; valid `tokensize` and boolean values
+14. **Event semantics** - How Valkyrie actually runs events: unreachable event2+ on hidden events, `conditions` ignored next to `vartests`, trailing logical operators, spawns wrongly placed in `add`
+15. **Custom images** - Referenced image files exist in the scenario folder
+16. **Token placement** - Tokens and monster placements sit on a tile
 
 ## Development
 
 ```bash
-npm test          # Run all tests (1096 tests across 36 files)
+npm test          # Run all tests (1032 tests across 42 files)
 npm run test:watch # Watch mode
 npm run lint       # Type check
 npm run build      # Compile to dist/
@@ -193,7 +202,7 @@ agents/            Scenario designer agent
 src/
   io/              INI parser/writer, localization CSV, ZIP packager
   model/           ScenarioModel, LocalizationStore, component types
-  validation/      12 rules + orchestrator
+  validation/      15 rules + orchestrator
     rules/         Individual validation rule implementations
   tools/           MCP tool implementations
   resources/       Format documentation resources

@@ -117,3 +117,55 @@ describe('cross-references', () => {
     expect(results[0].message).toContain('EventMissing');
   });
 });
+
+describe('cross-references: remove keywords', () => {
+  it.each(['#monsters', '#boardcomponents', '#shop', '#uicomponents', '#doors', '#tiles', '#qitems', '#tokens'])(
+    'accepts %s in remove', keyword => {
+      const model = new ScenarioModel();
+      model.upsert('EventClear', { buttons: '1', remove: `${keyword} TokenClue` });
+      model.upsert('TokenClue', { type: 'TokenSearch' });
+
+      expect(checkCrossReferences(model)).toHaveLength(0);
+    },
+  );
+
+  it('errors on an unknown #keyword in remove', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventClear', { buttons: '1', remove: '#everything' });
+
+    expect(checkCrossReferences(model)[0].message).toContain('unknown keyword "#everything"');
+  });
+
+  it('errors on a #keyword outside remove', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventClear', { buttons: '1', add: '#tokens' });
+
+    expect(checkCrossReferences(model)[0].message).toContain('only valid in "remove"');
+  });
+
+  it('checks custom monster evadeevent and horrorevent', () => {
+    const model = new ScenarioModel();
+    model.upsert('CustomMonsterBoss', { base: 'MonsterCultist', evadeevent: 'EventGone', horrorevent: 'EventBossHorror' });
+    model.upsert('EventBossHorror', { buttons: '1' });
+
+    const results = checkCrossReferences(model);
+    expect(results).toHaveLength(1);
+    expect(results[0].field).toBe('evadeevent');
+  });
+
+  it('errors when a custom monster activation repeats the Activation prefix', () => {
+    const model = new ScenarioModel();
+    model.upsert('ActivationBossRage', {});
+    model.upsert('CustomMonsterBoss', { base: 'MonsterCultist', activation: 'ActivationBossRage' });
+
+    expect(checkCrossReferences(model)[0].message).toContain('without the prefix: "BossRage"');
+  });
+
+  it('accepts custom monster activations written without the prefix', () => {
+    const model = new ScenarioModel();
+    model.upsert('ActivationBossRage', {});
+    model.upsert('CustomMonsterBoss', { base: 'MonsterCultist', activation: 'BossRage' });
+
+    expect(checkCrossReferences(model)).toHaveLength(0);
+  });
+});

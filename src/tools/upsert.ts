@@ -1,5 +1,6 @@
 import { ScenarioModel } from '../model/scenario-model.js';
 import type { ValidationResult } from '../model/component-types.js';
+import { checkFieldSchema } from '../validation/rules/field-schema.js';
 
 export interface UpsertResult {
   success: boolean;
@@ -11,17 +12,22 @@ export interface UpsertResult {
 interface ComponentConfig {
   prefix: string;
   requiredFields?: string[];
+  /** At least one of these fields must be set */
+  requiredOneOf?: string[];
   checkLocalization?: boolean;
 }
 
 const COMPONENT_CONFIGS: Record<string, ComponentConfig> = {
   Event:  { prefix: 'Event', checkLocalization: true },
-  Tile:   { prefix: 'Tile', requiredFields: ['side'] },
+  Tile:   { prefix: 'Tile', requiredOneOf: ['side', 'customImage'] },
   Token:  { prefix: 'Token', requiredFields: ['type'] },
   Spawn:  { prefix: 'Spawn' },
   QItem:  { prefix: 'QItem' },
   Puzzle: { prefix: 'Puzzle' },
   UI:     { prefix: 'UI' },
+  CustomMonster: { prefix: 'CustomMonster' },
+  MPlace: { prefix: 'MPlace' },
+  Activation: { prefix: 'Activation' },
 };
 
 function prefixError(name: string, expected: string): ValidationResult {
@@ -152,6 +158,12 @@ function autoCorrectTokenFields(
   const w1 = renameField(data, name, 'tokentype', 'type');
   if (w1) warnings.push(w1);
 
+  // A custom image replaces the token type, but Valkyrie always writes type= (editor default TokenSearch)
+  const existingToken = model.get(name);
+  if (data.customImage && !data.type && !existingToken?.data.type) {
+    data.type = 'TokenSearch';
+  }
+
   // event → event1
   const w2 = renameField(data, name, 'event', 'event1');
   if (w2) warnings.push(w2);
@@ -173,28 +185,6 @@ function autoCorrectTokenFields(
     }
   }
 
-  return warnings;
-}
-
-/** Remove position fields from spawns (they are positioned via event add fields) */
-function autoCorrectSpawnFields(
-  data: Record<string, string>,
-  name: string,
-): ValidationResult[] {
-  const warnings: ValidationResult[] = [];
-  const posFields = ['xposition', 'yposition', 'x', 'y'];
-  const found = posFields.filter(f => data[f] !== undefined);
-  for (const f of found) {
-    delete data[f];
-  }
-  if (found.length > 0) {
-    warnings.push({
-      rule: 'spawn-no-position',
-      severity: 'warning',
-      message: `"${name}": position fields (${found.join(', ')}) removed — spawns are positioned via an event's "add" field, not by their own coordinates`,
-      component: name,
-    });
-  }
   return warnings;
 }
 
@@ -241,6 +231,20 @@ function upsertGeneric(
     }
   }
 
+  if (config.requiredOneOf) {
+    const existing = model.get(name);
+    const hasOne = config.requiredOneOf.some(f => data[f] ?? existing?.data[f]);
+    if (!hasOne) {
+      errors.push({
+        rule: 'required_field',
+        severity: 'error',
+        message: `One of ${config.requiredOneOf.map(f => `"${f}"`).join(' or ')} is required for ${name}`,
+        component: name,
+      });
+      return { success: false, warnings, errors };
+    }
+  }
+
   // Auto-correct operations field for Event components
   if (config.prefix === 'Event' && data.operations) {
     const norm = normalizeOperations(name, data.operations);
@@ -249,6 +253,10 @@ function upsertGeneric(
   }
 
   model.upsert(name, data);
+
+  // Surface unknown fields and bad values immediately, scoped to what this call set
+  const setFields = new Set(Object.keys(data));
+  warnings.push(...checkFieldSchema(model).filter(w => w.component === name && w.field && setFields.has(w.field)));
 
   if (config.checkLocalization) {
     warnings.push(...checkEventLocalization(model, name, data));
@@ -279,7 +287,8 @@ export function upsertToken(model: ScenarioModel, name: string, data: Record<str
 }
 
 export function upsertSpawn(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
-  const preWarnings = autoCorrectSpawnFields(data, name);
+  // Optional position: Valkyrie shows the monster there and pans the camera during the spawn
+  const preWarnings = autoCorrectPositionFields(data, name);
   const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.Spawn);
   result.warnings.unshift(...preWarnings);
   return result;
@@ -295,4 +304,16 @@ export function upsertPuzzle(model: ScenarioModel, name: string, data: Record<st
 
 export function upsertUI(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
   return upsertGeneric(model, name, data, COMPONENT_CONFIGS.UI);
+}
+
+export function upsertCustomMonster(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.CustomMonster);
+}
+
+export function upsertMPlace(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.MPlace);
+}
+
+export function upsertActivation(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.Activation);
 }

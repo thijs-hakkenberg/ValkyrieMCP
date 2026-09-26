@@ -38,8 +38,14 @@ describe('format-rules', () => {
     expect(formatError!.severity).toBe('error');
   });
 
-  it('returns error for format=20 (above maximum)', () => {
-    const model = new ScenarioModel({ format: 20 });
+  it('accepts format=21 (Valkyrie 3.20+)', () => {
+    const model = new ScenarioModel({ format: 21 });
+
+    expect(checkFormatRules(model).find(r => r.field === 'format')).toBeUndefined();
+  });
+
+  it('returns error for format=22 (above maximum)', () => {
+    const model = new ScenarioModel({ format: 22 });
 
     const results = checkFormatRules(model);
     const formatError = results.find(r => r.field === 'format');
@@ -216,5 +222,23 @@ describe('format-rules', () => {
     const results = checkFormatRules(model);
     const btnErrors = results.filter(r => r.component === 'EventRemove' && r.field === 'buttons');
     expect(btnErrors).toHaveLength(0);
+  });
+});
+
+describe('format-rules: feature formats', () => {
+  it('warns when a feature needs a newer format than declared', () => {
+    const model = new ScenarioModel({ format: 19 });
+    model.upsert('TokenRug', { type: 'TokenSearch', tokensize: 'huge' });
+
+    const warning = checkFormatRules(model).find(r => r.component === 'TokenRug');
+    expect(warning?.severity).toBe('warning');
+    expect(warning?.message).toContain('needs quest format 21');
+  });
+
+  it('is quiet when the declared format covers the features', () => {
+    const model = new ScenarioModel({ format: 21 });
+    model.upsert('TokenRug', { type: 'TokenSearch', tokensize: 'huge' });
+
+    expect(checkFormatRules(model).find(r => r.component === 'TokenRug')).toBeUndefined();
   });
 });

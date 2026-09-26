@@ -71,3 +71,22 @@ describe('buildPackage', () => {
     expect(listing).not.toContain('tiles.ini');
   });
 });
+
+describe('buildPackage: subfolders', () => {
+  it('includes images in subfolders and language folders, skipping hidden files and packages', async () => {
+    const src = fs.mkdtempSync(path.join(tmpDir, 'sub-'));
+    fs.writeFileSync(path.join(src, 'quest.ini'), '[Quest]\nformat=21\n');
+    fs.mkdirSync(path.join(src, 'img', 'German'), { recursive: true });
+    fs.writeFileSync(path.join(src, 'img', 'map.png'), 'x');
+    fs.writeFileSync(path.join(src, 'img', 'German', 'map.png'), 'x');
+    fs.mkdirSync(path.join(src, '.git'));
+    fs.writeFileSync(path.join(src, '.git', 'HEAD'), 'x');
+    fs.writeFileSync(path.join(src, 'old.valkyrie'), 'x');
+
+    const outputPath = path.join(src, 'new.valkyrie');
+    await buildPackage(src, outputPath);
+
+    const entries = execSync(`unzip -Z1 "${outputPath}"`, { encoding: 'utf-8' }).trim().split('\n').sort();
+    expect(entries).toEqual(['img/German/map.png', 'img/map.png', 'quest.ini']);
+  });
+});

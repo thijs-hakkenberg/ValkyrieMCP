@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+Aligned with Valkyrie 3.28 (quest format 21) and verified against its source.
+
+### Fixed
+
+- **MCP server failed to start inside this repo**: `npx @thijshakkenberg/valkyrie-mom-mcp` resolved to the local package (same name) and failed with `valkyrie-mom-mcp: command not found`. The plugin now runs `@thijshakkenberg/valkyrie-mom-mcp@latest`.
+- **Scenarios saved by Valkyrie 3.20+ failed validation**: format 20/21 was rejected (valid range was 4-19).
+- **`remove` #keywords reported as broken references**: `#monsters`, `#boardcomponents`, `#shop`, and format 20's `#uicomponents`, `#doors`, `#tiles`, `#qitems`, `#tokens` are now accepted.
+- **`minhero`/`maxhero` and other `[Quest]` keys were dropped** when a scenario was loaded and saved.
+- **Spawn positions were stripped**: spawns keep `xposition`/`yposition`, which Valkyrie uses to show where to place the monster. (Reverts the 1.2.0 auto-correction, which assumed spawns are placed via `add`.)
+- **Saving destroyed multi-line localization text**: the parser split on every newline, so a quoted value spanning several lines (as written by the Valkyrie editor) kept only its first line and turned the rest into junk keys. Parsing and writing now mirror Valkyrie's `DictionaryI18n`: quoted multi-line blocks, `|||`-enclosed values, `""` escapes, and line breaks written as literal `\n`. Double quotes are preserved (via `|||`) instead of being replaced with `'`.
+- **Invalid token types passed validation**: `type` values that aren't catalog tokens (e.g. `explore`, `search`) are now reported. Valkyrie shows them as plain search tokens.
+- **Packages missed images in subfolders**: `build_scenario` now includes subfolders (e.g. `img/`, language folders) and skips hidden files and `.valkyrie` files.
+- **Skills taught patterns that do not work in Valkyrie**:
+  - Hidden events "branching" with `event1`/`event2` on a vartest. Valkyrie always follows button 1, so mythos escalation, loops, journals, locks and hero/expansion checks never took the second branch. Rewritten to the candidate-list pattern (`event1=EventA EventB`, first one whose vartests pass runs), which the golden scenario uses.
+  - `conditions` combined with `vartests`. Valkyrie ignores `conditions` when vartests is set, so one-shot guards never applied.
+  - Spawns placed via `add`. Valkyrie ignores spawns there, so the monster never appeared. Spawns are triggered from `eventN`.
+  - Postfix logical operators (`A B VarTestsLogicalOperator:OR` evaluates as A AND B).
+  - Custom monsters created with `upsert_token` (always failed the prefix check), and a monster stats table with wrong values and non-existent IDs.
+  - Token `conditions` described as hiding the token (tests only disable its click).
+
+### Added
+
+- **Map tools rebuilt on Valkyrie's placement rules**: tiles hang east and south from their position (their top-left corner), 1024 px of tile art = 3.5 units (large tiles 7x7, small 7x3.5), rotation is counter-clockwise around that corner, and tokens are centred. Previously the tools assumed 7x7 tiles extending north, so tokens placed "on" a tile ended up beside it.
+  - Tile geometry (size and door/open-edge positions) for all 174 catalog tiles is now measured from the tile artwork by `scripts/extract-tile-geometry.ts`, replacing a hand-written table that was wrong for many tiles.
+  - `place_tile_relative` now takes the new tile's side and returns position and rotation with a door lined up.
+  - `get_map_ascii` describes each tile's area, doors, where they lead, and a token spot for each door, and reports which tile each token is on.
+  - New `render_map` tool: a PNG of the board with the real tile artwork (from Valkyrie's imported data) or a schematic.
+  - New `token-placement` validation rule; `tile-connectivity` now also reports overlapping and isolated tiles.
+- **Valkyrie 3.20+ fields**: Tile `customImage`/`top`/`left` (instead of `side`), Token `tokensize`/`clickeffect`/`customImage` and monster types, MPlace `tokensize`. Saving raises the quest format to 20/21 only when these are used.
+- **Tools**: `set_quest_config`, `upsert_custom_monster`, `upsert_mplace`, `upsert_activation`.
+- **Validation rules**: `field-schema` (unknown fields and bad values, derived from Valkyrie's `QuestData.cs`), `event-semantics`, `custom-images`. Upserts now return field-schema warnings immediately.
+- Custom monster `evadeevent`/`horrorevent` are tracked as references; `activation` names that repeat the `Activation` prefix are reported.
+
 ## [1.2.0] - 2026-03-12
 
 ### Fixed

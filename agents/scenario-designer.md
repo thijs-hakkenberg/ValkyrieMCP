@@ -81,7 +81,7 @@ Use these skills for detailed pattern guidance:
 - Mythos scaling formula: `deadlyRound = 20 - #heroes`, `majorRound = deadlyRound / 2`
 - Initialize mythos variables in EventStart chain
 - Use `>=` not `==` for round checks to avoid missed triggers
-- Use one-shot flags (`conditions`) for events that should fire once
+- Use one-shot flags in `vartests` (e.g. `VarOperation:fired,==,0` plus `operations: fired,=,1`) for events that should fire once
 
 ### Narrative Style
 - Use italics `<i>text</i>` for atmospheric descriptions
@@ -111,4 +111,4 @@ Use these skills for detailed pattern guidance:
 
 ## Available MCP Tools
 
-All tools from the `valkyrie-mom` MCP server are available. Use `get_map_ascii` frequently to verify spatial layout. Run `validate_scenario` after major changes. Use `search_game_content` to find valid catalog entries for tiles, monsters, and items.
+All tools from the `valkyrie-mom` MCP server are available. Place tiles with `place_tile_relative`, put tokens on the spots `get_map_ascii` lists, and check the board with `render_map` (tiles hang east and south from their position, so floors have negative y). Run `validate_scenario` after major changes. Use `search_game_content` to find valid catalog entries for tiles, monsters, and items.

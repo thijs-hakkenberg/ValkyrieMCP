@@ -1,11 +1,14 @@
 import type { ValidationResult } from '../../model/component-types.js';
+import { MAX_QUEST_FORMAT, MIN_QUEST_FORMAT } from '../../model/component-types.js';
+import { findFormatRequirements } from '../../model/format-features.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
 
 const VALID_ROTATIONS = new Set(['0', '90', '180', '270']);
 
 /**
  * Checks format-level rules:
- * - format must be in range 4-19
+ * - format must be in range MIN_QUEST_FORMAT..MAX_QUEST_FORMAT
+ * - format must be high enough for the features the scenario uses
  * - type must be 'MoM'
  * - tile rotation must be in {0, 90, 180, 270}
  */
@@ -13,11 +16,22 @@ export function checkFormatRules(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
   const { format, type } = model.questConfig;
 
-  if (format < 4 || format > 19) {
+  if (format < MIN_QUEST_FORMAT || format > MAX_QUEST_FORMAT) {
     results.push({
       rule: 'format-rules',
       severity: 'error',
-      message: `Quest format ${format} is not in valid range (4-19)`,
+      message: `Quest format ${format} is not in valid range (${MIN_QUEST_FORMAT}-${MAX_QUEST_FORMAT})`,
+      field: 'format',
+    });
+  }
+
+  for (const req of findFormatRequirements(model.getAll())) {
+    if (req.format <= format) continue;
+    results.push({
+      rule: 'format-rules',
+      severity: 'warning',
+      message: `"${req.component}" uses ${req.reason}, which needs quest format ${req.format} (currently ${format}). Older Valkyrie versions ignore it; saving bumps the format automatically.`,
+      component: req.component,
       field: 'format',
     });
   }

@@ -187,3 +187,26 @@ describe('checkCatalogReferences', () => {
     expect(packWarning).toBeUndefined();
   });
 });
+
+describe('catalog-references: token types', () => {
+  it('warns on a token type that is not in the catalog', () => {
+    const model = new ScenarioModel();
+    model.upsert('TokenStart', { type: 'yourname' });
+
+    const w = checkCatalogReferences(model).find(r => r.field === 'type');
+    expect(w?.message).toContain('unknown type "yourname"');
+  });
+
+  it.each(['TokenSearch', 'TokenExplore', 'TokenInteract', 'TokenInvestigators', 'MonsterGhost'])('accepts %s', type => {
+    const model = new ScenarioModel();
+    model.upsert('TokenX', { type });
+    expect(checkCatalogReferences(model).filter(r => r.field === 'type')).toHaveLength(0);
+  });
+
+  it('skips the type when a custom image is used', () => {
+    const model = new ScenarioModel();
+    model.upsert('TokenX', { type: 'whatever', customImage: 'a.png' });
+    expect(checkCatalogReferences(model).filter(r => r.field === 'type')).toHaveLength(0);
+  });
+});
+

@@ -291,7 +291,7 @@ describe('Integration: full scenario pipeline', () => {
 
     const results = validateScenario(model);
     const errors = results.filter(r => r.severity === 'error');
-    const sideError = errors.find(e => e.message.includes('missing required field "side"'));
+    const sideError = errors.find(e => e.message.includes('needs either "side"'));
     expect(sideError).toBeDefined();
   });
 

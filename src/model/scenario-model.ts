@@ -151,6 +151,18 @@ export class ScenarioModel {
       version: questSection.version ?? '',
       packs: questSection.packs ?? '',
     };
+    if (questSection.minhero) config.minhero = parseInt(questSection.minhero, 10);
+    if (questSection.maxhero) config.maxhero = parseInt(questSection.maxhero, 10);
+
+    const known = new Set([
+      'format', 'type', 'hidden', 'defaultlanguage', 'defaultmusicon', 'difficulty',
+      'lengthmin', 'lengthmax', 'image', 'version', 'packs', 'minhero', 'maxhero',
+    ]);
+    const extra: Record<string, string> = {};
+    for (const [k, v] of Object.entries(questSection)) {
+      if (!known.has(k) && v !== undefined) extra[k] = v;
+    }
+    if (Object.keys(extra).length > 0) config.extra = extra;
 
     const model = new ScenarioModel(config);
 

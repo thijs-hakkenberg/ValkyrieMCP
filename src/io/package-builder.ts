@@ -13,11 +13,14 @@ export async function buildPackage(scenarioDir: string, outputPath: string): Pro
 
   archive.pipe(output);
 
-  const entries = fs.readdirSync(scenarioDir);
-  for (const entry of entries) {
+  // Include subfolders: images are often referenced as e.g. "img/map.png", and
+  // Valkyrie 3.23+ looks up translated media in language subfolders ("img/German/map.png")
+  for (const entry of fs.readdirSync(scenarioDir, { recursive: true, encoding: 'utf8' })) {
     const fullPath = path.join(scenarioDir, entry);
+    const isHidden = entry.split(path.sep).some(part => part.startsWith('.'));
+    if (isHidden || entry.endsWith('.valkyrie') || path.resolve(fullPath) === path.resolve(outputPath)) continue;
     if (fs.statSync(fullPath).isFile()) {
-      archive.file(fullPath, { name: entry });
+      archive.file(fullPath, { name: entry.split(path.sep).join('/') });
     }
   }
 

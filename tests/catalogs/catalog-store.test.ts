@@ -82,11 +82,11 @@ describe('CatalogStore', () => {
   });
 
   describe('tile geometry merge', () => {
-    it('tile entries include grid, edges, desc after construction', () => {
+    it('tile entries include size, openings, desc after construction', () => {
       const tile = store.getById('TileSideAlley1');
       expect(tile).toBeDefined();
-      expect(tile!.grid).toBeDefined();
-      expect(tile!.edges).toBeDefined();
+      expect(tile!.size).toBe('7x3.5 units');
+      expect(tile!.openings).toBeDefined();
       expect(tile!.desc).toBeDefined();
     });
 
