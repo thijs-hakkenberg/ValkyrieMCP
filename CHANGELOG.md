@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [2.0.0] - 2026-09-27
 
 Aligned with Valkyrie 3.28 (quest format 21) and verified against its source.
+
+**Breaking:** `place_tile_relative` now requires the new tile's `side`, no longer takes `tileSize`, and returns candidates with rotation. `build_scenario` refuses to build while validation reports errors (pass `force: true` to override). Unknown token types are rejected by `upsert_token`.
 
 ### Fixed
 
