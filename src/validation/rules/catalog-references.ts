@@ -95,7 +95,7 @@ export function checkCatalogReferences(model: ScenarioModel): ValidationResult[]
     if (tokenIds.has(type) || monsterIds.has(type) || customMonsterNames.has(type)) continue;
     results.push({
       rule: 'catalog-references',
-      severity: 'warning',
+      severity: 'error',
       message: `Token "${comp.name}" has unknown type "${type}" — Valkyrie shows it as a plain search token. Use a catalog ID such as TokenSearch, TokenExplore, TokenInteract or TokenInvestigators`,
       component: comp.name,
       field: 'type',

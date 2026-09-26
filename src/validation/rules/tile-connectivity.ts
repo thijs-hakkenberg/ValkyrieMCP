@@ -19,7 +19,7 @@ export function checkTileConnectivity(model: ScenarioModel): ValidationResult[] 
       if (area > 0.5) {
         results.push({
           rule: 'tile-connectivity',
-          severity: 'warning',
+          severity: 'error',
           message: `Tiles "${tiles[i].name}" and "${tiles[j].name}" overlap (${area.toFixed(1)} square units) — use place_tile_relative to position them edge to edge`,
           component: tiles[i].name,
         });

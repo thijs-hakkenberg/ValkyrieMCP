@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from '../src/server.js';
@@ -117,4 +120,25 @@ describe('MCP Server', () => {
       expect(result.isError).toBe(true);
     });
   });
+
+  describe('build_scenario guard', () => {
+    it('refuses to build a scenario with validation errors unless forced', async () => {
+      const server = createServer();
+      const client = new Client({ name: 'test-client', version: '1.0.0' });
+      const [ct, st] = InMemoryTransport.createLinkedPair();
+      await Promise.all([client.connect(ct), server.connect(st)]);
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'valkyrie-build-guard-'));
+      const out = path.join(dir, 'out.valkyrie');
+
+      await client.callTool({ name: 'create_scenario', arguments: { name: 'Guard', dir: path.join(dir, 'Guard') } });
+      const refused = await client.callTool({ name: 'build_scenario', arguments: { outputPath: out } });
+      expect((refused.content as any)[0].text).toContain('Not built');
+      expect(fs.existsSync(out)).toBe(false);
+
+      await client.callTool({ name: 'build_scenario', arguments: { outputPath: out, force: true } });
+      expect(fs.existsSync(out)).toBe(true);
+      fs.rmSync(dir, { recursive: true, force: true });
+    });
+  });
 });
+

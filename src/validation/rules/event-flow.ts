@@ -2,90 +2,60 @@ import type { ValidationResult } from '../../model/component-types.js';
 import { parseRefList } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
 
+const isHidden = (data: Record<string, string | undefined>) => data.display?.toLowerCase() === 'false';
+
 /**
- * Checks that the event chain from EventStart doesn't lead to a
- * non-display dead-end where the player would be stuck with no
- * visible interaction.
+ * Detects loops of hidden events that Valkyrie can never leave.
  *
- * Walks the "default path": follows event1 when no vartests,
- * follows event2 (else/default branch) when vartests are present.
- * Warns if the chain terminates at a display:false event with no
- * outgoing event refs and no $end operation.
+ * A hidden event (display=false) follows button 1 at once, running the first event in its
+ * event1 list whose vartests pass (EventManager). A cycle of hidden events without vartests
+ * therefore repeats forever and the game hangs. Chains that simply end in a hidden event are
+ * fine: Valkyrie returns to play when the event queue is empty.
  */
 export function checkEventFlow(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
 
-  // Find the event with trigger=EventStart
-  const startComp = model.getAll().find(c => c.data.trigger === 'EventStart');
-  if (!startComp) return results; // No start trigger — already caught by event-graph rule
-
-  const visited = new Set<string>();
-  let current: string | null = startComp.name;
-
-  while (current && !visited.has(current)) {
-    visited.add(current);
-
-    const comp = model.get(current);
-    if (!comp) break;
-
-    const hasEnd = comp.data.operations?.includes('$end');
-    if (hasEnd) return results; // Scenario ends intentionally
-
-    const display = comp.data.display;
-    const isDisplayTrue = display === undefined || display.toLowerCase() !== 'false';
-
-    // Determine next event on the default path
-    let nextEvent: string | null = null;
-
-    if (comp.data.vartests) {
-      // When vartests present, event2 is the else/default path
-      const event2 = comp.data.event2;
-      if (event2) {
-        const refs = parseRefList(event2);
-        nextEvent = refs.length > 0 ? refs[0] : null;
-      }
-    } else {
-      // No vartests — follow event1
-      const event1 = comp.data.event1;
-      if (event1) {
-        const refs = parseRefList(event1);
-        nextEvent = refs.length > 0 ? refs[0] : null;
-      }
+  // Edges a hidden event always or possibly takes: its event1 targets up to the first one
+  // without vartests (that one is always enabled, so later targets are never reached)
+  const next = new Map<string, string[]>();
+  for (const comp of model.getAll()) {
+    if (!isHidden(comp.data) || comp.data.randomevents?.toLowerCase() === 'true') continue;
+    const targets: string[] = [];
+    for (const t of parseRefList(comp.data.event1 ?? '')) {
+      const target = model.get(t);
+      if (!target) continue;
+      targets.push(t);
+      if (!target.data.vartests?.trim()) break;
     }
-
-    if (!nextEvent) {
-      // Chain ends here
-      if (!isDisplayTrue) {
-        results.push({
-          rule: 'event-flow',
-          severity: 'warning',
-          message: `Event chain from start reaches "${comp.name}" which is a non-display dead-end — player may be stuck with no visible interaction`,
-          component: comp.name,
-        });
-      }
-      return results;
-    }
-
-    current = nextEvent;
+    next.set(comp.name, targets);
   }
 
-  // If we exited due to a cycle, check if we ever reached a display:true event
-  // Walk through visited events to see if any were display:true
-  if (current && visited.has(current)) {
-    // We hit a cycle — check the last event before the cycle
-    // The cycle itself means the player is stuck in a loop of non-display events
-    const comp = model.get(current);
-    if (comp) {
-      const display = comp.data.display;
-      const isDisplayTrue = display === undefined || display.toLowerCase() !== 'false';
-      if (!isDisplayTrue) {
-        results.push({
-          rule: 'event-flow',
-          severity: 'warning',
-          message: `Event chain from start reaches "${comp.name}" which is a non-display dead-end — player may be stuck with no visible interaction`,
-          component: comp.name,
-        });
-      }
+  // A cycle among hidden, untested events where each step is the unconditional (last) edge
+  const unconditional = (name: string) => {
+    const targets = next.get(name) ?? [];
+    const last = targets[targets.length - 1];
+    return last && !model.get(last)?.data.vartests?.trim() && targets.length === 1 ? last : undefined;
+  };
+  const reported = new Set<string>();
+  for (const start of next.keys()) {
+    if (model.get(start)?.data.vartests?.trim()) continue;
+    const path: string[] = [];
+    let cur: string | undefined = start;
+    while (cur && !path.includes(cur) && next.has(cur) && !model.get(cur)?.data.vartests?.trim()) {
+      path.push(cur);
+      cur = unconditional(cur);
+    }
+    if (cur && path.includes(cur)) {
+      const loop = path.slice(path.indexOf(cur));
+      const key = [...loop].sort().join(' ');
+      if (reported.has(key)) continue;
+      reported.add(key);
+      results.push({
+        rule: 'event-flow',
+        severity: 'error',
+        message: `Hidden events loop forever: ${[...loop, cur].join(' -> ')}. None shows a dialog or has vartests, so Valkyrie repeats them and the game hangs. Add a vartests exit (e.g. a counter) or a displayed event`,
+        component: cur,
+      });
     }
   }
 

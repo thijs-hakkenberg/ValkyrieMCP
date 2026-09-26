@@ -39,7 +39,10 @@ Build the event flow:
 2. Create a setup chain: EventStart → place tiles → place tokens → remove TokenInvestigators
 3. Create exploration events that reveal tiles and place tokens
 4. Create encounter events for monster spawns and puzzles
-5. Create finale events with `$end` operation
+5. Create the endings. Both set `operations: "$end,=,1"`:
+   - Victory: an event with `trigger: "Defeated<SpawnName>"` (e.g. `DefeatedSpawnBoss`), or reached from the final objective
+   - Defeat: an event with `trigger: "Eliminated"` (fires when an investigator is eliminated)
+   Triggers only work with the names Valkyrie fires (see the event format doc). Tokens have no trigger: a token runs its own `event1` when clicked
 6. Wire events together via `event1`..`event6` fields
 
 For complex patterns like loops, branching, and dialogues, see `/event-patterns` and `/variables-and-mythos`.

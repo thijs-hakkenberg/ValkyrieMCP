@@ -71,7 +71,12 @@ upsert_item("QItemMysteryCommon", {
 
 ## Starting Items
 
-Items given to investigators at the beginning of the scenario. Set `starting=True`:
+Items given to investigators at the beginning of the scenario. Set `starting=True`.
+
+**Every other item needs `starting=false`**: Valkyrie treats an item without `starting` as a starting item, so a search that hands it out gives nothing new. `upsert_item` writes `starting=false` unless you pass `"True"`.
+
+Quest items are catalog items. A localization key like `QItemX.name` is ignored and the item shows its catalog name. To track a story object (a key, a fragment), use a variable and event text instead.
+
 
 ```
 # Each investigator gets a random weapon

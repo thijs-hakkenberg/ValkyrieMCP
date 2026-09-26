@@ -13,7 +13,7 @@ Events are the core quest logic mechanism. Each event is an INI section starting
 | eventN | string | Space-separated event/spawn names for button N. Valkyrie runs the **first** listed event whose tests pass (or a random enabled one with randomevents=true). Only parsed up to the buttons count |
 | eventNCondition | string | Vartests on button N itself (e.g. "VarOperation:key,>,0"). When it fails the button is disabled (default) or hidden |
 | eventNConditionAction | string | What a failing button condition does: disable (default), hide, or none (button stays usable) |
-| trigger | string | Auto-trigger condition: EventStart, Mythos, StartRound, EndRound, Eliminated, DefeatedMonster*, DefeatedCustomMonster* |
+| trigger | string | Only these fire: EventStart, StartRound, EndRound, EndRound<N>, StartFinalRound, Mythos, BeforeMonsterActivation, EndInvestigatorTurn, Eliminated (an investigator is eliminated), NoMorale, Defeated<SpawnName>/DefeatedUnique<SpawnName> (also Defeated<Monster ID>), Var<name> (an operation sets @name above 0). There is **no token trigger**: a token runs its own event1 when clicked |
 | conditions | string | **Legacy** — old AND-only form of vartests ("var,comparator,value"). Ignored entirely when vartests is also set. Prefer vartests |
 | highlight | bool | Camera focuses on the event's board position |
 | xposition | float | X position on board (for token placement) |
@@ -188,7 +188,7 @@ Always use \`vunits=True\` for resolution independence.
 | Specific item | itemname=ItemCommonKnife | Exact item |
 | Pool | itemname=Item1 Item2 Item3 | Random from list |
 | Trait with exclusion | traits=common, itemname=Excluded1 | Random trait, exclude listed |
-| Starting | starting=True | Given at scenario start |
+| Starting | starting=True | Given at scenario start (every other item needs starting=false) |
 
 ## Multi-Question Dialogue Structure
 N questions with pass/fail → 2^N permutation events.
@@ -268,7 +268,7 @@ Prefix: \`QItem\`
 | Field | Required | Description |
 |-------|----------|-------------|
 | itemname | No | Space-separated catalog item IDs (e.g., ItemCommonKnife, ItemCommonKeroseneLantern). Must use catalog IDs, not display names |
-| starting | No | True if given at start |
+| starting | **Always set** | true = given at the start. **A missing value counts as true** (legacy), so items handed out by searches need starting=false. upsert_item writes false by default |
 | traits | No | Space-separated: weapon, lightsource, equipment, common, spell |
 | traitpool | No | Alternative trait matching |
 | inspect | No | Event reference triggered on item inspection |
