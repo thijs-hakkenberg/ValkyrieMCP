@@ -1,7 +1,8 @@
 import type { ValidationResult } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
 
-const SKIP_TOKEN_TYPES = new Set(['TokenInvestigator', 'TokenWallOutside', 'TokenWallInside']);
+// Position markers and walls are not meant to be clicked
+const SKIP_TOKEN_TYPES = new Set(['TokenInvestigators', 'TokenInvestigator', 'TokenWallOutside', 'TokenWallInside']);
 
 /**
  * Checks that non-investigator, non-wall tokens have an event1 wired up.

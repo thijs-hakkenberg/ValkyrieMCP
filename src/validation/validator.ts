@@ -15,6 +15,8 @@ import { checkTokenEventWiring } from './rules/token-event-wiring.js';
 import { checkFieldSchema } from './rules/field-schema.js';
 import { checkEventSemantics } from './rules/event-semantics.js';
 import { checkCustomImages } from './rules/custom-images.js';
+import { checkTriggers } from './rules/triggers.js';
+import { checkGameFlow } from './rules/game-flow.js';
 
 const ALL_RULES = [
   checkRequiredFields,
@@ -33,6 +35,8 @@ const ALL_RULES = [
   checkFieldSchema,
   checkEventSemantics,
   checkCustomImages,
+  checkTriggers,
+  checkGameFlow,
 ];
 
 /**

@@ -71,7 +71,9 @@ Use these skills for detailed pattern guidance:
 - Silent events with `event1` MUST have `buttons>=1`
 - Use `randomevents=true` for random encounter pools
 - End scenarios with `operations=$end,=,1`
-- Include both victory and defeat paths
+- Include both victory and defeat paths: victory via `trigger=Defeated<SpawnName>` or the final objective, defeat via `trigger=Eliminated`
+- Wire tokens to their events with the token's own `event1` (never `trigger=<TokenName>`); give every item an explicit `starting`
+- `build_scenario` refuses while `validate_scenario` reports errors: fix them rather than forcing
 - Use vartests for branching: button1=FAIL, button2=PASS
 
 ### Difficulty Balance

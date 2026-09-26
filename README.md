@@ -165,13 +165,13 @@ Built scenarios are ZIP archives with a `.valkyrie` extension.
 
 ## Validation Rules
 
-The server validates scenarios against 16 rule categories, checked against Valkyrie 3.28 (quest format 21):
+The server validates scenarios against 18 rule categories, checked against Valkyrie 3.28 (quest format 21):
 
 1. **Unique names** - No duplicate component names
 2. **Required fields** - Tiles have `side` or `customImage`, displayed events have `buttons`
 3. **Cross-references** - All referenced components exist; `remove` #keywords are valid
 4. **Event graph** - `EventStart` trigger exists, no unreachable/dead-end events
-5. **Event flow** - Buttons vs event-ref consistency, silent event rules
+5. **Event flow** - No endless loops of hidden events
 6. **Localization completeness** - Event text, button labels, quest metadata
 7. **Format rules** - Valid format version (4-21) and high enough for the features used, type=MoM, tile rotations
 8. **Catalog references** - Tile sides, monster names, items match game content
@@ -183,11 +183,15 @@ The server validates scenarios against 16 rule categories, checked against Valky
 14. **Event semantics** - How Valkyrie actually runs events: unreachable event2+ on hidden events, `conditions` ignored next to `vartests`, trailing logical operators, spawns wrongly placed in `add`
 15. **Custom images** - Referenced image files exist in the scenario folder
 16. **Token placement** - Tokens and monster placements sit on a tile
+17. **Triggers** - Every trigger is one Valkyrie fires (no token triggers)
+18. **Game flow** - The game can reach an ending from its triggers; defeat condition, mythos, items and start marker set up correctly
+
+`build_scenario` refuses to package a scenario while any rule reports an error.
 
 ## Development
 
 ```bash
-npm test          # Run all tests (1032 tests across 42 files)
+npm test          # Run all tests (1067 tests across 44 files)
 npm run test:watch # Watch mode
 npm run lint       # Type check
 npm run build      # Compile to dist/

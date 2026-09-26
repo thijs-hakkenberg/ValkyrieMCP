@@ -1,6 +1,10 @@
 import { ScenarioModel } from '../model/scenario-model.js';
 import type { ValidationResult } from '../model/component-types.js';
 import { checkFieldSchema } from '../validation/rules/field-schema.js';
+import { checkEventSemantics } from '../validation/rules/event-semantics.js';
+import { checkTriggers } from '../validation/rules/triggers.js';
+import { checkTileConnectivity, checkTokenPlacement } from '../validation/rules/tile-connectivity.js';
+import { getSharedCatalog } from '../catalogs/catalog-store.js';
 
 export interface UpsertResult {
   success: boolean;
@@ -146,6 +150,28 @@ function autoCorrectPositionFields(
   return warnings;
 }
 
+const TOKEN_TYPE_ALIASES: Record<string, string> = {
+  search: 'TokenSearch', explore: 'TokenExplore', interact: 'TokenInteract',
+  investigators: 'TokenInvestigators', investigator: 'TokenInvestigators', start: 'TokenInvestigators',
+  wall: 'TokenWallInside', walloutside: 'TokenWallOutside', wallinside: 'TokenWallInside',
+};
+
+/** Token type must be a catalog token or monster (unless a custom image replaces it); Valkyrie otherwise shows a search token */
+function tokenTypeError(name: string, data: Record<string, string>, model: ScenarioModel): ValidationResult | undefined {
+  const type = data.type ?? model.get(name)?.data.type;
+  const customImage = data.customImage ?? model.get(name)?.data.customImage;
+  if (!type || customImage) return undefined;
+  const catalog = getSharedCatalog();
+  if (catalog.getAllIds('token').has(type) || catalog.getAllIds('monster').has(type)) return undefined;
+  return {
+    rule: 'token-type',
+    severity: 'error',
+    message: `"${name}": unknown token type "${type}". Use a catalog ID: TokenSearch, TokenExplore, TokenInteract, TokenInvestigators, TokenWallInside/Outside, another Token* from search_game_content, or a Monster* ID`,
+    component: name,
+    field: 'type',
+  };
+}
+
 /** Auto-correct token-specific fields: tokentype→type, event→event1, buttons */
 function autoCorrectTokenFields(
   data: Record<string, string>,
@@ -162,6 +188,13 @@ function autoCorrectTokenFields(
   const existingToken = model.get(name);
   if (data.customImage && !data.type && !existingToken?.data.type) {
     data.type = 'TokenSearch';
+  }
+
+  // Common shorthand for token types -> catalog IDs
+  const alias = data.type && TOKEN_TYPE_ALIASES[data.type.toLowerCase()];
+  if (alias && alias !== data.type) {
+    warnings.push({ rule: 'token-type', severity: 'warning', message: `"${name}": type "${data.type}" auto-corrected to "${alias}"`, component: name, field: 'type' });
+    data.type = alias;
   }
 
   // event → event1
@@ -258,6 +291,15 @@ function upsertGeneric(
   const setFields = new Set(Object.keys(data));
   warnings.push(...checkFieldSchema(model).filter(w => w.component === name && w.field && setFields.has(w.field)));
 
+  // And problems Valkyrie would silently misbehave on: bad triggers, event semantics, map placement
+  const mine = (r: ValidationResult) => r.component === name;
+  warnings.push(...checkTriggers(model).filter(mine));
+  warnings.push(...checkEventSemantics(model).filter(mine));
+  if (name.startsWith('Token') || name.startsWith('MPlace')) warnings.push(...checkTokenPlacement(model).filter(mine));
+  if (name.startsWith('Tile')) {
+    warnings.push(...checkTileConnectivity(model).filter(r => r.severity === 'error' && r.message.includes(`"${name}"`)));
+  }
+
   if (config.checkLocalization) {
     warnings.push(...checkEventLocalization(model, name, data));
   }
@@ -281,6 +323,8 @@ export function upsertToken(model: ScenarioModel, name: string, data: Record<str
     ...autoCorrectPositionFields(data, name),
     ...autoCorrectTokenFields(data, name, model),
   ];
+  const typeError = name.startsWith('Token') ? tokenTypeError(name, data, model) : undefined;
+  if (typeError) return { success: false, warnings: preWarnings, errors: [typeError] };
   const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.Token);
   result.warnings.unshift(...preWarnings);
   return result;
@@ -295,7 +339,15 @@ export function upsertSpawn(model: ScenarioModel, name: string, data: Record<str
 }
 
 export function upsertItem(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
-  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.QItem);
+  // Valkyrie treats a QItem without "starting" as a starting item, so always write it explicitly
+  const pre: ValidationResult[] = [];
+  if (data.starting === undefined && model.get(name)?.data.starting === undefined) {
+    data.starting = 'false';
+    pre.push({ rule: 'item-starting', severity: 'warning', message: `"${name}": starting set to false (Valkyrie gives items without "starting" to the investigators at the start). Pass starting: "true" for a starting item`, component: name, field: 'starting' });
+  }
+  const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.QItem);
+  result.warnings.unshift(...pre);
+  return result;
 }
 
 export function upsertPuzzle(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {

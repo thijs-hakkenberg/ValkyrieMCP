@@ -47,7 +47,10 @@ export function checkEventGraph(model: ScenarioModel): ValidationResult[] {
       const hasEnd = comp.data.operations?.includes('$end');
       const hasAnyEventField = EVENT_FIELDS.some(f => comp.data[f] !== undefined);
 
-      if (!hasEnd && !hasAnyEventField) {
+      // An explicit silent terminal (display=false, buttons=0) is the documented way to end a chain:
+      // Valkyrie returns to play when the event queue is empty
+      const silentTerminal = comp.data.display?.toLowerCase() === 'false' && (comp.data.buttons ?? '0') === '0';
+      if (!hasEnd && !hasAnyEventField && !silentTerminal) {
         results.push({
           rule: 'event-graph',
           severity: 'warning',
