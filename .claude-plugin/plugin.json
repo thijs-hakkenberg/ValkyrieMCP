@@ -10,7 +10,7 @@
   "mcpServers": {
     "valkyrie-mom": {
       "command": "npx",
-      "args": ["-y", "@thijshakkenberg/valkyrie-mom-mcp"]
+      "args": ["-y", "@thijshakkenberg/valkyrie-mom-mcp@latest"]
     }
   }
 }
