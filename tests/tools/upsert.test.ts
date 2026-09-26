@@ -447,3 +447,58 @@ describe('upsert tools: Valkyrie 3.20+ components and fields', () => {
     expect(r.warnings.map(w => w.field).sort()).toEqual(['tokensize', 'xpos']);
   });
 });
+
+describe('upsert guards', () => {
+  let model: ScenarioModel;
+  beforeEach(() => { model = new ScenarioModel(); });
+
+  it.each([['search', 'TokenSearch'], ['explore', 'TokenExplore'], ['interact', 'TokenInteract'], ['investigators', 'TokenInvestigators']])(
+    'corrects token type %s to %s', (alias, id) => {
+      const r = upsertToken(model, 'TokenX', { type: alias });
+      expect(r.success).toBe(true);
+      expect(model.get('TokenX')!.data.type).toBe(id);
+    },
+  );
+
+  it('rejects unknown token types (Wrath used type=yourname)', () => {
+    const r = upsertToken(model, 'TokenX', { type: 'yourname' });
+    expect(r.success).toBe(false);
+    expect(r.errors[0].message).toContain('unknown token type "yourname"');
+    expect(model.get('TokenX')).toBeUndefined();
+  });
+
+  it('accepts monster types for tokens', () => {
+    expect(upsertToken(model, 'TokenStatue', { type: 'MonsterDeepOne' }).success).toBe(true);
+  });
+
+  it('writes starting=false for new items (Valkyrie treats a missing value as true)', () => {
+    const r = upsertItem(model, 'QItemLamp', { itemname: 'ItemCommonKeroseneLantern' });
+    expect(model.get('QItemLamp')!.data.starting).toBe('false');
+    expect(r.warnings[0].rule).toBe('item-starting');
+  });
+
+  it('keeps an explicit starting=true', () => {
+    upsertItem(model, 'QItemKnife', { itemname: 'ItemCommonKnife', starting: 'true' });
+    expect(model.get('QItemKnife')!.data.starting).toBe('true');
+  });
+
+  it('warns immediately about a trigger named after a token', () => {
+    upsertToken(model, 'TokenSearch1', { type: 'TokenSearch' });
+    const r = upsertEvent(model, 'EventSearch1', { trigger: 'TokenSearch1', buttons: '1' });
+    expect(r.warnings.some(w => w.rule === 'triggers')).toBe(true);
+  });
+
+  it('warns immediately about a spawn put in add', () => {
+    const r = upsertEvent(model, 'EventReveal', { buttons: '1', add: 'SpawnGhost' });
+    expect(r.warnings.some(w => w.rule === 'event-semantics')).toBe(true);
+  });
+
+  it('warns immediately about a token placed off the tiles and about overlapping tiles', () => {
+    upsertTile(model, 'TileHall', { side: 'TileSideLobby', xposition: '0', yposition: '0' });
+    const token = upsertToken(model, 'TokenLost', { type: 'TokenSearch', xposition: '3', yposition: '3' });
+    expect(token.warnings.some(w => w.rule === 'token-placement')).toBe(true);
+    const tile = upsertTile(model, 'TileTwo', { side: 'TileSideAttic', xposition: '0', yposition: '0' });
+    expect(tile.warnings.some(w => w.message.includes('overlap'))).toBe(true);
+  });
+});
+

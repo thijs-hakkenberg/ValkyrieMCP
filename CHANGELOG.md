@@ -28,6 +28,13 @@ Aligned with Valkyrie 3.28 (quest format 21) and verified against its source.
 
 ### Added
 
+- **Guards against scenarios that load but can't be played** (found by playtesting two plugin-made scenarios):
+  - `triggers` rule: every trigger must be one Valkyrie fires; a trigger named after a token (the event never runs) is an error.
+  - `game-flow` rule: follows the game from its triggers through clicks, spawns and `Defeated<Spawn>` triggers. It is an error when no event that sets `$end` can be reached, and a warning when there is no defeat condition (`Eliminated`/`NoMorale`), base-game mythos is never enabled, board components are never placed, the start marker is added and removed at once, an item is both a starting item and a search reward, a quest item is "renamed" through localization, or a token is removed on click while its event offers a do-nothing button.
+  - `event-flow` rule now detects loops of hidden events with no way out (the game hangs). It replaces a warning that treated every silent terminal event as "stuck" and followed the wrong branch.
+  - Upserts: `upsert_token` corrects `search`/`explore`/`interact`/`investigators` and rejects unknown types; `upsert_item` writes `starting=false` (Valkyrie treats a missing value as true); every upsert reports trigger, event-semantics and map problems for the component it changed.
+  - `build_scenario` refuses to build while validation reports errors, unless `force: true` is passed.
+  - Unknown token types and overlapping tiles are now errors.
 - **Map tools rebuilt on Valkyrie's placement rules**: tiles hang east and south from their position (their top-left corner), 1024 px of tile art = 3.5 units (large tiles 7x7, small 7x3.5), rotation is counter-clockwise around that corner, and tokens are centred. Previously the tools assumed 7x7 tiles extending north, so tokens placed "on" a tile ended up beside it.
   - Tile geometry (size and door/open-edge positions) for all 174 catalog tiles is now measured from the tile artwork by `scripts/extract-tile-geometry.ts`, replacing a hand-written table that was wrong for many tiles.
   - `place_tile_relative` now takes the new tile's side and returns position and rotation with a door lined up.

@@ -156,10 +156,22 @@ export function createServer(): McpServer {
 
   server.tool(
     'build_scenario',
-    'Save and build .valkyrie package',
-    { outputPath: z.string().describe('Output .valkyrie file path') },
-    async ({ outputPath }) => {
+    'Save and build .valkyrie package. Refuses when validate_scenario reports errors (they break the game in Valkyrie) unless force is true',
+    {
+      outputPath: z.string().describe('Output .valkyrie file path'),
+      force: z.boolean().optional().describe('Build even when validation reports errors'),
+    },
+    async ({ outputPath, force }) => {
       const model = getModel();
+      const errors = validateScenario(model).filter(r => r.severity === 'error');
+      if (errors.length > 0 && !force) {
+        return {
+          content: [{
+            type: 'text',
+            text: `Not built: ${errors.length} validation error(s) would break the scenario in Valkyrie. Fix them (or pass force: true):\n${errors.map(e => `[error] ${e.rule}: ${e.message}`).join('\n')}`,
+          }],
+        };
+      }
       await saveScenario(model);
       await buildScenario(model, outputPath);
       return { content: [{ type: 'text', text: `Built package: ${outputPath}` }] };
