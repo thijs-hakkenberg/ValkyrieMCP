@@ -168,4 +168,21 @@ describe('cross-references: remove keywords', () => {
 
     expect(checkCrossReferences(model)).toHaveLength(0);
   });
+
+  it('accepts a single Event as a MoM custom monster activation', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventBossActivation', { display: 'false', buttons: '1' });
+    model.upsert('CustomMonsterBoss', { base: 'MonsterCultist', activation: 'EventBossActivation' });
+    expect(checkCrossReferences(model)).toHaveLength(0);
+  });
+
+  it('errors on a missing activation event or an event mixed with other activations', () => {
+    const model = new ScenarioModel();
+    model.upsert('CustomMonsterA', { base: 'MonsterCultist', activation: 'EventGone' });
+    model.upsert('EventX', { buttons: '1' });
+    model.upsert('CustomMonsterB', { base: 'MonsterCultist', activation: 'EventX Rage' });
+    const messages = checkCrossReferences(model).map(r => r.message).join(' | ');
+    expect(messages).toContain('"EventGone" does not exist');
+    expect(messages).toContain('only runs an event activation when it is the only entry');
+  });
 });

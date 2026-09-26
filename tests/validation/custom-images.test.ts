@@ -55,4 +55,14 @@ describe('custom-images', () => {
 
     expect(checkCustomImages(model)).toHaveLength(0);
   });
+
+  it('checks custom .ogg audio and music files and flags mp3', () => {
+    const model = modelWithDir();
+    fs.writeFileSync(path.join(dir, 'scream.ogg'), '');
+    model.upsert('EventScream', { buttons: '1', audio: 'scream.ogg', music: 'MusicDefault night.ogg' });
+    model.upsert('EventBad', { buttons: '1', audio: 'shriek.mp3' });
+
+    const results = checkCustomImages(model);
+    expect(results.map(r => `${r.component}:${r.field}`).sort()).toEqual(['EventBad:audio', 'EventScream:music']);
+  });
 });

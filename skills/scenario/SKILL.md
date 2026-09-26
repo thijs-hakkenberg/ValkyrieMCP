@@ -22,6 +22,10 @@ Ask for a scenario concept:
 
 Use `create_scenario` to scaffold the scenario directory. This creates the directory with default `quest.ini`, `quest.txt`, and supporting files.
 
+### Scenario Texts
+
+Set these localization keys: \`quest.name\`, \`quest.description\` (shown when choosing the scenario), \`quest.synopsys\` (a short teaser), \`quest.authors\` and \`quest.authors_short\`.
+
 ### Step 3: Map Design
 
 1. Use `suggest_tile_layout` with a style (linear, l_shape, hub_spoke) based on the concept
@@ -35,7 +39,8 @@ For systematic placement methodology, see `/tile-placement`.
 ### Step 4: Event Chain
 
 Build the event flow:
-1. Create `EventStart` with `trigger=EventStart` - the scenario introduction
+1. Create `EventStart` with `trigger=EventStart` - the scenario introduction (like the official app: hand out clues by party size first, e.g. three silent-picked events with vartests `#heroes,>=,4` / `#heroes,==,3` / `#heroes,<=,2`)
+   - Placement dialogs name what to place with `{c:TileName}`: the app prints the tile's name and icon
 2. Create a setup chain: EventStart → place tiles → place tokens → remove TokenInvestigators
 3. Create exploration events that reveal tiles and place tokens
 4. Create encounter events for monster spawns and puzzles

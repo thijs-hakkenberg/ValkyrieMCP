@@ -52,9 +52,32 @@ export function checkCrossReferences(model: ScenarioModel): ValidationResult[] {
     }
   }
 
-  // CustomMonster activation names omit the "Activation" prefix (RoundController looks up "Activation" + name)
+  // CustomMonster activation: in MoM a single Event runs every monster phase (RoundControllerMoM);
+  // otherwise names omit the "Activation" prefix (RoundController looks up "Activation" + name)
   for (const comp of model.getByType('CustomMonster')) {
-    for (const ref of parseRefList(comp.data.activation ?? '')) {
+    const activations = parseRefList(comp.data.activation ?? '');
+    if (activations.some(a => a.startsWith('Event'))) {
+      const ev = activations.find(a => a.startsWith('Event'))!;
+      if (activations.length > 1) {
+        results.push({
+          rule: 'cross-references',
+          severity: 'error',
+          message: `"${comp.name}" lists ${activations.length} activations including event "${ev}" — Valkyrie only runs an event activation when it is the only entry`,
+          component: comp.name,
+          field: 'activation',
+        });
+      } else if (!model.get(ev)) {
+        results.push({
+          rule: 'cross-references',
+          severity: 'error',
+          message: `"${comp.name}" activation event "${ev}" does not exist`,
+          component: comp.name,
+          field: 'activation',
+        });
+      }
+      continue;
+    }
+    for (const ref of activations) {
       if (model.get(`Activation${ref}`)) continue;
       if (ref.startsWith('Activation') && model.get(ref)) {
         results.push({

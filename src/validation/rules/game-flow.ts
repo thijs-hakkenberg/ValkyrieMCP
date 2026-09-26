@@ -56,6 +56,9 @@ export function computeReachability(model: ScenarioModel): Reachability {
         for (const m of parseRefList(comp.data.monster ?? '')) {
           const cm = model.get(m);
           if (cm) for (const f of ['evadeevent', 'horrorevent']) if (cm.data[f]) run(cm.data[f]!);
+          // MoM: a single Event activation runs every monster phase
+          const acts = parseRefList(cm?.data.activation ?? '');
+          if (acts.length === 1 && acts[0].startsWith('Event')) run(acts[0]);
         }
       }
     }
@@ -120,12 +123,12 @@ export function checkGameFlow(model: ScenarioModel): ValidationResult[] {
     });
   }
 
-  const mythosFlag = /^\$mythos(Minor|Major|Deadly),/;
+  const mythosFlag = /^\$mythos(Minor|Major|Deadly|Help|Flavor|Flavour),/i;
   if (!all.some(c => (c.data.operations ?? '').split(/\s+/).some(op => mythosFlag.test(op)))) {
     results.push({
       rule: 'game-flow',
       severity: 'warning',
-      message: 'Base-game mythos events never appear: no event sets $mythosMinor, $mythosMajor or $mythosDeadly. Set $mythosMinor,=,1 at setup and raise the tier by round (see /variables-and-mythos)',
+      message: 'Base-game mythos events never appear: no event sets $mythosFlavor, $mythosHelp, $mythosMinor, $mythosMajor or $mythosDeadly. Set $mythosMinor,=,1 at setup and raise the tier by round (see /variables-and-mythos)',
     });
   }
 
