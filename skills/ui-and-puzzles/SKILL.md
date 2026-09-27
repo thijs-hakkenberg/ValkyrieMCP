@@ -39,6 +39,10 @@ add: "UIBackground UIButton UIImage UIText"
 
 A UI element with `buttons=1` and `event1=` is itself clickable, and its label is `<name>.uitext`.
 
+### UI never stays on the board
+
+While **any** UI element is on the board, Valkyrie's next phase button does nothing (`Quest.UIItemsPresent()`), so the investigator phase can never end: no mythos, no monsters. UI is for cutscenes, handouts and puzzles that the next button removes again. For something that should stay available all game (a companion, a status sheet), use a token with `customImage`, and show the values in its dialog with `{var:Name}`, which dialog text fills in each time it opens. `validate_scenario` warns about UI that nothing removes (rule `ui-lifetime`).
+
 ## Prologue / Intro Cutscene
 
 `/artwork` has the complete, tested pattern. It uses a full-screen `ImageCutsceneBG` backdrop, the scenario's own picture on the left (`xposition=-0.45`), the story on the right (`xposition=0.35`, `textAlignment=TOP`), and a Begin button anchored to the bottom (`valign=bottom`) whose event removes the UI and sets up the board. `/artwork` also covers showing handouts and scene pictures during play, and generating the pictures with ComfyUI.
