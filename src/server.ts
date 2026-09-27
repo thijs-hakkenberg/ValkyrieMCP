@@ -323,7 +323,7 @@ export function createServer(): McpServer {
       format: z.enum(['outline', 'mermaid']).optional().describe('outline (default) or mermaid'),
       root: z.string().optional().describe('Only the part of the story that follows this component (e.g. EventScream)'),
       maxDepth: z.number().int().optional().describe('Stop expanding below this depth (default 30)'),
-      outputPath: z.string().optional().describe('Also write the result: .html (chart + outline page), .mmd/.md (Mermaid) or .txt (outline)'),
+      outputPath: z.string().optional().describe('Also write the result, relative to the scenario folder or absolute: .html (chart + outline page), .mmd/.md (Mermaid) or .txt (outline)'),
     },
     async ({ format, root, maxDepth, outputPath }) => {
       const model = getModel();
@@ -332,7 +332,7 @@ export function createServer(): McpServer {
       const text = format === 'mermaid' ? renderMermaid(graph) : renderOutline(graph, { root, maxDepth });
       let note = '';
       if (outputPath) {
-        const file = path.isAbsolute(outputPath) || !model.scenarioDir ? outputPath : path.resolve(outputPath);
+        const file = path.isAbsolute(outputPath) || !model.scenarioDir ? path.resolve(outputPath) : path.join(model.scenarioDir, outputPath);
         fs.mkdirSync(path.dirname(file), { recursive: true });
         if (/\.html?$/i.test(file)) fs.writeFileSync(file, renderStoryHtml(graph));
         else if (/\.(mmd|md)$/i.test(file)) fs.writeFileSync(file, file.endsWith('.md') ? `\`\`\`mermaid\n${renderMermaid(graph)}\n\`\`\`\n` : renderMermaid(graph));

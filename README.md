@@ -61,7 +61,7 @@ This gives you the MCP tools and resources, but not the skills or agent (those r
 hermes plugins install thijs-hakkenberg/ValkyrieMCP --enable
 ```
 
-The plugin registers the MCP tools as native Hermes tools (toolset `valkyrie-mom`) and the skills as `valkyrie-mom:<skill>` (e.g. `skill_view("valkyrie-mom:artwork")`). On the first tool call it starts the matching `@thijshakkenberg/valkyrie-mom-mcp` version with `npx` (Node.js 20+ required) and keeps it running for the session, since the scenario being edited lives there. Pictures that tools return, such as `render_map`, are saved under `~/.hermes/cache/valkyrie-mom/` and their paths are given in the result. For a local checkout, set `VALKYRIE_MCP_COMMAND="npx tsx /path/to/ValkyrieMCP/src/index.ts"`.
+If Hermes offers to install the plugin's Node dependencies, answer N: they are only needed to develop the plugin. The plugin registers the MCP tools as native Hermes tools (toolset `valkyrie-mom`) and the skills as `valkyrie-mom:<skill>` (e.g. `skill_view("valkyrie-mom:artwork")`). On the first tool call it starts the matching `@thijshakkenberg/valkyrie-mom-mcp` version with `npx` (Node.js 20+ required) and keeps it running for the session, since the scenario being edited lives there. Pictures that tools return, such as `render_map`, are saved under `~/.hermes/cache/valkyrie-mom/` and their paths are given in the result. For a local checkout, set `VALKYRIE_MCP_COMMAND="npx tsx /path/to/ValkyrieMCP/src/index.ts"`.
 
 ### From source
 
