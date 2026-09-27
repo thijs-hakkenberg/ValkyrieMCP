@@ -8,7 +8,7 @@ MCP (Model Context Protocol) server and Claude Code plugin for AI-assisted Mansi
 
 This server exposes Valkyrie scenario editing as MCP tools, enabling AI assistants (Claude, etc.) to create, modify, validate, and build complete MoM scenarios. It auto-detects the Valkyrie editor directory so scenarios appear directly in the app.
 
-The plugin bundles 7 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, etc.) and an autonomous scenario designer agent.
+The plugin bundles 8 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, generated artwork, etc.) and an autonomous scenario designer agent.
 
 ## Install
 
@@ -21,7 +21,7 @@ claude plugin install valkyrie-mom
 
 This gives you:
 - **MCP server** with 25 tools for scenario editing (auto-started)
-- **7 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`
+- **8 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`, `/artwork`
 - **Scenario designer agent** for autonomous scenario creation
 - **5 MCP resources** for format documentation
 
@@ -73,6 +73,7 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `/custom-monsters` | Custom activations, evade/horror events, round-based spawn triggering |
 | `/ui-and-puzzles` | Prologues, interactive journals, combination locks, built-in puzzle types |
 | `/items-and-distribution` | Random items, unique items, starting items, inspection events |
+| `/artwork` | Generate pictures with a local ComfyUI (FLUX.2 [klein] 4B) and show them: cover, intro cutscene, handouts, scenes, monsters, tokens, image puzzles |
 
 ## MCP Tools
 
@@ -84,7 +85,8 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `load_scenario` | Load an existing scenario from a directory |
 | `get_scenario_state` | Get current scenario component/localization summary |
 | `validate_scenario` | Run all validation rules |
-| `build_scenario` | Save and build `.valkyrie` package |
+| `save_scenario` | Write the scenario to its folder (edits stay in memory until saved or built) |
+| `build_scenario` | Save and build the `.valkyrie` package with Valkyrie's manifest `.ini` and cover image (default: `Desktop/<Package>/`, like Valkyrie's Create Package) |
 | `set_quest_config` | Set difficulty, play time, investigator count, cover image |
 
 ### Components
@@ -110,6 +112,24 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `render_map` | Render the board as a PNG with the real tile artwork (from Valkyrie's imported data) or a schematic, tokens numbered |
 | `suggest_tile_layout` | Suggest coordinates for large (7x7) tiles in linear, L-shape, or hub-spoke layouts |
 | `place_tile_relative` | Position and rotation for a new tile against an existing one, with a door lined up |
+
+### Artwork
+| Tool | Description |
+|------|-------------|
+| `artwork_status` | Check a local ComfyUI server and the FLUX.2 [klein] 4B model files; prints comfy-cli setup and download commands for anything missing |
+| `generate_artwork` | Generate an image (4 steps, CFG 1, size presets per use) and save it into the scenario folder, with a preview |
+
+Artwork is optional and runs entirely on your machine. Setup with [comfy-cli](https://github.com/Comfy-Org/comfy-cli):
+
+```bash
+pip install comfy-cli && comfy install
+comfy model download --url https://huggingface.co/Comfy-Org/flux2-klein-4B/resolve/main/split_files/diffusion_models/flux-2-klein-4b.safetensors --relative-path models/diffusion_models
+comfy model download --url https://huggingface.co/Comfy-Org/flux2-klein-4B/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors --relative-path models/text_encoders
+comfy model download --url https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors --relative-path models/vae
+comfy launch --background
+```
+
+On NVIDIA GPUs with less VRAM, the fp8 model (`black-forest-labs/FLUX.2-klein-4b-fp8`) is smaller. Set `VALKYRIE_COMFYUI_URL` if ComfyUI runs somewhere other than `http://127.0.0.1:8188`. The `/artwork` skill covers prompts and where Valkyrie shows images.
 
 ### Reference
 | Tool | Description |
@@ -201,7 +221,7 @@ npm run build      # Compile to dist/
 
 ```
 .claude-plugin/    Plugin manifest
-skills/            7 skill SKILL.md files
+skills/            8 skill SKILL.md files
 agents/            Scenario designer agent
 src/
   io/              INI parser/writer, localization CSV, ZIP packager

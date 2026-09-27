@@ -66,3 +66,43 @@ describe('custom-images', () => {
     expect(results.map(r => `${r.component}:${r.field}`).sort()).toEqual(['EventBad:audio', 'EventScream:music']);
   });
 });
+
+describe('custom-images: language folders and the cover image', () => {
+  let dir: string;
+  afterEach(() => { if (dir) fs.rmSync(dir, { recursive: true, force: true }); });
+
+  function setup(files: string[]): ScenarioModel {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'valkyrie-img-'));
+    for (const f of files) {
+      fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true });
+      fs.writeFileSync(path.join(dir, f), 'x');
+    }
+    return new ScenarioModel(undefined, dir);
+  }
+
+  it('accepts an image that only exists in a language folder at the root', () => {
+    const model = setup(['English/Photo.png']);
+    model.upsert('UIPhoto', { image: 'Photo.png' });
+    expect(checkCustomImages(model)).toEqual([]);
+  });
+
+  it('accepts a language folder next to the file', () => {
+    const model = setup(['img/Polish/map.png']);
+    model.upsert('TileMap', { customImage: 'img/map.png' });
+    expect(checkCustomImages(model)).toEqual([]);
+  });
+
+  it('warns when the quest.ini cover image is missing', () => {
+    const model = setup([]);
+    model.questConfig.image = 'img/Cover.jpg';
+    const results = checkCustomImages(model);
+    expect(results).toHaveLength(1);
+    expect(results[0].message).toContain('quest.ini image="img/Cover.jpg"');
+  });
+
+  it('accepts a present cover image', () => {
+    const model = setup(['img/Cover.jpg']);
+    model.questConfig.image = 'img/Cover.jpg';
+    expect(checkCustomImages(model)).toEqual([]);
+  });
+});

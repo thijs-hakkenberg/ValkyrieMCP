@@ -90,7 +90,10 @@ Use `set_localization` to write all text:
 ### Step 9: Validate & Build
 
 1. `validate_scenario` - fix any errors reported
-2. `build_scenario` - create .valkyrie package
+2. `save_scenario` - write the files so Valkyrie's editor sees them (edits stay in memory until saved)
+3. `build_scenario` - create the .valkyrie package, its manifest `.ini` and cover image (default `Desktop/<Package>/`, like Valkyrie's Create Package)
+
+Optional: `/artwork` adds a cover, an intro cutscene and handouts generated with a local ComfyUI.
 
 ## Advanced Patterns
 

@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - 2026-09-27
+
+### Added
+
+- **Scenario artwork with ComfyUI.** `artwork_status` checks a local ComfyUI server and the FLUX.2 [klein] 4B files (diffusion model, Qwen3 4B text encoder, FLUX.2 VAE) and prints comfy-cli setup and download commands for what is missing. `generate_artwork` renders an image with the distilled model's settings (4 steps, CFG 1, euler), size presets per use (cover, intro, handout, scene, monster, token) and a shared house style, saves it into the scenario (`.jpg` keeps packages small) and returns a preview.
+- `/artwork` skill: setup, recommended settings and prompts, every place Valkyrie shows images, and the intro cutscene and picture-during-play patterns.
+- `puzzles` validation rule: an unknown class, a missing finish-button label, a code solution that does not fit `puzzlelevel`/`puzzlealtlevel`, an image puzzle without an image, and `add=Puzzle...` are errors; puzzle text (never shown), a solution on a non-code puzzle, and puzzles nothing starts are warnings.
+- `custom-images` checks the `quest.ini` cover image.
+- `save_scenario` writes the scenario to its folder. Before, edits reached disk only through `build_scenario`, so a session that ended without a build lost its changes.
+- `build_scenario` writes what Valkyrie's editor "Create Package" writes: the `.valkyrie`, the `<Package>.ini` manifest (quest settings, name, synopsis, description, authors, SHA-256 version) and the cover image, which is what publishing needs. `outputPath` is optional and may be a folder; the default is `Desktop/<Package>/`, where Valkyrie puts it.
+- `package-name` rule: a scenario folder with spaces (the manual requires none before publishing) and an old `.valkyrie` inside the folder (Valkyrie's Create Package zips the whole folder) are warnings.
+
+### Changed
+
+- `create_scenario` names the folder without spaces (`The Wrath of Elder Claude` → `TheWrathOfElderClaude`), since the folder name becomes the package name.
+
+### Fixed
+
+- Puzzle documentation (skill, format docs, tool description) described puzzles as components placed with `add=` and PASS/FAIL buttons. A puzzle is an event started from a button; its window shows no text; `button1` is the finish button. `puzzlelevel`/`puzzlealtlevel` mean positions/symbols (code), columns/rows (image) and minimum moves (slide, tower); `puzzlesolution` and `image` were undocumented.
+- UI positioning was documented as 0 = left/top edge. Valkyrie centres elements: `xposition`/`yposition` offset from the screen centre unless `halign`/`valign` anchor to an edge.
+- `custom-images` reported images that exist only in a language folder (`English/img/X.png`, `img/English/X.png`) as missing; Valkyrie uses them.
+
 ## [2.1.0] - 2026-09-27
 
 Checked against the community "Valkyrie MoM Tutorial" (the scenario-creation manual) and by building a full scenario with the plugin (Herbert West—Reanimator I).

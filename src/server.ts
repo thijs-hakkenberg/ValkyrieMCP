@@ -1,4 +1,5 @@
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import { VERSION } from './version.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -32,6 +33,8 @@ import { deleteComponent, setLocalization } from './tools/shared.js';
 import { getMapAscii, suggestTileLayout, placeTileRelative } from './tools/map.js';
 import { renderMap } from './map/render.js';
 import { searchGameContent } from './tools/reference.js';
+import { toPackageName, writePackageManifest } from './io/package-manifest.js';
+import { DEFAULT_COMFYUI_URL, generateArtwork, getArtworkStatus, setupInstructions } from './artwork/comfyui.js';
 import {
   EVENT_FORMAT_DOC,
   LOCALIZATION_FORMAT_DOC,
@@ -68,8 +71,8 @@ const UPSERT_TOOLS = [
   { name: 'upsert_token',  desc: 'Create or update a token component. Optional: tokensize (small|medium|huge|massive|Original|<number>), clickeffect=false (decorative, not clickable), customImage (image path; replaces type), type may also be a catalog Monster ID to show that monster',       prefix: 'Token',  fn: upsertToken },
   { name: 'upsert_spawn',  desc: 'Create or update a spawn component',       prefix: 'Spawn',  fn: upsertSpawn },
   { name: 'upsert_item',   desc: 'Create or update a quest item component',  prefix: 'QItem',  fn: upsertItem },
-  { name: 'upsert_puzzle', desc: 'Create or update a puzzle component',      prefix: 'Puzzle', fn: upsertPuzzle },
-  { name: 'upsert_ui',     desc: 'Create or update a UI component',          prefix: 'UI',     fn: upsertUI },
+  { name: 'upsert_puzzle', desc: 'Create or update a puzzle. A puzzle is an event: start it from a button (event1=PuzzleX), never add=. Fields: class (slide default, code, image, tower), skill ({observation}...), puzzlelevel (code: positions, image: columns, slide/tower: min moves), puzzlealtlevel (code: symbols 1..N, image: rows), puzzlesolution (code: "3 6 1"), image (image puzzle picture), buttons=1 + event1 (runs after solving). The window shows no text: tell the story in the event before it; <name>.button1 labels the finish button', prefix: 'Puzzle', fn: upsertPuzzle },
+  { name: 'upsert_ui',     desc: 'Create or update a UI overlay. With vunits=True, size is the height in screen heights and xposition/yposition offset from the screen CENTRE (0,0 = centred) unless halign/valign anchor to an edge. image: built-in (ImageCutsceneBG) or scenario file (img/X.jpg, see generate_artwork). Text: <name>.uitext; buttons=1 + event1 makes it clickable. Show with an event add=, remove later; add buttons last', prefix: 'UI', fn: upsertUI },
   { name: 'upsert_custom_monster', desc: 'Create or update a custom monster. Fields: base (catalog Monster ID), health, healthperhero, horror, awareness, traits, image, imageplace, activation (MoM: ONE Event name, run every monster phase, e.g. activation=EventBossActivation with randomevents to pick moves/attacks; Descent-style: Activation component names without the prefix), evadeevent, horrorevent (Event names)', prefix: 'CustomMonster', fn: upsertCustomMonster },
   { name: 'upsert_mplace', desc: 'Create or update a monster placement (MPlace). Fields: xposition, yposition, master, rotate, tokensize (small|medium|huge|massive|Original|<number>)', prefix: 'MPlace', fn: upsertMPlace },
   { name: 'upsert_activation', desc: 'Create or update a custom monster activation. Fields: minionfirst, masterfirst; text goes in localization keys <name>.ability, <name>.minion, <name>.master, <name>.movebutton, <name>.move', prefix: 'Activation', fn: upsertActivation },
@@ -106,7 +109,8 @@ export function createServer(): McpServer {
     'Create a new MoM scenario with default scaffold. Defaults to the Valkyrie editor directory.',
     { name: z.string().describe('Scenario name'), dir: z.string().optional().describe('Custom output directory (defaults to Valkyrie editor dir)') },
     async ({ name, dir }) => {
-      const targetDir = dir ?? path.join(getEditorDir(), name);
+      // The folder name becomes the package name, which Valkyrie cannot publish with spaces
+      const targetDir = dir ?? path.join(getEditorDir(), toPackageName(name));
       const result = await createScenario(name, { dir: targetDir });
       currentModel = result.model;
       return { content: [{ type: 'text', text: `Scenario "${name}" created at ${result.dir}` }] };
@@ -157,10 +161,22 @@ export function createServer(): McpServer {
   );
 
   server.tool(
+    'save_scenario',
+    'Write the current scenario to its folder (INI files, localization, quest.ini) so Valkyrie\'s editor sees the changes. Edits made with the other tools stay in memory until save_scenario or build_scenario',
+    {},
+    async () => {
+      const model = getModel();
+      await saveScenario(model);
+      const errors = validateScenario(model).filter(r => r.severity === 'error').length;
+      return { content: [{ type: 'text', text: `Saved to ${model.scenarioDir}${errors ? ` (${errors} validation error(s); run validate_scenario)` : ''}` }] };
+    },
+  );
+
+  server.tool(
     'build_scenario',
-    'Save and build .valkyrie package. Refuses when validate_scenario reports errors (they break the game in Valkyrie) unless force is true',
+    'Save and build the .valkyrie package with the files Valkyrie\'s editor "Create Package" writes: <Package>.valkyrie, the <Package>.ini manifest (scenario list entry: quest settings, name, synopsis, description, authors, SHA-256 version) and the cover image. Without outputPath it goes where Valkyrie puts it: <Desktop>/<Package>/. Refuses when validate_scenario reports errors (they break the game in Valkyrie) unless force is true',
     {
-      outputPath: z.string().describe('Output .valkyrie file path'),
+      outputPath: z.string().optional().describe('A .valkyrie file path, or a folder to create <Package>/ in (default: the Desktop, like Valkyrie)'),
       force: z.boolean().optional().describe('Build even when validation reports errors'),
     },
     async ({ outputPath, force }) => {
@@ -174,9 +190,20 @@ export function createServer(): McpServer {
           }],
         };
       }
+      const packageName = toPackageName(path.basename(model.scenarioDir));
+      const packagePath = outputPath?.toLowerCase().endsWith('.valkyrie')
+        ? outputPath
+        : path.join(outputPath ?? path.join(os.homedir(), 'Desktop'), packageName, `${packageName}.valkyrie`);
+      fs.mkdirSync(path.dirname(packagePath), { recursive: true });
       await saveScenario(model);
-      await buildScenario(model, outputPath);
-      return { content: [{ type: 'text', text: `Built package: ${outputPath}` }] };
+      await buildScenario(model, packagePath);
+      const { manifest, icon } = writePackageManifest(model, packagePath);
+      const lines = [`Built package: ${packagePath}`, `Manifest: ${manifest}`];
+      if (icon) lines.push(`Cover image: ${path.join(path.dirname(packagePath), icon)}`);
+      if (/\s/.test(path.basename(model.scenarioDir))) {
+        lines.push(`Note: the scenario folder "${path.basename(model.scenarioDir)}" has spaces; Valkyrie's own Create Package would name the package after it, and a published package name must not contain spaces. Rename the folder to "${packageName}".`);
+      }
+      return { content: [{ type: 'text', text: lines.join('\n') }] };
     },
   );
 
@@ -281,6 +308,57 @@ export function createServer(): McpServer {
         content: [
           { type: 'image', data: r.png.toString('base64'), mimeType: 'image/png' },
           { type: 'text', text: `Map${note}${outputPath ? `, saved to ${outputPath}` : ''}:\n${r.legend.join('\n')}` },
+        ],
+      };
+    },
+  );
+
+  // ── Artwork Tools ──
+
+  server.tool(
+    'artwork_status',
+    'Check whether a local ComfyUI server with FLUX.2 [klein] 4B is ready for generate_artwork, and how to set up what is missing (comfy-cli install, launch and model downloads)',
+    { comfyUrl: z.string().optional().describe(`ComfyUI address (default ${DEFAULT_COMFYUI_URL}, or VALKYRIE_COMFYUI_URL)`) },
+    async ({ comfyUrl }) => {
+      const status = await getArtworkStatus(comfyUrl ?? DEFAULT_COMFYUI_URL);
+      const ready = status.reachable && status.missing.length === 0;
+      const lines = [
+        ready ? `Ready: ComfyUI ${status.comfyuiVersion ?? ''} at ${status.url}${status.device ? ` on ${status.device}` : ''}` : 'Not ready.',
+        ...Object.entries(status.models).map(([k, v]) => `  ${k}: ${v}`),
+      ];
+      if (!ready) lines.push('', setupInstructions(status));
+      return { content: [{ type: 'text', text: lines.join('\n') }] };
+    },
+  );
+
+  server.tool(
+    'generate_artwork',
+    'Generate scenario artwork with FLUX.2 [klein] 4B on a local ComfyUI (4 steps, CFG 1, euler) and save it into the scenario folder. '
+    + 'Presets: cover/intro 896x896 (quest.ini image, intro cutscene), handout 768x1024 (letters, parchments, photos), scene 1024x768 (pictures during play), monster 768x768 (CustomMonster image), token 512x512 (Token customImage). '
+    + 'Describe the subject only; a house style is appended so all pictures match. The first image of a session also loads the model (minutes); later ones take ~30 s. Reference the returned path from ui image=, customImage= etc.',
+    {
+      prompt: z.string().describe('What the picture shows (subject, setting, mood)'),
+      outputPath: z.string().describe('File to write, relative to the loaded scenario folder (e.g. "img/Letter.jpg") or absolute. .jpg keeps packages small; .png is lossless'),
+      preset: z.enum(['cover', 'intro', 'handout', 'scene', 'monster', 'token']).optional().describe('Image size for the intended use (default scene)'),
+      width: z.number().int().optional().describe('Override the preset width (rounded to 16)'),
+      height: z.number().int().optional().describe('Override the preset height (rounded to 16)'),
+      seed: z.number().int().optional().describe('Fixed seed to reproduce or vary an image (random by default)'),
+      steps: z.number().int().optional().describe('Sampling steps (default 4 for the distilled model, 20 for base)'),
+      style: z.string().optional().describe('Replaces the default style suffix; "" for none'),
+      comfyUrl: z.string().optional().describe(`ComfyUI address (default ${DEFAULT_COMFYUI_URL})`),
+    },
+    async ({ prompt, outputPath, preset, width, height, seed, steps, style, comfyUrl }) => {
+      const baseDir = currentModel?.scenarioDir;
+      if (!path.isAbsolute(outputPath) && !baseDir) {
+        throw new Error('Load or create a scenario first, or pass an absolute outputPath');
+      }
+      const outputFile = path.isAbsolute(outputPath) ? outputPath : path.join(baseDir!, outputPath);
+      const r = await generateArtwork({ prompt, outputFile, preset, width, height, seed, steps, style, url: comfyUrl });
+      const relative = baseDir && !path.relative(baseDir, r.file).startsWith('..') ? path.relative(baseDir, r.file).split(path.sep).join('/') : r.file;
+      return {
+        content: [
+          { type: 'image', data: r.preview.toString('base64'), mimeType: 'image/jpeg' },
+          { type: 'text', text: `Saved ${relative} (${r.width}x${r.height}, seed ${r.seed}, ${r.steps} steps, CFG ${r.cfg}, ${r.diffusionModel}, ${r.seconds} s). Reference it as "${relative}".` },
         ],
       };
     },
