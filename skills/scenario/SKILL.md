@@ -90,6 +90,7 @@ Use `set_localization` to write all text:
 ### Step 9: Validate & Build
 
 1. `validate_scenario` - fix any errors reported
+1. `story_graph` - read the storyline back as a condensed tree: check every branch leads somewhere, every ending is reachable, and nothing is listed under "Never reached"
 2. `save_scenario` - write the files so Valkyrie's editor sees them (edits stay in memory until saved)
 3. `build_scenario` - create the .valkyrie package, its manifest `.ini` and cover image (default `Desktop/<Package>/`, like Valkyrie's Create Package)
 

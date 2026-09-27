@@ -113,6 +113,11 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `suggest_tile_layout` | Suggest coordinates for large (7x7) tiles in linear, L-shape, or hub-spoke layouts |
 | `place_tile_relative` | Position and rotation for a new tile against an existing one, with a door lined up |
 
+### Story
+| Tool | Description |
+|------|-------------|
+| `story_graph` | Project the storyline as a graph: a condensed text outline (buttons, conditions, effects, placed tokens, puzzles, monster events, endings, never-reached events), Mermaid, or an HTML page with the rendered flowchart |
+
 ### Artwork
 | Tool | Description |
 |------|-------------|

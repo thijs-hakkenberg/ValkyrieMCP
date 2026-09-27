@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- `story_graph`: the storyline projected as a graph, following what Valkyrie runs: buttons (with their labels), "first that passes" and random choices, tokens and UI placed by `add` and what clicking them runs, item inspection, puzzles, spawns with their monster-phase, evade and horror events, and `Defeated` triggers. The outline is condensed for reading: one line per event with its first words, conditions and effects, straight chains on one level, decisions indented, repeats pointing back, and sections for endings and never-reached events. It also renders Mermaid, and an HTML page with the flowchart and the outline.
+
 ## [2.2.0] - 2026-09-27
 
 ### Added

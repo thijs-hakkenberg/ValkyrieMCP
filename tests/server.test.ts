@@ -59,6 +59,7 @@ describe('MCP Server', () => {
         'suggest_tile_layout',
         'place_tile_relative',
         'render_map',
+        'story_graph',
         'artwork_status',
         'generate_artwork',
         'search_game_content',

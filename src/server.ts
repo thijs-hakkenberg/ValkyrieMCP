@@ -34,6 +34,7 @@ import { getMapAscii, suggestTileLayout, placeTileRelative } from './tools/map.j
 import { renderMap } from './map/render.js';
 import { searchGameContent } from './tools/reference.js';
 import { toPackageName, writePackageManifest } from './io/package-manifest.js';
+import { buildStoryGraph, renderMermaid, renderOutline, renderStoryHtml } from './story/story-graph.js';
 import { DEFAULT_COMFYUI_URL, generateArtwork, getArtworkStatus, setupInstructions } from './artwork/comfyui.js';
 import {
   EVENT_FORMAT_DOC,
@@ -310,6 +311,35 @@ export function createServer(): McpServer {
           { type: 'text', text: `Map${note}${outputPath ? `, saved to ${outputPath}` : ''}:\n${r.legend.join('\n')}` },
         ],
       };
+    },
+  );
+
+  server.tool(
+    'story_graph',
+    'Project the scenario\'s storyline as a graph: what each button, trigger, placed token, item inspection and monster event leads to. '
+    + 'format=outline (default) is a condensed text tree: one line per event with its first words, conditions (if ...), effects (variables, +placed/−removed) and END; straight chains stay on one level, decisions indent, repeats point back (↩), and endings and never-reached events are listed. '
+    + 'format=mermaid gives a flowchart definition. outputPath (.html) writes a page with the rendered chart and the outline for people. Use it to review or explain the plot, and to find dead ends and loops',
+    {
+      format: z.enum(['outline', 'mermaid']).optional().describe('outline (default) or mermaid'),
+      root: z.string().optional().describe('Only the part of the story that follows this component (e.g. EventScream)'),
+      maxDepth: z.number().int().optional().describe('Stop expanding below this depth (default 30)'),
+      outputPath: z.string().optional().describe('Also write the result: .html (chart + outline page), .mmd/.md (Mermaid) or .txt (outline)'),
+    },
+    async ({ format, root, maxDepth, outputPath }) => {
+      const model = getModel();
+      if (root && !model.get(root)) throw new Error(`No component named "${root}"`);
+      const graph = buildStoryGraph(model);
+      const text = format === 'mermaid' ? renderMermaid(graph) : renderOutline(graph, { root, maxDepth });
+      let note = '';
+      if (outputPath) {
+        const file = path.isAbsolute(outputPath) || !model.scenarioDir ? outputPath : path.resolve(outputPath);
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        if (/\.html?$/i.test(file)) fs.writeFileSync(file, renderStoryHtml(graph));
+        else if (/\.(mmd|md)$/i.test(file)) fs.writeFileSync(file, file.endsWith('.md') ? `\`\`\`mermaid\n${renderMermaid(graph)}\n\`\`\`\n` : renderMermaid(graph));
+        else fs.writeFileSync(file, text);
+        note = `\n\nWritten to ${file}`;
+      }
+      return { content: [{ type: 'text', text: text + note }] };
     },
   );
 
