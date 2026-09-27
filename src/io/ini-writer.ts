@@ -1,4 +1,5 @@
 import { BARE_KEY_SECTIONS } from '../model/component-types.js';
+import { VERSION } from '../version.js';
 
 const BARE_KEY_ORDER = ['QuestText', 'QuestData'];
 
@@ -10,7 +11,7 @@ export function writeIni(
   const lines: string[] = [];
 
   // Header comment
-  lines.push(comment ?? '; Saved by version: 0.1.0');
+  lines.push(comment ?? `; Saved by valkyrie-mom-mcp ${VERSION}`);
   lines.push('');
 
   // Write Quest section first (if present)

@@ -6,7 +6,7 @@ import type { ScenarioModel } from '../../model/scenario-model.js';
  * - quest.name and quest.description should exist
  * - Events with display != false should have ComponentName.text
  * - Events/Spawns with buttons > 0 should have ComponentName.button1..N
- * - Tokens should have ComponentName.text and ComponentName.button1
+ * - Tokens with text should have ComponentName.button1 (a token without text runs its event on click)
  */
 export function checkLocalizationCompleteness(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
@@ -41,15 +41,8 @@ export function checkLocalizationCompleteness(model: ScenarioModel): ValidationR
     if (isToken) {
       if (displayExplicitlyFalse) continue;
 
-      if (!loc.has(`${comp.name}.text`)) {
-        results.push({
-          rule: 'localization-completeness',
-          severity: 'warning',
-          message: `Missing localization key "${comp.name}.text" for token`,
-          component: comp.name,
-        });
-      }
-      if (!loc.has(`${comp.name}.button1`)) {
+      // No text is a valid pattern: clicking the token runs its event1 directly
+      if (loc.has(`${comp.name}.text`) && comp.data.event1?.trim() && !loc.has(`${comp.name}.button1`)) {
         results.push({
           rule: 'localization-completeness',
           severity: 'warning',

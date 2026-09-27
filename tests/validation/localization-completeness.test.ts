@@ -76,23 +76,19 @@ describe('localization-completeness', () => {
     expect(eventWarnings).toHaveLength(0);
   });
 
-  it('returns warning for token missing text key', () => {
+  it('accepts a token without text (clicking it runs its event directly)', () => {
     const model = new ScenarioModel();
-    model.upsert('TokenSearch1', { type: 'TokenSearch', buttons: '1', event1: '' });
+    model.upsert('TokenSearch1', { type: 'TokenSearch', buttons: '1', event1: 'EventSearch1' });
     model.localization.set('quest.name', 'Test');
     model.localization.set('quest.description', 'Desc');
-    model.localization.set('TokenSearch1.button1', 'Search');
-    // Missing TokenSearch1.text
 
     const results = checkLocalizationCompleteness(model);
-    const textWarning = results.find(r => r.component === 'TokenSearch1' && r.message.includes('.text'));
-    expect(textWarning).toBeDefined();
-    expect(textWarning!.severity).toBe('warning');
+    expect(results.filter(r => r.component === 'TokenSearch1')).toHaveLength(0);
   });
 
   it('returns warning for token missing button1 key', () => {
     const model = new ScenarioModel();
-    model.upsert('TokenSearch1', { type: 'TokenSearch', buttons: '1', event1: '' });
+    model.upsert('TokenSearch1', { type: 'TokenSearch', buttons: '1', event1: 'EventSearch1' });
     model.localization.set('quest.name', 'Test');
     model.localization.set('quest.description', 'Desc');
     model.localization.set('TokenSearch1.text', 'A search spot');

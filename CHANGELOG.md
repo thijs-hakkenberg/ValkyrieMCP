@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+Checked against the community "Valkyrie MoM Tutorial" (the scenario-creation manual) and by building a full scenario with the plugin (Herbert West—Reanimator I).
+
+### Added
+
+- Custom monster activation in MoM mode: a single Event that runs every monster phase. Documented as the primary form, checked (the event must exist and be the only entry), and followed by reachability.
+- `event-semantics` reports an event that `add`s components which its own `remove` (by name or `#tiles`/`#tokens`/…) also covers. Valkyrie adds first and removes second, so they vanish at once.
+- Custom `.ogg` audio and music files are checked; `.mp3`/`.wav` are flagged.
+- Docs: text codes (`{c:}`, `{var:}`, `{rnd:hero}`, icons), camera and highlight on events, `audio` vs `music`, trigger timing (`Mythos` vs `BeforeMonsterActivation`, `Eliminated` after one more round, `#eliminated`), quest synopsis and author keys, clue handout by party size.
+
+### Fixed
+
+- `event-graph` used direct references only, so events run by monster activations, `Var` triggers or `Defeated` triggers were reported as unreachable, and every dialog that simply closes was a "dead-end". It now uses the game-flow reachability and reports only events that can never run, including `Defeated` triggers for monsters that never spawn.
+- Tokens without text (which run their event on click, a documented pattern) no longer need `.text`/`.button1`.
+- Explore tokens: event chains were read from the whole `event1` string, so candidate lists (`EventA EventB`) were missed; removal via `#tokens` and chains that end the scenario now count.
+- Spawn `uniquehealth`/`uniquehealthhero` are documented as added to the monster's health (they were described as overrides).
+- `$mythosFlavor`/`$mythosHelp` count as enabling base-game mythos.
+- INI files are stamped with the real plugin version instead of `0.1.0`.
+
 ## [2.0.0] - 2026-09-27
 
 Aligned with Valkyrie 3.28 (quest format 21) and verified against its source.

@@ -1,64 +1,39 @@
 import type { ValidationResult } from '../../model/component-types.js';
-import { EVENT_FIELDS } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
+import { computeReachability } from './game-flow.js';
 
 /**
  * Checks the event graph for structural issues:
  * - Error: No component with trigger=EventStart
- * - Warning: Unreachable events (no incoming refs and no trigger)
- * - Warning: Dead-end events (no next-event refs and no $end operation)
+ * - Warning: Events and spawns that can never run — not reachable from any real trigger
+ *   through event references, clicked board items, spawned monsters (activation, evade,
+ *   horror) or Defeated triggers (see game-flow computeReachability)
+ *
+ * An event whose buttons lead nowhere is not a problem: the dialog closes and play resumes.
  */
 export function checkEventGraph(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
-
   const allComponents = model.getAll();
 
-  // Check for EventStart trigger
-  const hasEventStart = allComponents.some(c => c.data.trigger === 'EventStart');
-  if (!hasEventStart) {
+  if (!allComponents.some(c => c.data.trigger === 'EventStart')) {
     results.push({
       rule: 'event-graph',
       severity: 'error',
       message: 'No component has trigger=EventStart; scenario cannot begin',
     });
+    return results;
   }
 
-  // Only check Event and Spawn components for graph analysis
-  const eventLikeComponents = allComponents.filter(
-    c => c.name.startsWith('Event') || c.name.startsWith('Spawn'),
-  );
-
-  for (const comp of eventLikeComponents) {
-    // Check unreachable: no incoming refs AND no trigger
-    if (!comp.data.trigger) {
-      const incomingRefs = model.getReferencesTo(comp.name);
-      if (incomingRefs.length === 0) {
-        results.push({
-          rule: 'event-graph',
-          severity: 'warning',
-          message: `"${comp.name}" is unreachable: no incoming references and no trigger`,
-          component: comp.name,
-        });
-      }
-    }
-
-    // Check dead-end: only for Event components (not Spawn)
-    if (comp.name.startsWith('Event')) {
-      const hasEnd = comp.data.operations?.includes('$end');
-      const hasAnyEventField = EVENT_FIELDS.some(f => comp.data[f] !== undefined);
-
-      // An explicit silent terminal (display=false, buttons=0) is the documented way to end a chain:
-      // Valkyrie returns to play when the event queue is empty
-      const silentTerminal = comp.data.display?.toLowerCase() === 'false' && (comp.data.buttons ?? '0') === '0';
-      if (!hasEnd && !hasAnyEventField && !silentTerminal) {
-        results.push({
-          rule: 'event-graph',
-          severity: 'warning',
-          message: `"${comp.name}" is a dead-end: no next-event references and no $end operation`,
-          component: comp.name,
-        });
-      }
-    }
+  const { runs } = computeReachability(model);
+  for (const comp of allComponents) {
+    if (!comp.name.startsWith('Event') && !comp.name.startsWith('Spawn')) continue;
+    if (runs.has(comp.name)) continue;
+    results.push({
+      rule: 'event-graph',
+      severity: 'warning',
+      message: `"${comp.name}" can never run: no reachable event, clicked token, monster or valid trigger leads to it`,
+      component: comp.name,
+    });
   }
 
   return results;

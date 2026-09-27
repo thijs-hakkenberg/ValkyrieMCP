@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { VERSION } from './version.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ScenarioModel } from './model/scenario-model.js';
@@ -75,10 +75,6 @@ const UPSERT_TOOLS = [
   { name: 'upsert_activation', desc: 'Create or update a custom monster activation. Fields: minionfirst, masterfirst; text goes in localization keys <name>.ability, <name>.minion, <name>.master, <name>.movebutton, <name>.move', prefix: 'Activation', fn: upsertActivation },
 ] as const;
 
-/** Package version (src/ and dist/ both sit one level below package.json) */
-const VERSION: string = JSON.parse(
-  fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf-8'),
-).version;
 
 export function createServer(): McpServer {
   const server = new McpServer({

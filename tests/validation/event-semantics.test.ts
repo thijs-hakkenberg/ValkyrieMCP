@@ -82,4 +82,19 @@ describe('event-semantics', () => {
 
     expect(checkEventSemantics(model)).toHaveLength(0);
   });
+
+  it('errors when remove=#tiles would undo tiles added by the same event (add runs before remove)', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventNewAct', { buttons: '1', remove: '#tiles #tokens', add: 'TileFarmhouse TokenSlab' });
+    const r = checkEventSemantics(model).find(x => x.field === 'remove');
+    expect(r?.severity).toBe('error');
+    expect(r?.message).toContain('TileFarmhouse, TokenSlab');
+  });
+
+  it('accepts clearing the board in one event and adding in the next', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventClear', { display: 'false', buttons: '1', remove: '#tiles #tokens', event1: 'EventPlace' });
+    model.upsert('EventPlace', { buttons: '1', add: 'TileFarmhouse' });
+    expect(checkEventSemantics(model)).toHaveLength(0);
+  });
 });
