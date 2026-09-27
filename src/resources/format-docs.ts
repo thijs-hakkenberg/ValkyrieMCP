@@ -288,23 +288,31 @@ Prefix: \`QItem\`
 | traitpool | No | Alternative trait matching |
 | inspect | No | Event reference triggered on item inspection |
 
-## Puzzles (other.ini)
-Prefix: \`Puzzle\`
+## Puzzles (other.ini) — upsert_puzzle
+Prefix: \`Puzzle\`. A puzzle is an **event**: a button starts it (\`event1=PuzzleSafe\`), never \`add=\`. Its window shows no text; \`<name>.button1\` labels the finish button, enabled once solved, which runs \`event1\`. "Close" keeps progress and runs nothing.
 | Field | Required | Description |
 |-------|----------|-------------|
-| class | No | code, slide, image, tower (default: slide) |
-| skill | No | Skill test: {observation}, {agility}, etc. |
+| class | No | slide (default), code, image, tower |
+| skill | No | Skill icon shown in the window: {observation}, {lore}, {agility}, {strength}, {will}, {influence} |
+| puzzlelevel | No | code: positions (default 4); image: columns; slide/tower: minimum moves (difficulty) |
+| puzzlealtlevel | No | code: number of symbols 1..N (default 3); image: rows; unused otherwise |
+| puzzlesolution | No | code only: fixed answer, space-separated symbols ("3 6 1"); random when empty |
+| image | No | image: the picture (catalog puzzle image or scenario file); code: symbol or element for icons instead of digits |
+| buttons / event1 | Yes | buttons=1, event1 = what happens after solving |
 | vartests | No | While failing, the puzzle event is skipped |
-| puzzlelevel | No | Puzzle difficulty level |
-| puzzlealtlevel | No | Alternative difficulty level |
 
 ## UI Elements (ui.ini)
 Prefix: \`UI\`
 | Field | Required | Description |
 |-------|----------|-------------|
-| image | No | Image filename or library ref |
-| size | No | Display size multiplier |
-| vunits | No | Use vertical units |
+| image | No | Built-in image (ImageCutsceneBG, ImageInvestigatorSelectTitle, ...) or scenario file (img/Letter.jpg; a copy in a language folder such as English/img/Letter.jpg wins for that language) |
+| size | No | Height (vunits: fraction of screen height); width follows the image aspect ratio, or textaspect for text |
+| vunits | No | True: sizes and positions in screen heights (recommended) |
+| xposition / yposition | No | Offset from the screen **centre** (0,0 = centred; negative = left/up) unless halign/valign anchor it to an edge |
+| halign / valign | No | left/right, top/bottom: anchor to that screen edge; the position becomes the distance from it |
+| textsize / textaspect / textcolor / textbackgroundcolor / textAlignment / richText | No | Text styling; the text is \`<name>.uitext\` |
+| buttons / event1 | No | buttons=1 makes the element clickable and runs event1 |
+| border / clickeffect / fadespeed | No | Frame, click animation (default true), fade (fast) |
 
 ## Custom Monsters (spawns.ini or monsters.ini) — upsert_custom_monster
 Prefix: \`CustomMonster\`

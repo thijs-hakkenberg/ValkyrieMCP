@@ -28,9 +28,30 @@ function parseMusic(music: string | undefined): string[] {
   return (music ?? '').split(/\s+/).filter(Boolean).map(m => `music:${m}`);
 }
 
+/**
+ * Whether Valkyrie finds the file (Quest.FindLocalisedMultimediaFile): at the path itself, or a
+ * translated copy in a language folder, either at the root (English/img/a.png) or next to the
+ * file (img/English/a.png). Any language folder counts, since the player's language is unknown.
+ */
+function mediaExists(scenarioDir: string, file: string): boolean {
+  if (fs.existsSync(path.join(scenarioDir, file))) return true;
+  const languageDirs = (dir: string) => fs.existsSync(dir)
+    ? fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name)
+    : [];
+  if (languageDirs(scenarioDir).some(lang => fs.existsSync(path.join(scenarioDir, lang, file)))) return true;
+  const sub = path.dirname(file);
+  if (sub === '.') return false;
+  return languageDirs(path.join(scenarioDir, sub)).some(lang => fs.existsSync(path.join(scenarioDir, sub, lang, path.basename(file))));
+}
+
 export function checkCustomImages(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
   if (!model.scenarioDir || !fs.existsSync(model.scenarioDir)) return results;
+
+  const cover = model.questConfig.image?.trim();
+  if (cover && looksLikeFile(cover) && !mediaExists(model.scenarioDir, cover)) {
+    results.push({ rule: 'custom-images', severity: 'warning', message: `quest.ini image="${cover}" not found in the scenario directory — the scenario list shows no picture`, field: 'image' });
+  }
 
   for (const comp of model.getAll()) {
     const entry = IMAGE_FIELDS.find(([prefix]) => comp.name.startsWith(prefix));
@@ -38,7 +59,7 @@ export function checkCustomImages(model: ScenarioModel): ValidationResult[] {
     for (const field of fields) {
       if (field.startsWith('music:')) {
         const file = field.slice('music:'.length);
-        if (looksLikeFile(file) && !fs.existsSync(path.join(model.scenarioDir, file))) {
+        if (looksLikeFile(file) && !mediaExists(model.scenarioDir, file)) {
           results.push({ rule: 'custom-images', severity: 'warning', message: `"${comp.name}" music "${file}" not found in the scenario directory`, component: comp.name, field: 'music' });
         }
         continue;
@@ -49,7 +70,7 @@ export function checkCustomImages(model: ScenarioModel): ValidationResult[] {
       }
       const value = comp.data[field]?.trim();
       if (!value || !looksLikeFile(value)) continue;
-      if (fs.existsSync(path.join(model.scenarioDir, value))) continue;
+      if (mediaExists(model.scenarioDir, value)) continue;
       results.push({
         rule: 'custom-images',
         severity: comp.name.startsWith('Tile') ? 'error' : 'warning',

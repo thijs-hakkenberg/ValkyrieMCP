@@ -40,6 +40,7 @@ describe('MCP Server', () => {
         'load_scenario',
         'get_scenario_state',
         'validate_scenario',
+        'save_scenario',
         'build_scenario',
         'set_quest_config',
         'upsert_event',
@@ -58,6 +59,8 @@ describe('MCP Server', () => {
         'suggest_tile_layout',
         'place_tile_relative',
         'render_map',
+        'artwork_status',
+        'generate_artwork',
         'search_game_content',
         'export_bug_report',
       ];

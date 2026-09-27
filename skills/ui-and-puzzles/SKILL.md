@@ -1,6 +1,6 @@
 ---
 name: ui-and-puzzles
-description: UI element design and custom puzzle patterns for Valkyrie MoM. Use when creating splash screens, prologues, interactive journals, combination locks, or custom puzzle systems using UI overlays.
+description: UI element design and puzzle patterns for Valkyrie MoM. Use when creating splash screens, prologues, interactive journals, combination locks, built-in puzzles (code, slide, image, tower) or custom puzzle systems using UI overlays.
 ---
 
 # /ui-and-puzzles - UI Elements & Custom Puzzles
@@ -11,19 +11,23 @@ Design UI overlays and implement custom puzzle systems using Valkyrie's UI compo
 
 ### Vertical Units (`vunits=True`)
 
-Always use vertical units for resolution independence. Positions and sizes are expressed as fractions of screen height.
+Always use vertical units: sizes and positions are then fractions of the **screen height**, and the layout holds on every resolution.
 
 | Field | Description |
 |-------|-------------|
-| `size` | Display size multiplier (1.0 = screen height) |
-| `xposition` | Horizontal position (0 = left, ~0.9 = right) |
-| `yposition` | Vertical position (0 = top, ~0.9 = bottom) |
-| `vunits` | Set to `True` to use vertical units (always recommended) |
-| `image` | Image filename or library reference |
+| `size` | Height of the element (1.0 = screen height); the width follows the image's aspect ratio, or `textaspect` for text |
+| `xposition` | Horizontal offset. **Centred by default**: 0 = screen centre, negative = left, positive = right |
+| `yposition` | Vertical offset from the centre: negative = up, positive = down |
+| `halign` / `valign` | `left`/`right` and `top`/`bottom` anchor the element to that screen edge instead; the position is then the distance from that edge |
+| `vunits` | Set to `True` (always recommended) |
+| `image` | A built-in image (`ImageCutsceneBG`, `ImageInvestigatorSelectTitle`, ...) or a file in the scenario folder (`img/Letter.jpg`) |
+| `textsize`, `textaspect`, `textcolor`, `textAlignment`, `richText` | Text styling for elements with `<name>.uitext` |
+
+For example, `xposition=0 yposition=0 size=1` fills the middle of the screen, and `xposition=-0.45 size=0.9` puts a square picture on the left half. On a 16:9 screen the visible range is roughly ±0.89 horizontally and ±0.5 vertically.
 
 ### Layering Order
 
-**Critical rule:** UI elements are rendered in the order they are added. Later elements overlay earlier ones. Buttons MUST be added LAST to remain clickable.
+**Critical rule:** UI elements are drawn in the order they are added, so later elements cover earlier ones. Buttons MUST be added LAST to stay clickable.
 
 ```
 # CORRECT order: background → content → buttons
@@ -33,85 +37,12 @@ add: "UIBackground UIText UIImage UIButton"
 add: "UIBackground UIButton UIImage UIText"
 ```
 
-## Prologue Layout
+A UI element with `buttons=1` and `event1=` is itself clickable, and its label is `<name>.uitext`.
 
-A standard prologue/splash screen uses 6 UI elements:
+## Prologue / Intro Cutscene
 
-```
-# 1. Background — full screen dark overlay
-upsert_ui("UIBGPrologue", {
-  image: "PaperBGBlack",
-  size: "1.3",
-  xposition: "0.5",
-  yposition: "0.5",
-  vunits: "True"
-})
+`/artwork` has the complete, tested pattern. It uses a full-screen `ImageCutsceneBG` backdrop, the scenario's own picture on the left (`xposition=-0.45`), the story on the right (`xposition=0.35`, `textAlignment=TOP`), and a Begin button anchored to the bottom (`valign=bottom`) whose event removes the UI and sets up the board. `/artwork` also covers showing handouts and scene pictures during play, and generating the pictures with ComfyUI.
 
-# 2. Text Topper — decorative header
-upsert_ui("UITopperPrologue", {
-  image: "PrologueTopper",
-  size: "0.15",
-  xposition: "0.5",
-  yposition: "0.15",
-  vunits: "True"
-})
-
-# 3. Continue Frame — button background
-upsert_ui("UIFramePrologue", {
-  image: "PanelEdge",
-  size: "0.06",
-  xposition: "0.5",
-  yposition: "0.85",
-  vunits: "True"
-})
-
-# 4. Scenario Image — center artwork
-upsert_ui("UIImagePrologue", {
-  image: "your_scenario_image",
-  size: "0.3",
-  xposition: "0.5",
-  yposition: "0.45",
-  vunits: "True"
-})
-
-# 5. Text — scenario intro text
-upsert_ui("UITextPrologue", {
-  size: "0.04",
-  xposition: "0.5",
-  yposition: "0.7",
-  vunits: "True"
-})
-
-# 6. Continue Button — LAST for clickability
-upsert_ui("UIButtonPrologue", {
-  size: "0.05",
-  xposition: "0.5",
-  yposition: "0.85",
-  vunits: "True"
-})
-
-# Add localization for the text
-set_localization({
-  "UITextPrologue.uitext": "<i>The old house looms before you, its windows dark and empty...</i>"
-})
-```
-
-**Display the prologue:**
-```
-upsert_event("EventPrologue", {
-  buttons: "1",
-  add: "UIBGPrologue UITopperPrologue UIFramePrologue UIImagePrologue UITextPrologue UIButtonPrologue",
-  event1: "EventPrologueDismiss"
-})
-
-# Remove all UI elements when continuing
-upsert_event("EventPrologueDismiss", {
-  display: "false",
-  buttons: "1",
-  remove: "UIBGPrologue UITopperPrologue UIFramePrologue UIImagePrologue UITextPrologue UIButtonPrologue",
-  event1: "EventSetupBegin"
-})
-```
 
 ## Interactive Journal
 
@@ -274,66 +205,52 @@ set_localization({
 
 ## Built-in Puzzle Types
 
-Valkyrie provides built-in puzzle mechanics. Use `upsert_puzzle` with these fields:
+A puzzle is a special **event** (`upsert_puzzle`, prefix `Puzzle`). Valkyrie opens its puzzle window when a button reaches it, like any event: `event1=PuzzleSafe`. It is never placed with `add=`.
 
-| Field | Description |
-|-------|-------------|
-| `class` | Puzzle type: `code`, `slide`, `image`, `tower` |
-| `skill` | Skill test icon: `{observation}`, `{agility}`, `{lore}`, `{strength}` |
-| `puzzlelevel` | Difficulty level (higher = harder) |
-| `puzzlealtlevel` | Alternative difficulty level |
+- **No text.** The window shows no dialog text, so tell the story (and the MoM rule "make as many moves as your skill") in the event whose button starts the puzzle.
+- **`button1` is the finish button.** It is greyed out until the puzzle is solved, and pressing it then runs `event1`. Give it a label (`PuzzleSafe.button1`).
+- **"Close" keeps progress.** It leaves without running anything, and reopening the puzzle continues where the players stopped. Keep the token that starts it until the puzzle is solved.
+- **`skill`** is the skill icon shown in the window (`{observation}`, `{lore}`, `{agility}`, `{strength}`, `{will}`, `{influence}`). Valkyrie does not limit the moves: players follow the physical rule.
 
-### Puzzle Types
+| class | `puzzlelevel` | `puzzlealtlevel` | Other fields |
+|---|---|---|---|
+| `slide` (default) | Minimum moves of the random layout (difficulty) | unused | |
+| `code` | Number of positions (default 4) | Number of symbols, 1..N (default 3) | `puzzlesolution` fixes the answer ("3 6 1"); without it the answer is random. `image=symbol` or `image=element` shows icons instead of digits |
+| `image` | Columns | Rows | `image` = catalog puzzle picture or a scenario file (`img/Photo.jpg`) |
+| `tower` | Minimum moves (difficulty) | unused | |
 
-**Code Puzzle** (`class=code`): Enter a numeric code. Good for locks and safes.
+A **code** puzzle is Mastermind: each guess reports how many symbols are right and in the right place, and how many are right but misplaced. With `puzzlesolution`, clues elsewhere in the scenario (a date on a photograph, a stopped clock) can give the answer away, and the feedback still lets players crack it without them.
+
+### Example — strongbox with clues
+
 ```
-upsert_puzzle("PuzzleSafeCode", {
-  class: "code",
-  skill: "{observation}",
-  puzzlelevel: "3"
+upsert_puzzle("PuzzleStrongbox", {
+  class: "code", skill: "{observation}",
+  puzzlelevel: "3", puzzlealtlevel: "6", puzzlesolution: "3 6 1",
+  buttons: "1", event1: "EventStrongboxOpened"
 })
-```
 
-**Slide Puzzle** (`class=slide`): Rearrange sliding tiles. Good for mechanical puzzles.
-```
-upsert_puzzle("PuzzleMechanicalLock", {
-  class: "slide",
-  skill: "{agility}",
-  puzzlelevel: "2"
-})
-```
-
-**Image Puzzle** (`class=image`): Reconstruct a fragmented image. Good for documents and maps.
-```
-upsert_puzzle("PuzzleTornMap", {
-  class: "image",
-  skill: "{observation}",
-  puzzlelevel: "2"
-})
-```
-
-**Tower Puzzle** (`class=tower`): Tower of Hanoi variant. Good for ritual sequences.
-```
-upsert_puzzle("PuzzleRitualTower", {
-  class: "tower",
-  skill: "{lore}",
-  puzzlelevel: "4"
-})
-```
-
-### Connecting Puzzles to Events
-
-```
-upsert_event("EventSolvePuzzle", {
-  buttons: "2",
-  add: "PuzzleSafeCode",
-  event1: "EventPuzzleSolved",
-  event2: "EventPuzzleFailed"
-})
+# The token shows a hint version once both clues are read, else the plain intro
+upsert_token("TokenStrongbox", { type: "TokenInteract", display: "false", buttons: "1",
+  event1: "EventStrongboxHint EventStrongboxIntro", ... })
+upsert_event("EventStrongboxHint",  { buttons: "2", event1: "PuzzleStrongbox", event2: "",
+  vartests: "VarOperation:clueDate,==,1 VarTestsLogicalOperator:AND VarOperation:clueClock,==,1" })
+upsert_event("EventStrongboxIntro", { buttons: "2", event1: "PuzzleStrongbox", event2: "" })
+upsert_event("EventStrongboxOpened", { buttons: "1", remove: "TokenStrongbox", ... })
 
 set_localization({
-  "EventSolvePuzzle.text": "An ornate safe sits behind the painting. Test {observation} to crack the code.",
-  "EventSolvePuzzle.button1": "{qst:PASS}",
-  "EventSolvePuzzle.button2": "{qst:FAIL}"
+  "EventStrongboxIntro.text": "Three brass dials, each numbered 1 to 6, guard the lid...",
+  "EventStrongboxIntro.button1": "Try the dials", "EventStrongboxIntro.button2": "Leave it",
+  "PuzzleStrongbox.button1": "Open the strongbox"
 })
 ```
+
+### Example — image puzzle from your own picture
+
+```
+generate_artwork({ prompt: "A torn family photograph...", preset: "handout", outputPath: "img/Photo.jpg" })
+upsert_puzzle("PuzzlePhoto", { class: "image", image: "img/Photo.jpg", puzzlelevel: "4", puzzlealtlevel: "3",
+  skill: "{observation}", buttons: "1", event1: "EventPhotoRestored" })
+```
+
+`validate_scenario` checks puzzles for an unknown class, a missing finish label, a solution that doesn't fit the dials, an image puzzle without an image, and `add=Puzzle...`.
