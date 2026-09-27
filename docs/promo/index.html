@@ -196,18 +196,33 @@
 
   /* ---------- map ---------- */
   .mapsec{background:radial-gradient(ellipse at center, #111a15, var(--void) 70%)}
-  .map-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:36px; align-items:center}
-  @media (max-width:820px){.map-grid{grid-template-columns:1fr}}
-  pre.ascii{
-    margin:0; padding:26px 24px; background:#050706; border:1px solid var(--eldritch-dim);
-    color:var(--eldritch); font-size:14px; line-height:1.35; overflow-x:auto;
-    box-shadow:inset 0 0 40px rgba(127,209,154,.08), 0 0 30px rgba(0,0,0,.6);
-    text-shadow:0 0 6px rgba(127,209,154,.5);
-  }
-  pre.ascii .dim{color:var(--eldritch-dim); text-shadow:none}
-  pre.ascii .red{color:var(--blood-hi); text-shadow:0 0 6px rgba(194,59,46,.6)}
+  .map-grid{display:grid; grid-template-columns:1fr; gap:30px}
+  .map-copy{max-width:760px; margin:0 auto}
   .map-copy h2{text-align:left}
   .map-copy p{color:var(--parchment-dim)}
+
+  /* ---------- plates (artwork) ---------- */
+  .plates{background:linear-gradient(180deg,var(--void),var(--moss))}
+  .plate-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:22px; margin-top:8px}
+  figure{margin:0}
+  .plate{background:#0b100e; border:1px solid rgba(184,139,69,.45); padding:10px 10px 12px; box-shadow:0 18px 40px rgba(0,0,0,.55); transition:transform .35s}
+  .plate:nth-child(odd){transform:rotate(-.6deg)} .plate:nth-child(even){transform:rotate(.5deg)}
+  .plate:hover{transform:rotate(0) translateY(-4px)}
+  .plate img{display:block; width:100%; height:auto; aspect-ratio:1/1; object-fit:cover; filter:sepia(.12)}
+  .plate figcaption{font-style:italic; font-size:15px; color:var(--parchment-dim); margin-top:8px; line-height:1.4}
+  .plate figcaption b{font-style:normal; font-family:var(--fell-sc); color:var(--brass-hi); letter-spacing:.06em}
+  .plate-notes{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px 34px; margin-top:44px}
+  .plate-notes p{margin:0; color:var(--parchment-dim); font-size:17px}
+  .plate-notes b{color:var(--parchment); font-weight:400; font-family:var(--fell-sc); letter-spacing:.05em}
+
+  /* ---------- screenshots ---------- */
+  .shot{border:1px solid var(--eldritch-dim); background:#050706; box-shadow:0 0 30px rgba(0,0,0,.6), inset 0 0 40px rgba(127,209,154,.06)}
+  .shot img{display:block; width:100%; height:auto}
+  .shot figcaption{font-size:14px; font-style:italic; color:var(--parchment-dim); padding:8px 12px 10px; border-top:1px solid rgba(127,209,154,.15)}
+  .thread{background:linear-gradient(180deg,var(--moss),var(--void))}
+  .thread-grid{display:grid; grid-template-columns:1fr; gap:26px}
+  pre.outline{margin:0; padding:22px 22px; background:#050706; border:1px solid var(--eldritch-dim); color:var(--parchment); font-size:13px; line-height:1.5; overflow-x:auto; white-space:pre}
+  pre.outline .k{color:var(--brass-hi)} pre.outline .c{color:var(--eldritch)} pre.outline .e{color:var(--blood-hi)} pre.outline .d{color:#8d8a7e}
 
   /* ---------- wards ---------- */
   .wards{background:var(--moss)}
@@ -298,9 +313,9 @@
         <ellipse cx="100" cy="100" rx="2.2" ry="8" fill="#050706"/>
       </g>
     </svg>
-    <div class="kicker">A Claude Code Plugin · For the Valkyrie App</div>
+    <div class="kicker">For Claude Code &amp; Hermes Agent · For the Valkyrie App</div>
     <h1>Valkyrie MoM<span>SCENARIO FORGE</span></h1>
-    <p class="tag">Describe a nightmare in plain words. An AI assistant builds it as a Mansions of Madness scenario you can play: tiles laid, events wired, monsters spawned, checked against twelve wards, and packed into a <code>.valkyrie</code> file.</p>
+    <p class="tag">Describe a nightmare in plain words. An AI assistant builds it as a Mansions of Madness scenario you can play: tiles laid, events wired, puzzles set, plates painted, checked against twenty wards, and packed into a <code>.valkyrie</code> file.</p>
     <div class="cta">
       <a class="btn" href="#summon">Perform the Summoning</a>
       <a class="btn ghost" href="https://github.com/thijs-hakkenberg/ValkyrieMCP" target="_blank" rel="noopener">Read the Codex ↗</a>
@@ -329,26 +344,26 @@
     <div class="rule">✦</div>
     <div class="relic-grid">
       <article class="relic reveal">
-        <div class="num">20</div>
+        <div class="num">29</div>
         <div class="unit">MCP Tools</div>
         <h3>The Engine Below</h3>
         <p>An MCP server that reads and writes Valkyrie's INI and localization files directly and understands the format's quirks.</p>
         <ul>
-          <li><code>create_scenario</code>, <code>load_scenario</code>, <code>build_scenario</code></li>
-          <li><code>upsert_event</code>, tile, token, spawn, item, puzzle, UI</li>
-          <li><code>delete_component</code> with cascading reference cleanup</li>
-          <li><code>get_map_ascii</code>, <code>suggest_tile_layout</code></li>
+          <li><code>create_scenario</code>, <code>save_scenario</code>, <code>build_scenario</code> with the publishing manifest</li>
+          <li><code>upsert_event</code>, tile, token, spawn, item, puzzle, UI, custom monster</li>
+          <li><code>place_tile_relative</code> lines up doors; <code>render_map</code> draws the real tiles</li>
+          <li><code>story_graph</code> projects the whole plot as a tree</li>
+          <li><code>generate_artwork</code> paints plates with a local ComfyUI</li>
           <li><code>search_game_content</code> over an 846-entry catalog</li>
-          <li><code>export_bug_report</code> when something goes wrong</li>
         </ul>
       </article>
       <article class="relic reveal">
-        <div class="num">7</div>
+        <div class="num">8</div>
         <div class="unit">Skills</div>
         <h3>The Grimoire</h3>
         <p>Pattern knowledge taken from community-authored scenarios: event loops, mythos scaling, placement chains, combination locks. The assistant knows how experienced designers build these things.</p>
         <ul>
-          <li>From <code>/scenario</code> to <code>/custom-monsters</code></li>
+          <li>From <code>/scenario</code> to <code>/artwork</code></li>
           <li>Each chapter includes working tool-call examples</li>
         </ul>
       </article>
@@ -360,6 +375,7 @@
         <ul>
           <li>Plus 5 format resources and 2 guided prompts</li>
           <li>Writes straight to Valkyrie's Editor folder</li>
+          <li>Also summoned by Hermes Agent, as a native plugin</li>
         </ul>
       </article>
     </div>
@@ -369,7 +385,7 @@
 <!-- ============ GRIMOIRE ============ -->
 <section class="grimoire">
   <div class="wrap">
-    <h2 class="reveal"><small>Liber Valkyriensis</small>The Seven Chapters</h2>
+    <h2 class="reveal"><small>Liber Valkyriensis</small>The Eight Chapters</h2>
     <div class="rule">✦</div>
     <div class="chapters">
       <div class="chapter reveal"><div class="roman">I</div><div><h3>Of the Making <code>/scenario</code></h3><p>The guided rite from first concept to a built, playable package.</p></div></div>
@@ -377,8 +393,9 @@
       <div class="chapter reveal"><div class="roman">III</div><div><h3>Of Rooms Revealed <code>/tile-placement</code></h3><p>The standard placement chain, tiles with several entrances, and naming conventions that stay readable at forty events.</p></div></div>
       <div class="chapter reveal"><div class="roman">IV</div><div><h3>Of Numbers &amp; the Mythos <code>/variables-and-mythos</code></h3><p>Mythos scaling formulas, random generation, detecting which investigator is present, gating by expansion.</p></div></div>
       <div class="chapter reveal"><div class="roman">V</div><div><h3>Of Things That Hunt <code>/custom-monsters</code></h3><p>Custom activations, evade and horror checks, spawns that arrive on a chosen round.</p></div></div>
-      <div class="chapter reveal"><div class="roman">VI</div><div><h3>Of Riddles &amp; Relics <code>/ui-and-puzzles</code></h3><p>Prologues, interactive journals, combination locks, and puzzles built from UI overlays.</p></div></div>
+      <div class="chapter reveal"><div class="roman">VI</div><div><h3>Of Riddles &amp; Relics <code>/ui-and-puzzles</code></h3><p>Prologues and journals, and the four built-in puzzles: a Mastermind code lock, a sliding picture, sliding blocks, and the tower.</p></div></div>
       <div class="chapter reveal"><div class="roman">VII</div><div><h3>Of Things Found <code>/items-and-distribution</code></h3><p>Random items, unique items, starting kit, and events for inspecting them.</p></div></div>
+      <div class="chapter reveal"><div class="roman">VIII</div><div><h3>Of Painted Plates <code>/artwork</code></h3><p>Covers, intro cutscenes, handouts, monster portraits and picture puzzles, painted on your own machine.</p></div></div>
     </div>
   </div>
 </section>
@@ -392,8 +409,10 @@
       <div class="step reveal"><h3>Speak the Premise</h3><p>“A fishing village, a missing priest, three hours before high tide.” That much is enough to begin. Invoke <code>/scenario</code> or hand it to the familiar.</p></div>
       <div class="step reveal"><h3>Lay the House</h3><p>Tiles are chosen from the real game catalog and placed in linear, L-shaped, or hub-and-spoke layouts. Each exploration reveal is wired to the next.</p></div>
       <div class="step reveal"><h3>Bind the Events</h3><p>Events, tokens, spawns, items, and puzzles are upserted one at a time. Every button, every <code>event1</code>..<code>event6</code> link, and every localization string is tracked.</p></div>
-      <div class="step reveal"><h3>Test the Wards</h3><p>Twelve validation rules walk the event graph for dead ends, orphans, broken references, and missing text before any player sees them.</p></div>
-      <div class="step reveal"><h3>Seal the Package</h3><p><code>build_scenario</code> saves the INI files and packs the <code>.valkyrie</code> archive. It appears in Valkyrie's editor, ready to play tonight.</p></div>
+      <div class="step reveal"><h3>Paint the Plates</h3><p>With a local ComfyUI, <code>generate_artwork</code> paints the cover, an intro cutscene, handouts that hide clues, and the thing on the slab, all in one house style.</p></div>
+      <div class="step reveal"><h3>Read the Thread</h3><p><code>story_graph</code> reads the plot back as one condensed tree, so you and the assistant can check that every branch leads somewhere and every ending can be reached.</p></div>
+      <div class="step reveal"><h3>Test the Wards</h3><p>Twenty validation rules walk the game as Valkyrie runs it, looking for dead ends, unwinnable scenarios, broken references, unsolvable puzzles and missing text before any player sees them.</p></div>
+      <div class="step reveal"><h3>Seal the Package</h3><p><code>build_scenario</code> saves the files and writes what Valkyrie's own Create Package writes: the <code>.valkyrie</code> archive, its manifest and cover, ready to publish. The scenario is in Valkyrie's editor, ready to play tonight.</p></div>
     </div>
   </div>
 </section>
@@ -401,24 +420,78 @@
 <!-- ============ MAP ============ -->
 <section class="mapsec">
   <div class="wrap map-grid">
-    <pre class="ascii reveal" aria-label="ASCII rendering of a tile layout"><span class="dim">get_map_ascii()  ·  Innsmouth_Rectory</span>
-
-        <span class="dim">+-----------+</span>
-        |  Belfry   |
-        |    <span class="red">!</span>      |
-<span class="dim">+-------+---+-----+-----+-------+</span>
-| Vestry|  Nave         | Crypt  |
-|  ?    |      @        |   <span class="red">☠</span>    |
-<span class="dim">+-------+-------+-------+-------+</span>
-                | Cellar|
-                |  <span class="red">~~~</span>  |
-                <span class="dim">+-------+</span>
-
-<span class="dim">@ investigators  ? search  ! explore  ☠ spawn</span></pre>
+    <figure class="shot reveal">
+      <img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/map.jpg" alt="render_map output: the potter's field, lane, farmhouse and cellar tiles of Herbert West with numbered tokens" loading="lazy" width="1000" height="363">
+      <figcaption><code>render_map()</code> · Herbert West—Reanimator I: the potter's field, the lane, and the farmhouse over its cellar, drawn from Valkyrie's own tile art.</figcaption>
+    </figure>
     <div class="map-copy reveal">
       <h2><small>Cartography of the unseen</small>See the Map It Drew</h2>
-      <p>You don't need to open the editor to check the layout. The assistant renders the floor plan as ASCII, computes tile positions relative to one another, and suggests layouts that stay connected. Tile connectivity is one of the wards, so the plugin catches a room that floats off on its own.</p>
+      <p>You don't need to open the editor to check the layout. The assistant renders the board with the real tile artwork, exactly as Valkyrie lays it out, with every token numbered. <code>place_tile_relative</code> joins tiles door to door and open ground to open ground, and a ward catches any token that falls off the board.</p>
       <p>Every tile side, monster, and item is checked against the real game content, so nothing unknown gets into the file.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLATES ============ -->
+<section class="plates">
+  <div class="wrap">
+    <h2 class="reveal"><small>Scenario artwork</small>The Painted Plates</h2>
+    <div class="rule">✦</div>
+    <p class="lede reveal" style="margin-bottom:40px">Every picture below was painted for a scenario by the plugin itself: FLUX.2 [klein] on a local ComfyUI, about thirty seconds a plate, then wired into the scenario where the story needs it.</p>
+    <div class="plate-grid">
+      <figure class="plate reveal"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/west-intro.jpg" alt="Two medical students digging up a grave at night" loading="lazy"><figcaption><b>The potter's field.</b> Intro cutscene and cover of <i>Herbert West—Reanimator</i>.</figcaption></figure>
+      <figure class="plate reveal"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/west-lab.jpg" alt="West leaning over a body under an acetylene lamp" loading="lazy"><figcaption><b>The farmhouse.</b> Shown as the lab briefing is read.</figcaption></figure>
+      <figure class="plate reveal"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/west-specimen.jpg" alt="A screaming reanimated workman" loading="lazy"><figcaption><b>The Specimen.</b> A custom monster's portrait.</figcaption></figure>
+      <figure class="plate reveal"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/bump-intro.jpg" alt="A ghostly widow in a moonlit hallway" loading="lazy"><figcaption><b>Margaret.</b> The locket, the stopped clock and the strongbox are the clues to a code lock.</figcaption></figure>
+      <figure class="plate reveal"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/wrath-intro.jpg" alt="Two developers before screens pouring out an eldritch eye" loading="lazy"><figcaption><b>3:47 AM.</b> The opening of <i>The Wrath of Elder Claude</i>.</figcaption></figure>
+      <figure class="plate reveal"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/wrath-elder.jpg" alt="A towering figure of glowing text above a ritual circle" loading="lazy"><figcaption><b>Elder Claude manifests.</b> Shown as the boss arrives.</figcaption></figure>
+    </div>
+    <div class="plate-notes">
+      <p><b>Cover &amp; cutscene.</b> The scenario list picture, and a full-screen opening with the art beside the story.</p>
+      <p><b>Handouts.</b> Letters, clippings and photographs that appear beside the text as they're found, and again whenever an item is inspected.</p>
+      <p><b>Picture puzzles.</b> West's torn formula page becomes a sliding-picture puzzle. Solve it and the lab needs one fewer mix.</p>
+      <p><b>Set up once.</b> <code>artwork_status</code> checks ComfyUI and the three model files, and prints the exact comfy-cli commands for anything missing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THREAD ============ -->
+<section class="thread">
+  <div class="wrap">
+    <h2 class="reveal"><small>The storyline as a tree</small>The Thread of Fate</h2>
+    <div class="rule">✦</div>
+    <p class="lede reveal" style="margin-bottom:40px">A scenario is a tangle of buttons, triggers, tokens and conditions spread over a dozen INI files. <code>story_graph</code> pulls on the thread and lays the whole plot out at once, as a flowchart for you and a condensed outline the assistant can reason over.</p>
+    <div class="thread-grid">
+      <figure class="shot reveal">
+        <a href="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/story.jpg" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/story.jpg" alt="Flowchart of every event in Herbert West, from game start and each trigger to the three endings" loading="lazy" width="1600" height="1354"></a>
+        <figcaption>Herbert West, all 98 components: eight entry points, three graves that converge on the dig, the laboratory, the Specimen's monster phase, and three endings in red.</figcaption>
+      </figure>
+      <pre class="outline reveal"><span class="d">story_graph({ root: "EventScream" })  ·  Herbert West</span>
+▶ EventScream <span class="c">if Screamed==0</span> "The awful event was very sudden, and wholly unexpected. I was pouring something…" <span class="d">⟨Screamed=1⟩</span>
+<span class="k">[Continue]</span> ▶ EventFlee "Without a thought of our late employment or its possible discovery both West an…" <span class="d">⟨$fire=1, +TokenWindow⟩</span>
+  <span class="k">[Continue]</span> first that passes:
+    • ☠ SpawnSpecimenThrall <span class="c">if #BtT==1</span> "The Specimen" <span class="d">⟨monster CustomMonsterSpecimenThrall⟩</span>
+        (each monster phase) · EventSpecimenActivation
+          → one at random:
+            • ▶ EventSpecimenLurch "The Specimen lurches 2 spaces toward the nearest investigator, arms flailing li…"
+              <span class="k">[An investigator is in its space]</span> ▶ EventSpecimenBlow "It strikes with the strength of the brawny youth it was, and none of the restra…"
+            • <span class="d">↩ EventSpecimenLurch</span>
+            • ▶ EventSpecimenHowl "It opens its mouth and the cries come again—the agony of the damned. Each inves…"
+        (on evade) ▶ EventSpecimenEvade "You try to slip past the thing that was on the slab. Test {agility}. On a failu…"
+        (on horror check) ▶ EventSpecimenHorror "Its vacant grey eyes are open now, and they are not vacant. Test {will}. On a f…"
+    • ☠ SpawnSpecimenHybrid "The Specimen" <span class="d">⟨monster CustomMonsterSpecimenHybrid⟩</span>
+        (each monster phase) <span class="d">↩ EventSpecimenActivation</span>
+        (on evade) <span class="d">↩ EventSpecimenEvade</span>
+        (on horror check) <span class="d">↩ EventSpecimenHorror</span>
+  (places) ⊕ TokenWindow
+  → ▶ EventWindow "The nearest window, its dark curtain torn half away. Beyond it lies the starred…"
+  <span class="k">[{action} Vault through the window]</span> ▶ EventEscape "Vaulting madly into the starred abyss of the rural night, I think we screamed o…" <span class="d">⟨+UIEscape⟩</span>
+    <span class="k">[Continue]</span> first that passes:
+      • ▶ EventEpilogueClean <span class="c">if TracesHidden==1</span> "We did not separate, but managed to get to West's room, where we whispered with…" <span class="d">⟨−UIEscape⟩</span>
+        <span class="k">[Continue]</span> ▶ EventTheEnd "And for seventeen years after that West would look frequently over his shoulder…"
+        <span class="k">[Continue]</span> · EventTheEndOp <span class="e">✦ END</span>
+      • ▶ EventEpilogueTraces "We did not separate, but managed to get to West's room, where we whispered with…" <span class="d">⟨−UIEscape⟩</span>
+        <span class="k">[Continue]</span> <span class="d">↩ EventTheEnd</span></pre>
     </div>
   </div>
 </section>
@@ -426,22 +499,30 @@
 <!-- ============ WARDS ============ -->
 <section class="wards">
   <div class="wrap">
-    <h2 class="reveal"><small>Validation rules</small>The Twelve Wards</h2>
+    <h2 class="reveal"><small>Validation rules</small>The Twenty Wards</h2>
     <div class="rule">✦</div>
-    <p class="lede reveal" style="margin-bottom:38px">They were tested against community-authored scenarios. A scenario that passes all twelve loads in Valkyrie as intended.</p>
+    <p class="lede reveal" style="margin-bottom:38px">They follow the game the way Valkyrie runs it, and were tested against community-authored scenarios. A scenario that passes all twenty loads and plays as intended.</p>
     <div class="ward-grid">
-      <div class="ward reveal"><b>I</b><span>Unique Names<em>Nothing shares a name.</em></span></div>
-      <div class="ward reveal"><b>II</b><span>Required Fields<em>Tiles have sides; displayed events have buttons.</em></span></div>
-      <div class="ward reveal"><b>III</b><span>Cross-References<em>Every name referenced actually exists.</em></span></div>
-      <div class="ward reveal"><b>IV</b><span>Event Graph<em>Starts at <code>EventStart</code>, no dead ends.</em></span></div>
-      <div class="ward reveal"><b>V</b><span>Event Flow<em>Buttons and links agree; silent events behave.</em></span></div>
-      <div class="ward reveal"><b>VI</b><span>Localization<em>Every button and text has words.</em></span></div>
-      <div class="ward reveal"><b>VII</b><span>Format<em>Correct version, type, and rotations.</em></span></div>
-      <div class="ward reveal"><b>VIII</b><span>Catalog<em>Tiles, monsters, and items are real game content.</em></span></div>
-      <div class="ward reveal"><b>IX</b><span>Tile Connectivity<em>The house is one house.</em></span></div>
-      <div class="ward reveal"><b>X</b><span>Mythos Structure<em>The Mythos phase triggers correctly.</em></span></div>
-      <div class="ward reveal"><b>XI</b><span>Investigator Token<em>Placed at the start and removed after.</em></span></div>
-      <div class="ward reveal"><b>XII</b><span>Explore Tokens<em>Each one leads to a reveal.</em></span></div>
+      <div class="ward reveal"><b>I</b><span>Required Fields<em>Tiles have sides; spawns have monsters.</em></span></div>
+      <div class="ward reveal"><b>II</b><span>Cross-References<em>Every name referenced actually exists.</em></span></div>
+      <div class="ward reveal"><b>III</b><span>Event Graph<em>No dead ends, no orphans.</em></span></div>
+      <div class="ward reveal"><b>IV</b><span>Localization<em>Every button and dialog has words.</em></span></div>
+      <div class="ward reveal"><b>V</b><span>Format<em>Correct version, type and rotations.</em></span></div>
+      <div class="ward reveal"><b>VI</b><span>Catalog<em>Tiles, monsters and items are real game content.</em></span></div>
+      <div class="ward reveal"><b>VII</b><span>Mythos Structure<em>The Mythos phase triggers correctly.</em></span></div>
+      <div class="ward reveal"><b>VIII</b><span>Explore Tokens<em>Each one leads to a reveal.</em></span></div>
+      <div class="ward reveal"><b>IX</b><span>Investigator Token<em>Placed at the start, removed after.</em></span></div>
+      <div class="ward reveal"><b>X</b><span>Tile Connectivity<em>The house is one house.</em></span></div>
+      <div class="ward reveal"><b>XI</b><span>Token Placement<em>No token falls off the board.</em></span></div>
+      <div class="ward reveal"><b>XII</b><span>Event Flow<em>Buttons and links agree; silent events behave.</em></span></div>
+      <div class="ward reveal"><b>XIII</b><span>Token Wiring<em>Clicking a token does something.</em></span></div>
+      <div class="ward reveal"><b>XIV</b><span>Field Schema<em>No field Valkyrie would ignore.</em></span></div>
+      <div class="ward reveal"><b>XV</b><span>Event Semantics<em>Nothing is added and removed at once.</em></span></div>
+      <div class="ward reveal"><b>XVI</b><span>Custom Images<em>Every picture and sound exists.</em></span></div>
+      <div class="ward reveal"><b>XVII</b><span>Triggers<em>Every trigger can actually fire.</em></span></div>
+      <div class="ward reveal"><b>XVIII</b><span>Game Flow<em>The game can be won, and lost.</em></span></div>
+      <div class="ward reveal"><b>XIX</b><span>Puzzles<em>Every lock can be opened.</em></span></div>
+      <div class="ward reveal"><b>XX</b><span>Package Name<em>The package can be published.</em></span></div>
     </div>
   </div>
 </section>
@@ -453,15 +534,22 @@
     <div class="rule">✦</div>
     <div class="circle reveal">
       <h3>As a Claude Code plugin (the full rite)</h3>
-      <p>Installs the MCP server, all seven skills, and the scenario-designer agent.</p>
+      <p>Installs the MCP server, all eight skills, and the scenario-designer agent.</p>
       <div class="incant">
 <pre><span class="p">$ </span>claude plugin marketplace add thijs-hakkenberg/ValkyrieMCP
 <span class="p">$ </span>claude plugin install valkyrie-mom</pre>
         <button class="copy" data-copy="claude plugin marketplace add thijs-hakkenberg/ValkyrieMCP&#10;claude plugin install valkyrie-mom">Copy</button>
       </div>
 
+      <h3>As a Hermes Agent plugin</h3>
+      <p>Every tool as a native Hermes tool, and the skills as <code>valkyrie-mom:&lt;skill&gt;</code>. Node.js 20+ runs the engine below.</p>
+      <div class="incant">
+<pre><span class="p">$ </span>hermes plugins install thijs-hakkenberg/ValkyrieMCP --enable</pre>
+        <button class="copy" data-copy="hermes plugins install thijs-hakkenberg/ValkyrieMCP --enable">Copy</button>
+      </div>
+
       <h3>As a bare MCP server (Claude Desktop &amp; other clients)</h3>
-      <p>Only the tools and resources. The grimoire and the familiar need Claude Code.</p>
+      <p>Only the tools and resources. The grimoire and the familiar need Claude Code or Hermes.</p>
       <div class="incant">
 <pre>{
   "mcpServers": {
@@ -492,7 +580,7 @@
 
 <footer>
   <div class="end">· PH'NGLUI · MGLW'NAFH ·</div>
-  <p>Valkyrie MoM is MIT-licensed and open source. Written in TypeScript and covered by 1,096 tests.</p>
+  <p>Valkyrie MoM is MIT-licensed and open source. Written in TypeScript and covered by 1,108 tests.</p>
   <p class="fine">An unofficial fan project for the community-built <a href="https://github.com/NPBruce/valkyrie" target="_blank" rel="noopener">Valkyrie</a> app. It is not affiliated with or endorsed by Fantasy Flight Games. Mansions of Madness is a trademark of Fantasy Flight Games. Sanity loss while playing is your own responsibility.</p>
 </footer>
 
