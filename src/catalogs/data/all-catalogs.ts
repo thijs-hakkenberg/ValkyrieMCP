@@ -324,6 +324,246 @@ export const MONSTERS: CatalogEntry[] = [
     "awareness": 2,
     "horror": 6,
     "brawn": 1
+  },
+  {
+    "id": "MonsterZombie",
+    "type": "monster",
+    "name": "{ffg:MONSTER_ZOMBIE}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "undead",
+      "small",
+      "humanoid"
+    ],
+    "health": 2,
+    "healthperhero": 1,
+    "awareness": 2,
+    "horror": 4,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterCthonian",
+    "type": "monster",
+    "name": "{ffg:MONSTER_CTHONIAN}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 3,
+    "healthperhero": 2,
+    "awareness": 4,
+    "horror": 7,
+    "brawn": 5
+  },
+  {
+    "id": "MonsterHoundOfTindalos",
+    "type": "monster",
+    "name": "{ffg:MONSTER_HOUND_OF_TINDALOS}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 1,
+    "healthperhero": 2,
+    "awareness": 6,
+    "horror": 5,
+    "brawn": 5
+  },
+  {
+    "id": "MonsterManiac",
+    "type": "monster",
+    "name": "{ffg:MONSTER_MANIAC}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 2,
+    "healthperhero": 1,
+    "awareness": 5,
+    "horror": 1,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterMiGo",
+    "type": "monster",
+    "name": "{ffg:MONSTER_MI_GO}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 3,
+    "healthperhero": 1,
+    "awareness": 6,
+    "horror": 4,
+    "brawn": 3
+  },
+  {
+    "id": "MonsterShoggoth",
+    "type": "monster",
+    "name": "{ffg:MONSTER_SHOGGOTH}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 4,
+    "healthperhero": 2,
+    "awareness": 4,
+    "horror": 6,
+    "brawn": 4
+  },
+  {
+    "id": "MonsterWitch",
+    "type": "monster",
+    "name": "{ffg:MONSTER_WITCH}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 2,
+    "healthperhero": 1,
+    "awareness": 3,
+    "horror": 2,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterCultLeader",
+    "type": "monster",
+    "name": "{ffg:UNIQUE_MONSTER_CULT_LEADER}",
+    "pack": "mom1e-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 8,
+    "healthperhero": 4,
+    "awareness": 4,
+    "horror": 3,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterChildOfTheGoat",
+    "type": "monster",
+    "name": "{ffg:MONSTER_CHILD_OF_THE_GOAT}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 1,
+    "healthperhero": 1,
+    "awareness": 3,
+    "horror": 1,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterDarkDruid",
+    "type": "monster",
+    "name": "{ffg:MONSTER_DARK_DRUID}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 2,
+    "healthperhero": 1,
+    "awareness": 3,
+    "horror": 2,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterDarkYoung",
+    "type": "monster",
+    "name": "{ffg:MONSTER_DARK_YOUNG}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 4,
+    "healthperhero": 2,
+    "awareness": 4,
+    "horror": 7,
+    "brawn": 5
+  },
+  {
+    "id": "MonsterGoatSpawn",
+    "type": "monster",
+    "name": "{ffg:MONSTER_GOAT_SPAWN}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 1,
+    "healthperhero": 2,
+    "awareness": 4,
+    "horror": 3,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterNightgaunt",
+    "type": "monster",
+    "name": "{ffg:MONSTER_NIGHTGAUNT}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 1,
+    "healthperhero": 2,
+    "awareness": 6,
+    "horror": 5,
+    "brawn": 3
+  },
+  {
+    "id": "MonsterDunwichHorror",
+    "type": "monster",
+    "name": "{ffg:UNIQUE_MONSTER_DUNWICH_HORROR}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "horror"
+    ],
+    "health": 2,
+    "healthperhero": 3,
+    "awareness": 7,
+    "horror": 9,
+    "brawn": 5
+  },
+  {
+    "id": "MonsterWizard",
+    "type": "monster",
+    "name": "{ffg:UNIQUE_MONSTER_WIZARD}",
+    "pack": "cotw-monsters",
+    "traits": [
+      "humanoid"
+    ],
+    "health": 2,
+    "healthperhero": 1,
+    "awareness": 4,
+    "horror": 3,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterByakhee",
+    "type": "monster",
+    "name": "{ffg:MONSTER_BYAKHEE}",
+    "pack": "fa-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 1,
+    "healthperhero": 2,
+    "awareness": 4,
+    "horror": 3,
+    "brawn": 2
+  },
+  {
+    "id": "MonsterCrawlingOne",
+    "type": "monster",
+    "name": "{ffg:MONSTER_CRAWLING_ONE}",
+    "pack": "fa-monsters",
+    "traits": [
+      "beast"
+    ],
+    "health": 3,
+    "healthperhero": 1,
+    "awareness": 2,
+    "horror": 4,
+    "brawn": 4
   }
 ];
 
@@ -5431,6 +5671,26 @@ export const ITEMS: CatalogEntry[] = [
       "spell",
       "spellattack"
     ]
+  },
+  {
+    "id": "ItemUniqueDukeTheDog",
+    "type": "item",
+    "name": "{ffg:UNIQUE_ITEM_DUKE_THE_DOG}",
+    "pack": "ck-tokensandcards",
+    "traits": [
+      "ally",
+      "unique"
+    ]
+  },
+  {
+    "id": "ItemUniqueFluxStabilizer",
+    "type": "item",
+    "name": "{ffg:UNIQUE_ITEM_FLUX_STABILIZER}",
+    "pack": "ck-tokensandcards",
+    "traits": [
+      "equipment",
+      "unique"
+    ]
   }
 ];
 
@@ -5649,6 +5909,150 @@ export const INVESTIGATORS: CatalogEntry[] = [
     "pack": "sot",
     "traits": [
       "female"
+    ]
+  },
+  {
+    "id": "HeroMichaelMcGlen",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_MICHAEL_MCGLEN}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroAshcanPete",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_ASHCAN_PETE}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroGloriaGoldberg",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_GLORIA_GOLDBERG}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroHarveyWalters",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_HARVEY_WALTERS}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroJennyBarnes",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_JENNY_BARNES}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroJoeDiamond",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_JOE_DIAMOND}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroKateWinthrop",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_KATE_WINTHROP}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroSisterMary",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_SISTER_MARY}",
+    "pack": "mom1e-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroAmandaSharpe",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_AMANDA_SHARPE}",
+    "pack": "cotw-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroBobJenkins",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_BOB_JENKINS}",
+    "pack": "cotw-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroMandyThompson",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_MANDY_THOMPSON}",
+    "pack": "cotw-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroMontereyJack",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_MONTEREY_JACK}",
+    "pack": "cotw-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroCarolynFern",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_CAROLYN_FERN}",
+    "pack": "fa-investigators",
+    "traits": [
+      "female"
+    ]
+  },
+  {
+    "id": "HeroDarrellSimmons",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_DARRELL_SIMMONS}",
+    "pack": "fa-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroDexterDrake",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_DEXTER_DRAKE}",
+    "pack": "fa-investigators",
+    "traits": [
+      "male"
+    ]
+  },
+  {
+    "id": "HeroVincentLee",
+    "type": "investigator",
+    "name": "{ffg:INVESTIGATOR_VINCENT_LEE}",
+    "pack": "fa-investigators",
+    "traits": [
+      "male"
     ]
   }
 ];
@@ -8387,5 +8791,33 @@ export const TOKENS: CatalogEntry[] = [
       "spell",
       "spellattack"
     ]
+  },
+  {
+    "id": "TokenAmmiPierce",
+    "type": "token",
+    "name": "",
+    "pack": "ck-tokensandcards",
+    "traits": []
+  },
+  {
+    "id": "TokenCorrinaJones",
+    "type": "token",
+    "name": "",
+    "pack": "ck-tokensandcards",
+    "traits": []
+  },
+  {
+    "id": "TokenEricColt",
+    "type": "token",
+    "name": "",
+    "pack": "ck-tokensandcards",
+    "traits": []
+  },
+  {
+    "id": "TokenZebulonWhateley",
+    "type": "token",
+    "name": "",
+    "pack": "ck-tokensandcards",
+    "traits": []
   }
 ];

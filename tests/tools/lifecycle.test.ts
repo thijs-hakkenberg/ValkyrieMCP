@@ -192,6 +192,48 @@ describe('lifecycle tools', () => {
       expect(questContent).toContain('packs=SoA');
     });
 
+    it('computes packs from a custom monster base', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('CustomBase', { dir: tmp });
+      model.upsert('CustomMonsterBlob', { base: 'MonsterShoggoth', health: '9' });
+      model.upsert('SpawnBlob', { monster: 'CustomMonsterBlob', buttons: '1', event1: '' });
+
+      await saveScenario(model);
+
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).toContain('packs=MoM1EM');
+    });
+
+    it('computes packs from quest items and monster tokens', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('ItemPack', { dir: tmp });
+      model.upsert('QItemDog', { itemname: 'ItemUniqueDukeTheDog', starting: 'false' });
+      model.upsert('QItemKnife', { itemname: 'ItemCommonKnife', starting: 'false' });
+      model.upsert('TokenFigure', { type: 'MonsterSkeleton', xposition: '0', yposition: '0' });
+
+      await saveScenario(model);
+
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).toContain('packs=MoM1CK SoA');
+    });
+
+    it('does not require a pack for an item that is only excluded from a trait draw', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      const { model } = await createScenario('Exclusion', { dir: tmp });
+      model.upsert('QItemAnyCommon', { traits: 'common', itemname: 'ItemUniqueDukeTheDog', starting: 'false' });
+
+      await saveScenario(model);
+
+      const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
+      expect(questContent).not.toContain('packs=');
+    });
+
     it('only writes and lists populated data files', async () => {
       const tmp = makeTmpDir();
       tmpDirs.push(tmp);

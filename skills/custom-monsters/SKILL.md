@@ -185,4 +185,4 @@ Catalog values for common `base` monsters (from the plugin's game-content catalo
 | MonsterStarSpawn | base | 9 | 3 | 8 | 5 | beast |
 | MonsterThrall | btt | 2 | 1 | 4 | 3 | humanoid |
 
-Use `search_game_content` with query "Monster" to find all monsters, including expansions. Monsters from packs other than base are added to the quest's `packs` automatically on save.
+Use `search_game_content` with query "Monster" to find all monsters, including expansions. Monsters from packs other than base are added to the quest's `packs` automatically on save, including a custom monster's `base`. The first-edition monsters (Shoggoth, Mi-Go, Cthonian, Hound of Tindalos, ...) come from the conversion kit, which owners of the Recurring Nightmares figure pack have: they add pack `MoM1EM`.
