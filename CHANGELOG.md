@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [2.1.0] - 2026-09-27
 
 Checked against the community "Valkyrie MoM Tutorial" (the scenario-creation manual) and by building a full scenario with the plugin (Herbert West—Reanimator I).
 
