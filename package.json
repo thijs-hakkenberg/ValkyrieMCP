@@ -1,6 +1,6 @@
 {
   "name": "@thijshakkenberg/valkyrie-mom-mcp",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "MCP server for AI-assisted Mansions of Madness scenario creation with Valkyrie",
   "type": "module",
   "main": "dist/index.js",
@@ -44,7 +44,8 @@
     "extract-catalogs": "tsx src/catalogs/extract-catalogs.ts",
     "lint": "tsc --noEmit",
     "convert-tiles": "tsx scripts/convert-tile-images.ts",
-    "prepublishOnly": "npm run lint && npm run test && npm run build"
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
+    "hermes:tools": "tsx scripts/export-hermes-tools.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

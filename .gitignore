@@ -3,3 +3,5 @@ dist/
 *.valkyrie
 .DS_Store
 .tile-images/
+__pycache__/
+*.pyc
