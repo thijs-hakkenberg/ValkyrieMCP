@@ -19,6 +19,7 @@ import { checkTriggers } from './rules/triggers.js';
 import { checkGameFlow } from './rules/game-flow.js';
 import { checkPuzzles } from './rules/puzzles.js';
 import { checkPackageName } from './rules/package-name.js';
+import { checkUILifetime } from './rules/ui-lifetime.js';
 
 const ALL_RULES = [
   checkRequiredFields,
@@ -41,6 +42,7 @@ const ALL_RULES = [
   checkGameFlow,
   checkPuzzles,
   checkPackageName,
+  checkUILifetime,
 ];
 
 /**

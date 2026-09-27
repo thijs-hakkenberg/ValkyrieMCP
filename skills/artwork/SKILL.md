@@ -102,6 +102,7 @@ upsert_event("EventReadLetter", { buttons: "1", event1: "EventHideLetter", add: 
 upsert_event("EventHideLetter", { display: "false", buttons: "0", remove: "UILetter" })
 ```
 
+- Never leave a picture up: while any UI element is on the board, the next phase button does nothing. For a portrait that stays available, use a token with `customImage`.
 - Use `size` 0.6–0.7 for portrait handouts and 0.55–0.65 for landscape scenes, so a long dialog text still clears the picture.
 - For an item the players keep, give the item `inspect=EventReadLetter`, so the picture comes back whenever they inspect it.
 

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.3.3] - 2026-09-27
+
+### Added
+
+- Validation rule `ui-lifetime`: warns about a UI element that is placed but never removed. While any UI element is on the board, Valkyrie's next phase button does nothing, so the investigator phase never ends and the mythos phase never comes. Found building a status panel that stayed on screen. The `/ui-and-puzzles` and `/artwork` skills explain it, and suggest a token with `customImage` and `{var:}` dialog text for anything that should stay available.
+
 ## [2.3.2] - 2026-09-27
 
 ### Fixed
