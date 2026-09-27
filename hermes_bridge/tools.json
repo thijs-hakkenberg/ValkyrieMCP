@@ -494,7 +494,7 @@
         },
         "outputPath": {
           "type": "string",
-          "description": "Also write the result: .html (chart + outline page), .mmd/.md (Mermaid) or .txt (outline)"
+          "description": "Also write the result, relative to the scenario folder or absolute: .html (chart + outline page), .mmd/.md (Mermaid) or .txt (outline)"
         }
       },
       "additionalProperties": false,

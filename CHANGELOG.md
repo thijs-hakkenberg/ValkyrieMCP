@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.3.1] - 2026-09-27
+
+### Fixed
+
+- Hermes plugin: the bridge starts `npx` from its own cache folder. Started from Hermes' install directory, npm read Hermes' `.npmrc` (`min-release-age=14`) and refused the matching server version for two weeks after each release.
+- `story_graph` resolves a relative `outputPath` against the scenario folder, like `generate_artwork`, instead of the server's working directory.
+
 ## [2.3.0] - 2026-09-27
 
 ### Added

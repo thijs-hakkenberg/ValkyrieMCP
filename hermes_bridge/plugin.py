@@ -63,7 +63,9 @@ def get_client() -> McpStdioClient:
         if _client is None:
             _client = McpStdioClient(
                 server_command(),
-                cwd=os.environ.get("VALKYRIE_MCP_CWD") or None,
+                # A neutral directory: npm reads the .npmrc of the directory it runs in, and Hermes may
+                # run from its own checkout, whose .npmrc (min-release-age) would reject new releases
+                cwd=os.environ.get("VALKYRIE_MCP_CWD") or str(_cache_dir()),
                 stderr_path=str(_cache_dir() / "server.log"),
                 client_version=plugin_version(),
             )
