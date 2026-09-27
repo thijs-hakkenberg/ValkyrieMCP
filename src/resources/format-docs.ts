@@ -71,6 +71,21 @@ Note: EventRemoveInv uses buttons=0 because it has no event1. EventSetup needs b
 ## Button Labels
 Set via localization: \`EventName.button1\`, \`EventName.button2\`, etc.
 Common patterns: \`{qst:CONTINUE}\`, \`{qst:PASS}\`, \`{qst:FAIL}\`
+
+## Camera, highlight and sound
+- An event (or spawn) with \`xposition\`/\`yposition\` moves the camera there when it runs; \`highlight=true\` also pulses a circle at that spot. Spawns use it to show where the monster goes.
+- \`audio\` plays a one-off sound on top of whatever is playing. \`music\` replaces the background music (the previous track fades out). Both take catalog Audio IDs or \`.ogg\` files in the scenario folder (Valkyrie plays only .ogg).
+
+## Text codes (in any dialog text)
+- \`{c:ComponentName}\` prints a component's name: a tile's name and pack icon (use it in placement dialogs so players take the right tile), or the item a random QItem picked. For an event, it prints the \`{rnd:hero}\` that event chose.
+- \`{rnd:hero}\` picks a random investigator's name; \`{c:EventName}\` repeats it later.
+- \`{var:VarName}\` prints a variable's current value.
+- \`{qst:KEY}\` inserts another localization entry. Icons: \`{action}\`, \`{strength}\`, \`{agility}\`, \`{observation}\`, \`{lore}\`, \`{influence}\`, \`{will}\`, \`{success}\`, \`{clue}\`, \`{health}\`, \`{sanity}\`.
+
+## Trigger timing (MoM)
+- \`Mythos\` events run in the Mythos phase in no fixed order with the base-game mythos events. \`BeforeMonsterActivation\` always runs after the mythos events, so it is the predictable choice.
+- \`EndInvestigatorTurn\` is the natural place to check end conditions.
+- \`Eliminated\` does not fire immediately: after the first investigator is eliminated, one more full round is played, then the event runs once. Word the defeat event accordingly ("As the last of you falls…"). Setting \`#eliminated\` to 1 starts the same countdown.
 `;
 
 export const LOCALIZATION_FORMAT_DOC = `# Valkyrie Localization Format
@@ -260,8 +275,8 @@ Optional \`xposition\`/\`yposition\`: Valkyrie pans the camera there and shows t
 | event1 | No | Next event |
 | vartests | No | While failing, the spawn is skipped when triggered |
 | add | No | Space-separated component names to show |
-| uniquehealth | No | Base health override |
-| uniquehealthhero | No | Per-hero health modifier |
+| uniquehealth | No | Health **added** to the monster type's own health (with unique=true) |
+| uniquehealthhero | No | Health added per investigator, on top of the monster type's own |
 
 ## Items (items.ini)
 Prefix: \`QItem\`
@@ -302,7 +317,7 @@ Prefix: \`CustomMonster\`
 | traits | No | Monster traits |
 | image | No | Portrait image (file in scenario folder or content image ID) |
 | imageplace | No | Board image; placed at its own size (Valkyrie 3.20+) |
-| activation | No | Space-separated activation names **without** the \`Activation\` prefix: \`activation=BossRage\` uses component ActivationBossRage (else content activation MonsterActivationBossRage). Empty = the base monster's activations |
+| activation | No | **MoM: one Event name** (\`activation=EventBossActivation\`), run every monster phase. Make it a silent event with \`randomevents=true\` listing move/attack events. Alternatively, Activation component names **without** the \`Activation\` prefix (\`activation=BossRage\` uses ActivationBossRage). Empty = the base monster's activations |
 | evadeevent / horrorevent | No | Event queued instead of the standard evade / horror check |
 | attacks | No | Attack overrides |
 

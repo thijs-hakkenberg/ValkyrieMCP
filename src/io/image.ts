@@ -81,6 +81,24 @@ export function decodeDds(buf: Buffer): RgbaImage {
   return { width, height, data };
 }
 
+/** Mirror top to bottom */
+export function flipVertical(img: RgbaImage): RgbaImage {
+  const row = img.width * 4;
+  const out = new Uint8Array(img.data.length);
+  for (let y = 0; y < img.height; y++) out.set(img.data.subarray(y * row, (y + 1) * row), (img.height - 1 - y) * row);
+  return { width: img.width, height: img.height, data: out };
+}
+
+/**
+ * Decode a DDS texture as Valkyrie displays it. Valkyrie hands the raw DDS data to Unity's
+ * LoadRawTextureData, which treats the first row as the bottom, and the MoM app's textures are
+ * authored for that. So the picture players see (and the printed tile) is the vertical mirror
+ * of the DDS row order.
+ */
+export function decodeValkyrieDds(buf: Buffer): RgbaImage {
+  return flipVertical(decodeDds(buf));
+}
+
 /** Box-filter resize to the target size */
 export function resize(img: RgbaImage, width: number, height: number): RgbaImage {
   const out = new Uint8Array(width * height * 4);

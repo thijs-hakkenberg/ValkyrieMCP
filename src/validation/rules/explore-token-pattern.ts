@@ -29,15 +29,18 @@ export function checkExploreTokenPattern(model: ScenarioModel): ValidationResult
       continue;
     }
 
-    // Walk the event chain from event1
+    // Walk the event chain from event1 (all listed candidates)
     const chain = collectEventChain(model, event1);
+    // A chain that ends the scenario needs neither a new tile nor the token's removal
+    if (chain.some(e => (model.get(e)?.data.operations ?? '').split(/\s+/).some(op => /^\$end,=,[1-9]/.test(op)))) continue;
 
     // Check: event chain should remove the token itself
     let removesToken = false;
     for (const eventName of chain) {
       const comp = model.get(eventName);
       if (!comp) continue;
-      if (parseRefList(comp.data.remove ?? '').includes(token.name)) {
+      const removes = parseRefList(comp.data.remove ?? '');
+      if (removes.includes(token.name) || removes.includes('#tokens') || removes.includes('#boardcomponents')) {
         removesToken = true;
         break;
       }

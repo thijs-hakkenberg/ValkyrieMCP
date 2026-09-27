@@ -6,7 +6,9 @@ import type { ScenarioModel } from '../../model/scenario-model.js';
  * - quest.name and quest.description should exist
  * - Events with display != false should have ComponentName.text
  * - Events/Spawns with buttons > 0 should have ComponentName.button1..N
- * - Tokens should have ComponentName.text and ComponentName.button1
+ * - Error: a clickable token that shows a dialog (display not false) needs .text and a label per button;
+ *   otherwise Valkyrie shows an empty dialog with the raw key "TokenX.button1". A token meant to run its
+ *   event directly on click must have display=false (what the Valkyrie editor writes for empty text)
  */
 export function checkLocalizationCompleteness(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
@@ -41,19 +43,18 @@ export function checkLocalizationCompleteness(model: ScenarioModel): ValidationR
     if (isToken) {
       if (displayExplicitlyFalse) continue;
 
-      if (!loc.has(`${comp.name}.text`)) {
+      const buttons = parseInt(comp.data.buttons ?? '0', 10) || 0;
+      // Position markers (TokenInvestigators, or any token whose buttons run nothing) are not interactions
+      if (comp.data.type === 'TokenInvestigators' || !Object.entries(comp.data).some(([k, v]) => /^event\d+$/.test(k) && v?.trim())) continue;
+      const missing = [
+        ...(loc.has(`${comp.name}.text`) ? [] : [`${comp.name}.text`]),
+        ...Array.from({ length: Math.max(buttons, 1) }, (_, i) => `${comp.name}.button${i + 1}`).filter(k => !loc.has(k)),
+      ];
+      if (missing.length > 0) {
         results.push({
           rule: 'localization-completeness',
-          severity: 'warning',
-          message: `Missing localization key "${comp.name}.text" for token`,
-          component: comp.name,
-        });
-      }
-      if (!loc.has(`${comp.name}.button1`)) {
-        results.push({
-          rule: 'localization-completeness',
-          severity: 'warning',
-          message: `Missing localization key "${comp.name}.button1" for token`,
+          severity: 'error',
+          message: `Token "${comp.name}" shows a dialog when clicked but is missing ${missing.join(', ')} — players see an empty box and a raw "${comp.name}.button1" button. Add the text and button labels, or set display=false so clicking runs its event1 directly`,
           component: comp.name,
         });
       }

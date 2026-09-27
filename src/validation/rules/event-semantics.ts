@@ -45,6 +45,25 @@ export function checkEventSemantics(model: ScenarioModel): ValidationResult[] {
       }
     }
 
+    // Valkyrie adds first, then removes (EventManager), so a removal covering an added component undoes it
+    const adds = (d.add ?? '').split(/\s+/).filter(Boolean);
+    const removes = new Set((d.remove ?? '').split(/\s+/).filter(Boolean));
+    const KEYWORD_PREFIXES: Record<string, string[]> = {
+      '#tiles': ['Tile'], '#tokens': ['Token'], '#uicomponents': ['UI'], '#doors': ['Door'],
+      '#qitems': ['QItem'], '#boardcomponents': ['Tile', 'Token', 'UI', 'Door'],
+    };
+    const undone = adds.filter(a => a !== 'TokenInvestigators' && (removes.has(a)
+      || [...removes].some(r => (KEYWORD_PREFIXES[r] ?? []).some(p => a.startsWith(p)))));
+    if (undone.length > 0) {
+      results.push({
+        rule: 'event-semantics',
+        severity: 'error',
+        message: `"${comp.name}" adds ${undone.join(', ')} but its remove also covers them — Valkyrie adds first and removes second, so they vanish at once. Clear the board in one event and add the new components in the next`,
+        component: comp.name,
+        field: 'remove',
+      });
+    }
+
     const addedSpawns = (d.add ?? '').split(/\s+/).filter(ref => ref.startsWith('Spawn'));
     if (addedSpawns.length > 0) {
       results.push({

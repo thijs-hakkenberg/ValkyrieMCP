@@ -13,16 +13,19 @@ describe('TileGeometry', () => {
     expect(extraInGeo, `extra geometry entries: ${extraInGeo.join(', ')}`).toEqual([]);
   });
 
-  it('matches doors verified by eye on the tile artwork', () => {
+  it('matches doors as Valkyrie displays the artwork (DDS rows are bottom-up)', () => {
     const mids = (id: string, side: 'N' | 'E' | 'S' | 'W') =>
       TILE_GEOMETRY[id].openings[side].map(o => Math.round((o.from + o.to) / 2 * 4) / 4);
+    // Yard 2 in a Valkyrie screenshot: wall with a gate at the bottom left, open grass at the top
+    expect(mids('TileSideYard2', 'S')).toEqual([1.75]);
+    expect(TILE_GEOMETRY.TileSideYard2.openings.N[0].kind).toBe('open');
     expect(TILE_GEOMETRY.TileSideLobby).toMatchObject({ width: 7, height: 7 });
-    expect(mids('TileSideLobby', 'N')).toEqual([1.75, 5.25]);
-    expect(mids('TileSideLobby', 'S')).toEqual([3.5]);
+    expect(mids('TileSideLobby', 'N')).toEqual([3.5]);
+    expect(mids('TileSideLobby', 'S')).toEqual([1.75, 5.25]);
     expect(mids('TileSideInteriorHall', 'N')).toEqual([]);
     expect(mids('TileSideInteriorHall', 'W')).toEqual([1.75, 5.25]);
     expect(TILE_GEOMETRY.TileSideLibrary).toMatchObject({ width: 7, height: 3.5 });
-    expect(TILE_GEOMETRY.TileSideRootCellar.openings.N).toEqual([{ from: 0, to: 7, kind: 'open' }]);
+    expect(TILE_GEOMETRY.TileSideRootCellar.openings.S).toEqual([{ from: 0, to: 7, kind: 'open' }]);
   });
 
   for (const [id, geo] of Object.entries(TILE_GEOMETRY)) {

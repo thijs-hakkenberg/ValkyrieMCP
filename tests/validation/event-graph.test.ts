@@ -32,7 +32,7 @@ describe('event-graph', () => {
     model.upsert('EventOrphan', { buttons: '1', event1: '' });
 
     const results = checkEventGraph(model);
-    const orphanWarning = results.find(r => r.component === 'EventOrphan' && r.message.includes('unreachable'));
+    const orphanWarning = results.find(r => r.component === 'EventOrphan' && r.message.includes('can never run'));
     expect(orphanWarning).toBeDefined();
     expect(orphanWarning!.severity).toBe('warning');
   });
@@ -48,41 +48,29 @@ describe('event-graph', () => {
     expect(mythosWarnings).toHaveLength(0);
   });
 
-  it('returns warning for dead-end event (no next-event refs and no $end)', () => {
+  it('does not warn about a displayed event whose button leads nowhere (the dialog closes)', () => {
     const model = new ScenarioModel();
     model.upsert('EventMinCam', { buttons: '1', event1: 'EventMain', trigger: 'EventStart' });
     model.upsert('EventMain', { buttons: '1' });
 
-    const results = checkEventGraph(model);
-    const deadEnd = results.find(r => r.component === 'EventMain' && r.message.includes('dead-end'));
-    expect(deadEnd).toBeDefined();
-    expect(deadEnd!.severity).toBe('warning');
+    expect(checkEventGraph(model)).toHaveLength(0);
   });
 
-  it('does not warn about dead-end for event with $end operation', () => {
+  it('follows monster activation events and Var triggers', () => {
     const model = new ScenarioModel();
-    model.upsert('EventMinCam', { buttons: '1', event1: 'EventEnd', trigger: 'EventStart' });
-    model.upsert('EventEnd', { buttons: '1', operations: '$end,=,1' });
+    model.upsert('EventStart', { trigger: 'EventStart', buttons: '1', event1: 'SpawnBoss', operations: '@Alarm,=,1' });
+    model.upsert('SpawnBoss', { monster: 'CustomMonsterBoss', buttons: '1' });
+    model.upsert('CustomMonsterBoss', { base: 'MonsterCultist', activation: 'EventBossActs' });
+    model.upsert('EventBossActs', { display: 'false', buttons: '1' });
+    model.upsert('EventAlarm', { trigger: 'VarAlarm', buttons: '1' });
 
-    const results = checkEventGraph(model);
-    const deadEnd = results.filter(r => r.component === 'EventEnd' && r.message.includes('dead-end'));
-    expect(deadEnd).toHaveLength(0);
-  });
-
-  it('does not warn about dead-end for event with empty event1 (explicit terminal)', () => {
-    const model = new ScenarioModel();
-    model.upsert('EventMinCam', { buttons: '1', event1: 'EventEnd', trigger: 'EventStart' });
-    model.upsert('EventEnd', { buttons: '1', event1: '' });
-
-    const results = checkEventGraph(model);
-    const deadEnd = results.filter(r => r.component === 'EventEnd' && r.message.includes('dead-end'));
-    expect(deadEnd).toHaveLength(0);
+    expect(checkEventGraph(model)).toHaveLength(0);
   });
 
   it('does not warn about unreachable for event with Defeated* trigger', () => {
     const model = new ScenarioModel();
-    model.upsert('EventMinCam', { buttons: '1', event1: 'EventMain', trigger: 'EventStart' });
-    model.upsert('EventMain', { buttons: '1', event1: '' });
+    model.upsert('EventMinCam', { buttons: '1', event1: 'SpawnCultist', trigger: 'EventStart' });
+    model.upsert('SpawnCultist', { monster: 'MonsterCultist', buttons: '1' });
     model.upsert('EventDefeatedCultist', { buttons: '1', event1: '', trigger: 'DefeatedMonsterCultist' });
 
     const results = checkEventGraph(model);
@@ -92,13 +80,22 @@ describe('event-graph', () => {
 
   it('does not warn about unreachable for event with DefeatedCustomMonster trigger', () => {
     const model = new ScenarioModel();
-    model.upsert('EventMinCam', { buttons: '1', event1: 'EventMain', trigger: 'EventStart' });
-    model.upsert('EventMain', { buttons: '1', event1: '' });
+    model.upsert('EventMinCam', { buttons: '1', event1: 'SpawnBoss', trigger: 'EventStart' });
+    model.upsert('SpawnBoss', { monster: 'CustomMonsterBoss', buttons: '1' });
+    model.upsert('CustomMonsterBoss', { base: 'MonsterCultist' });
     model.upsert('EventDefeatBoss', { buttons: '1', event1: '', trigger: 'DefeatedCustomMonsterBoss' });
 
     const results = checkEventGraph(model);
     const defeatedWarnings = results.filter(r => r.component === 'EventDefeatBoss');
     expect(defeatedWarnings).toHaveLength(0);
+  });
+
+  it('warns about a Defeated trigger for a monster that never spawns', () => {
+    const model = new ScenarioModel();
+    model.upsert('EventMinCam', { buttons: '1', trigger: 'EventStart' });
+    model.upsert('EventDefeatedCultist', { buttons: '1', trigger: 'DefeatedMonsterCultist' });
+
+    expect(checkEventGraph(model)[0].component).toBe('EventDefeatedCultist');
   });
 
   it('does not flag non-Event components as unreachable', () => {

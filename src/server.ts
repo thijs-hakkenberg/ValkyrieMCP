@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { VERSION } from './version.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ScenarioModel } from './model/scenario-model.js';
@@ -70,15 +70,11 @@ const UPSERT_TOOLS = [
   { name: 'upsert_item',   desc: 'Create or update a quest item component',  prefix: 'QItem',  fn: upsertItem },
   { name: 'upsert_puzzle', desc: 'Create or update a puzzle component',      prefix: 'Puzzle', fn: upsertPuzzle },
   { name: 'upsert_ui',     desc: 'Create or update a UI component',          prefix: 'UI',     fn: upsertUI },
-  { name: 'upsert_custom_monster', desc: 'Create or update a custom monster. Fields: base (catalog Monster ID), health, healthperhero, horror, awareness, traits, image, imageplace, activation (space-separated names WITHOUT the Activation prefix: activation=BossRage uses ActivationBossRage), evadeevent, horrorevent (Event names)', prefix: 'CustomMonster', fn: upsertCustomMonster },
+  { name: 'upsert_custom_monster', desc: 'Create or update a custom monster. Fields: base (catalog Monster ID), health, healthperhero, horror, awareness, traits, image, imageplace, activation (MoM: ONE Event name, run every monster phase, e.g. activation=EventBossActivation with randomevents to pick moves/attacks; Descent-style: Activation component names without the prefix), evadeevent, horrorevent (Event names)', prefix: 'CustomMonster', fn: upsertCustomMonster },
   { name: 'upsert_mplace', desc: 'Create or update a monster placement (MPlace). Fields: xposition, yposition, master, rotate, tokensize (small|medium|huge|massive|Original|<number>)', prefix: 'MPlace', fn: upsertMPlace },
   { name: 'upsert_activation', desc: 'Create or update a custom monster activation. Fields: minionfirst, masterfirst; text goes in localization keys <name>.ability, <name>.minion, <name>.master, <name>.movebutton, <name>.move', prefix: 'Activation', fn: upsertActivation },
 ] as const;
 
-/** Package version (src/ and dist/ both sit one level below package.json) */
-const VERSION: string = JSON.parse(
-  fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf-8'),
-).version;
 
 export function createServer(): McpServer {
   const server = new McpServer({

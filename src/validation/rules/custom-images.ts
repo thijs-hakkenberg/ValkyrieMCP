@@ -12,9 +12,9 @@ const IMAGE_FIELDS: Array<[prefix: string, fields: string[]]> = [
   ['Puzzle', ['image']],
 ];
 
-/** Valkyrie also accepts content-pack image IDs; only values that look like file paths are checked */
+/** Valkyrie also accepts content-pack image and audio IDs; only values that look like file paths are checked */
 function looksLikeFile(value: string): boolean {
-  return /\.(png|jpe?g|dds)$/i.test(value);
+  return /\.(png|jpe?g|dds|ogg)$/i.test(value);
 }
 
 /**
@@ -23,14 +23,30 @@ function looksLikeFile(value: string): boolean {
  * a missing token or UI image renders as a fallback or nothing.
  * Skipped for models without a directory (e.g. built in memory).
  */
+/** music holds several space-separated tracks; tag them so the loop can report them as the music field */
+function parseMusic(music: string | undefined): string[] {
+  return (music ?? '').split(/\s+/).filter(Boolean).map(m => `music:${m}`);
+}
+
 export function checkCustomImages(model: ScenarioModel): ValidationResult[] {
   const results: ValidationResult[] = [];
   if (!model.scenarioDir || !fs.existsSync(model.scenarioDir)) return results;
 
   for (const comp of model.getAll()) {
     const entry = IMAGE_FIELDS.find(([prefix]) => comp.name.startsWith(prefix));
-    if (!entry) continue;
-    for (const field of entry[1]) {
+    const fields = [...(entry?.[1] ?? []), 'audio', ...parseMusic(comp.data.music)];
+    for (const field of fields) {
+      if (field.startsWith('music:')) {
+        const file = field.slice('music:'.length);
+        if (looksLikeFile(file) && !fs.existsSync(path.join(model.scenarioDir, file))) {
+          results.push({ rule: 'custom-images', severity: 'warning', message: `"${comp.name}" music "${file}" not found in the scenario directory`, component: comp.name, field: 'music' });
+        }
+        continue;
+      }
+      if (field === 'audio' && comp.data.audio && /\.(mp3|wav)$/i.test(comp.data.audio)) {
+        results.push({ rule: 'custom-images', severity: 'warning', message: `"${comp.name}" audio "${comp.data.audio}" — Valkyrie only plays .ogg files`, component: comp.name, field: 'audio' });
+        continue;
+      }
       const value = comp.data[field]?.trim();
       if (!value || !looksLikeFile(value)) continue;
       if (fs.existsSync(path.join(model.scenarioDir, value))) continue;

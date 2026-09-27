@@ -1,4 +1,4 @@
-import { EVENT_FIELDS, parseRefList } from '../../model/component-types.js';
+import { parseRefList } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
 
 /**
@@ -6,9 +6,10 @@ import type { ScenarioModel } from '../../model/scenario-model.js';
  * via event1..event6 references (BFS). Stops after visiting maxNodes to prevent
  * infinite loops in cyclic graphs.
  */
-export function collectEventChain(model: ScenarioModel, startEventName: string, maxNodes = 10): string[] {
+export function collectEventChain(model: ScenarioModel, startEventName: string, maxNodes = 50): string[] {
   const visited = new Set<string>();
-  const queue = [startEventName];
+  // Accept a whole eventN value ("EventA EventB"): every listed event is a possible start
+  const queue = parseRefList(startEventName);
 
   while (queue.length > 0 && visited.size < maxNodes) {
     const current = queue.shift()!;
@@ -18,7 +19,7 @@ export function collectEventChain(model: ScenarioModel, startEventName: string, 
     const comp = model.get(current);
     if (!comp) continue;
 
-    for (const field of EVENT_FIELDS) {
+    for (const field of Object.keys(comp.data).filter(k => /^event\d+$/.test(k))) {
       const val = comp.data[field];
       if (!val) continue;
       for (const ref of parseRefList(val)) {

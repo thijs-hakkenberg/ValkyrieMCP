@@ -61,7 +61,7 @@ describe('writeIni', () => {
     it('includes the version comment header by default', () => {
       const output = writeIni({ Section: { key: 'val' } });
       const lines = output.split('\n');
-      expect(lines[0]).toBe('; Saved by version: 0.1.0');
+      expect(lines[0]).toMatch(/^; Saved by valkyrie-mom-mcp \d+\.\d+\.\d+$/);
     });
 
     it('uses custom comment when provided', () => {
@@ -77,7 +77,7 @@ describe('writeIni', () => {
     it('has a blank line between comment and first section', () => {
       const output = writeIni({ Section: { key: 'val' } });
       const lines = output.split('\n');
-      expect(lines[0]).toBe('; Saved by version: 0.1.0');
+      expect(lines[0]).toMatch(/^; Saved by valkyrie-mom-mcp \d+\.\d+\.\d+$/);
       expect(lines[1]).toBe('');
       expect(lines[2]).toBe('[Section]');
     });
@@ -86,12 +86,12 @@ describe('writeIni', () => {
   describe('empty sections', () => {
     it('handles empty sections record', () => {
       const output = writeIni({});
-      expect(output).toContain('; Saved by version: 0.1.0');
+      expect(output).toMatch(/; Saved by valkyrie-mom-mcp \d+\.\d+\.\d+/);
     });
 
     it('handles empty bare-key sections', () => {
       const output = writeIni({}, {});
-      expect(output).toContain('; Saved by version: 0.1.0');
+      expect(output).toMatch(/; Saved by valkyrie-mom-mcp \d+\.\d+\.\d+/);
     });
   });
 

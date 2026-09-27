@@ -105,7 +105,7 @@ export function checkCatalogReferences(model: ScenarioModel): ValidationResult[]
   // Check audio fields on all components
   for (const comp of model.getAll()) {
     const audio = comp.data.audio;
-    if (!audio) continue;
+    if (!audio || /\.ogg$/i.test(audio)) continue; // custom sound files are checked by custom-images
     if (!audioIds.has(audio)) {
       results.push({
         rule: 'catalog-references',

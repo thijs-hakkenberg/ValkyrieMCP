@@ -98,4 +98,18 @@ describe('game-flow', () => {
     m.upsert('EventPuzzle', { buttons: '1' });
     expect(checkGameFlow(m).find(r => r.component === 'EventBook')?.message).toContain('loses the token for good');
   });
+
+  it('follows a MoM activation event from a spawned custom monster', () => {
+    const m = playable();
+    m.upsert('CustomMonsterGhoul', { base: 'MonsterGhost', activation: 'EventGhoulActs' });
+    m.upsert('EventGhoulActs', { display: 'false', buttons: '1' });
+    m.upsert('SpawnGhost', { monster: 'CustomMonsterGhoul' });
+    expect(computeReachability(m).runs.has('EventGhoulActs')).toBe(true);
+  });
+
+  it('accepts $mythosFlavor or $mythosHelp as enabling base-game mythos', () => {
+    const m = playable();
+    m.upsert('EventSetup', { operations: '$mythosFlavor,=,1' });
+    expect(checkGameFlow(m).map(r => r.message).join()).not.toContain('mythos events never appear');
+  });
 });

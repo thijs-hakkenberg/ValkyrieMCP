@@ -18,7 +18,7 @@ upsert_custom_monster("CustomMonsterCultLeader", {
   healthperhero: "2",
   horror: "2",
   awareness: "4",
-  activation: "CultLeaderRitual CultLeaderStrike",   # see Custom Activations
+  activation: "EventCultLeaderActivation",           # see Custom Activations
   evadeevent: "EventCultLeaderEvade",                # see Evade & Horror
   horrorevent: "EventCultLeaderHorror"
 })
@@ -38,31 +38,42 @@ set_localization({
 | `horror` / `awareness` | Horror check and awareness values |
 | `traits` | Space-separated traits (humanoid, spirit, beast, …) |
 | `image` / `imageplace` | Own portrait / board image (file in the scenario folder). imageplace is drawn at its own size |
-| `activation` | Activation names **without** the `Activation` prefix. Empty = base monster's activations |
+| `activation` | MoM: **one Event** run every monster phase (see below). Empty = base monster's activations |
 | `evadeevent` / `horrorevent` | Event queued instead of the standard evade / horror check |
 
 ## Custom Activations
 
-Activations are the attack/move cards Valkyrie draws when the monster activates in the Monster phase. Create each one with `upsert_activation` and list it on the monster **without** its prefix: `activation=CultLeaderStrike` uses the component `ActivationCultLeaderStrike`. Valkyrie picks one at random among those whose vartests pass.
+In Mansions of Madness, give the monster **one activation event**: Valkyrie runs it every monster phase while the monster is on the board. Make it a silent picker (`randomevents: "true"`) over a few move/target events. Each of those shows what the monster does, with a button for "Investigator in range" (leading to an attack) and one for "No investigator in range".
 
 ```
-upsert_activation("ActivationCultLeaderStrike", { masterfirst: "true" })
+upsert_event("EventCultLeaderActivation", {
+  display: "false",
+  buttons: "1",
+  randomevents: "true",
+  event1: "EventCultLeaderStalk EventCultLeaderStalk EventCultLeaderChant"   # list an event twice to make it likelier
+})
+
+upsert_event("EventCultLeaderStalk", {
+  buttons: "2",
+  event1: "EventCultLeaderStab",   # an investigator is in its space
+  event2: ""                       # nobody in range: activation ends
+})
+
+upsert_event("EventCultLeaderStab", {
+  buttons: "1"
+})
 
 set_localization({
-  "ActivationCultLeaderStrike.ability": "The Cult Leader raises a jagged dagger.",
-  "ActivationCultLeaderStrike.movebutton": "Unengaged",
-  "ActivationCultLeaderStrike.move": "The Cult Leader moves 2 spaces toward the nearest investigator.",
-  "ActivationCultLeaderStrike.master": "The investigator tests {strength}. On a failure, suffer 3 damage.",
-  "ActivationCultLeaderStrike.minion": "The investigator tests {agility}. On a failure, suffer 1 damage."
-})
-
-# Only available once the ritual has begun
-upsert_activation("ActivationCultLeaderRitual", {
-  vartests: "VarOperation:ritualStarted,==,1"
+  "EventCultLeaderStalk.text": "The Cult Leader moves 2 spaces toward the nearest investigator.",
+  "EventCultLeaderStalk.button1": "Investigator in its space",
+  "EventCultLeaderStalk.button2": "No investigator in range",
+  "EventCultLeaderStab.text": "The Cult Leader raises a jagged dagger. The investigator tests {agility}. On a failure, suffer 3 damage.",
+  "EventCultLeaderStab.button1": "{qst:CONTINUE}"
 })
 ```
 
-validate_scenario reports `activation=ActivationCultLeaderStrike` (prefix repeated) as an error.
+- Only a **single** event works as an activation. Listing more makes Valkyrie treat them as Activation components (the Descent-style system with `upsert_activation`); validate_scenario reports mixing the two.
+- Leave `activation` empty to use the base monster's normal activations.
 
 ## Evade & Horror Events
 
@@ -93,8 +104,8 @@ A `Spawn` is an event: it runs when it is listed in another event's `eventN`. **
 upsert_spawn("SpawnCultLeader", {
   monster: "CustomMonsterCultLeader",
   unique: "true",                  # optional: a named unique monster...
-  uniquehealth: "10",              # ...with its own health
-  uniquehealthhero: "3",
+  uniquehealth: "6",               # ...with this much health ADDED to the monster type's own
+  uniquehealthhero: "2",           # ...plus this much per investigator
   xposition: "4", yposition: "2",  # optional: where the figure is shown
   buttons: "1",
   event1: "EventCultLeaderArrives"

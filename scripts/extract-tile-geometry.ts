@@ -18,7 +18,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { decodeDds, resize, type RgbaImage } from '../src/io/image.js';
+import { decodeValkyrieDds, resize, type RgbaImage } from '../src/io/image.js';
 import { TILES } from '../src/catalogs/data/all-catalogs.js';
 import { TILE_GEOMETRY as PREVIOUS } from '../src/catalogs/data/tile-geometry.js';
 import { MOM_PIXELS_PER_UNIT } from '../src/map/layout.js';
@@ -177,7 +177,7 @@ for (const tile of TILES) {
   const file = c && join(IMPORT_IMG, `${c.image}.dds`);
   const full = !c ? undefined
     : c.bundled ? loadBundled(c)
-    : file && existsSync(file) ? decodeDds(readFileSync(file)) : undefined;
+    : file && existsSync(file) ? decodeValkyrieDds(readFileSync(file)) : undefined;
   if (!c || !full) {
     missing.push(tile.id);
     continue;

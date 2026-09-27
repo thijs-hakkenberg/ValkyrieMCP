@@ -225,7 +225,7 @@ const snap = (v: number) => (Math.abs(v * 4 - Math.round(v * 4)) < 0.2 ? Math.ro
  * both tiles lined up. Tries every rotation unless one is given, slides the new tile along the
  * shared edge to line up each pair of openings (plus flush-corner alignments), and returns the
  * best candidates first: no overlap with other tiles, a connecting passage, sitting flush
- * against the existing tile, then rotation 0.
+ * against the existing tile, the widest connection (open edge to open edge), then rotation 0.
  */
 export function placeTileRelative(
   model: ScenarioModel,
@@ -290,8 +290,9 @@ export function placeTileRelative(
     (a.overlaps.length > 0 ? 1 : 0) - (b.overlaps.length > 0 ? 1 : 0)
     || Math.min(b.passages.length, 1) - Math.min(a.passages.length, 1)
     || b.flush - a.flush
-    || (a.rotation === 0 ? 0 : 1) - (b.rotation === 0 ? 0 : 1)
-    || width(b) - width(a));
+    // Prefer the wider connection: open ground against open ground beats a gate in a wall
+    || Math.round(width(b)) - Math.round(width(a))
+    || (a.rotation === 0 ? 0 : 1) - (b.rotation === 0 ? 0 : 1));
 }
 
 /** Points inside a tile useful for tokens: centre, and just inside each opening (for explore tokens) */
