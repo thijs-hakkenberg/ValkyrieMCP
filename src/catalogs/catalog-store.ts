@@ -18,6 +18,14 @@ export const PACK_ID_MAP: Record<string, string> = {
   pots: 'PotS',
   soa: 'SoA',
   sot: 'SoT',
+  // First-edition conversion kit (cloned by the Recurring Nightmares and Suppressed Memories figure packs)
+  'mom1e-monsters': 'MoM1EM',
+  'mom1e-investigators': 'MoM1EI',
+  'ck-tokensandcards': 'MoM1CK',
+  'cotw-monsters': 'CotWM',
+  'cotw-investigators': 'CotWI',
+  'fa-monsters': 'FAM',
+  'fa-investigators': 'FAI',
 };
 
 /** Convert a catalog pack ID (lowercase) to Valkyrie's case-sensitive pack ID */
@@ -106,6 +114,13 @@ export class CatalogStore {
   getPackForTileSide(tileId: string): string | undefined {
     const entry = this.byId.get(tileId);
     if (!entry || entry.type !== 'tile') return undefined;
+    return getValkyriePackId(entry.pack);
+  }
+
+  /** Look up an item's pack from catalog, return Valkyrie pack ID */
+  getPackForItem(itemId: string): string | undefined {
+    const entry = this.byId.get(itemId);
+    if (!entry || entry.type !== 'item') return undefined;
     return getValkyriePackId(entry.pack);
   }
 

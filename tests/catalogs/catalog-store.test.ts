@@ -176,6 +176,27 @@ describe('CatalogStore', () => {
     it('returns undefined for unknown monster', () => {
       expect(store.getPackForMonster('MonsterNonexistent')).toBeUndefined();
     });
+
+    it('knows the conversion kit monsters (first edition, Recurring Nightmares)', () => {
+      expect(store.getPackForMonster('MonsterShoggoth')).toBe('MoM1EM');
+      expect(store.getPackForMonster('MonsterMiGo')).toBe('MoM1EM');
+      expect(store.getPackForMonster('MonsterNightgaunt')).toBe('CotWM');
+      expect(store.getPackForMonster('MonsterByakhee')).toBe('FAM');
+    });
+  });
+
+  describe('getPackForItem', () => {
+    it('returns MoMBase for a base item', () => {
+      expect(store.getPackForItem('ItemCommonKnife')).toBe('MoMBase');
+    });
+
+    it('returns the conversion kit pack for its items', () => {
+      expect(store.getPackForItem('ItemUniqueDukeTheDog')).toBe('MoM1CK');
+    });
+
+    it('returns undefined for unknown item', () => {
+      expect(store.getPackForItem('ItemNonexistent')).toBeUndefined();
+    });
   });
 
   describe('getPackId', () => {

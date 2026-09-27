@@ -70,7 +70,17 @@ const PACK_FILE_MAPPINGS: FileMapping[] = [
   { file: 'tokens_monsters.ini', type: 'token' },
 ];
 
-const CONTENT_PACKS = ['base', 'btt', 'hj', 'pots', 'soa', 'sot'];
+/**
+ * Content folders to read, and the catalog pack each one files its entries under.
+ * The ck/ folders are the first-edition conversion kit. Recurring Nightmares (RN) and
+ * Suppressed Memories (SM) clone them, so owners of those figure packs have these
+ * monsters and items. Their tiles are left out: tile-geometry.ts has no data for them.
+ */
+const CONTENT_PACKS: Array<{ dir: string; pack: string }> = [
+  ...['base', 'btt', 'hj', 'pots', 'soa', 'sot'].map(p => ({ dir: p, pack: p })),
+  ...['mom1e-monsters', 'mom1e-investigators', 'ck-tokensandcards', 'cotw-monsters', 'cotw-investigators', 'fa-monsters', 'fa-investigators']
+    .map(p => ({ dir: path.join('ck', p), pack: p })),
+];
 
 /**
  * Extract all catalogs from Valkyrie content directory.
@@ -89,9 +99,9 @@ export function extractAllCatalogs(
     token: [],
   };
 
-  for (const pack of CONTENT_PACKS) {
+  for (const { dir, pack } of CONTENT_PACKS) {
     for (const mapping of PACK_FILE_MAPPINGS) {
-      const filePath = path.join(contentDir, pack, mapping.file);
+      const filePath = path.join(contentDir, dir, mapping.file);
       if (!fs.existsSync(filePath)) continue;
 
       const content = fs.readFileSync(filePath, 'utf-8');

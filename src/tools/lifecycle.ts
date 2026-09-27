@@ -171,25 +171,7 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
     }
   }
 
-  // Auto-compute required packs from tile sides and monsters
-  const catalog = getSharedCatalog();
-  const requiredPacks = new Set<string>();
-
-  for (const comp of model.getByType('Tile')) {
-    const side = comp.data.side;
-    if (!side) continue;
-    const pack = catalog.getPackForTileSide(side);
-    if (pack && pack !== 'MoMBase') requiredPacks.add(pack);
-  }
-
-  for (const comp of model.getByType('Spawn')) {
-    const monsterField = comp.data.monster;
-    if (!monsterField) continue;
-    for (const name of parseRefList(monsterField)) {
-      const pack = catalog.getPackForMonster(name);
-      if (pack && pack !== 'MoMBase') requiredPacks.add(pack);
-    }
-  }
+  const requiredPacks = computeRequiredPacks(model);
 
   if (requiredPacks.size > 0) {
     model.questConfig.packs = [...requiredPacks].sort().join(' ');
@@ -212,6 +194,44 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
   // Write localization
   const locContent = model.localization.toCSV();
   fs.writeFileSync(path.join(dir, 'Localization.English.txt'), locContent);
+}
+
+/**
+ * The expansions a scenario needs, from everything it puts on the table:
+ * tile sides, spawned monsters (a custom monster counts through its base),
+ * catalog monsters shown as tokens, and quest items given by name.
+ */
+export function computeRequiredPacks(model: ScenarioModel): Set<string> {
+  const catalog = getSharedCatalog();
+  const requiredPacks = new Set<string>();
+  const add = (pack: string | undefined) => {
+    if (pack && pack !== 'MoMBase') requiredPacks.add(pack);
+  };
+  const addMonster = (name: string) => {
+    const custom = name.startsWith('CustomMonster') ? model.get(name) : undefined;
+    add(catalog.getPackForMonster(custom?.data.base ?? name));
+  };
+
+  for (const comp of model.getByType('Tile')) {
+    if (comp.data.side) add(catalog.getPackForTileSide(comp.data.side));
+  }
+  for (const comp of model.getByType('Spawn')) {
+    for (const name of parseRefList(comp.data.monster ?? '')) addMonster(name);
+  }
+  for (const comp of model.getByType('CustomMonster')) {
+    if (comp.data.base) add(catalog.getPackForMonster(comp.data.base));
+  }
+  for (const comp of model.getByType('Token')) {
+    if (comp.data.type && !comp.data.customImage) add(catalog.getPackForMonster(comp.data.type));
+  }
+  for (const comp of model.getByType('QItem')) {
+    // With traits, itemname lists items to exclude from the draw, so they need not be owned
+    if (comp.data.traits?.trim()) continue;
+    // Several names: Valkyrie picks one it can find, so only a single name is a hard requirement
+    const names = parseRefList(comp.data.itemname ?? '');
+    if (names.length === 1) add(catalog.getPackForItem(names[0]));
+  }
+  return requiredPacks;
 }
 
 /** Builds .valkyrie package */

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.3.2] - 2026-09-27
+
+### Fixed
+
+- The game-content catalog includes the first-edition conversion kit: 8 monsters (Shoggoth, Mi-Go, Cthonian, Hound of Tindalos, ...), the Call of the Wild and Forbidden Alchemy monsters, their investigators, and the conversion kit's items and tokens. The Recurring Nightmares and Suppressed Memories figure packs enable these in Valkyrie. `search_game_content` finds them, and `validate_scenario` no longer rejects them.
+- Saving works out the required `packs` from everything the scenario puts on the table. A spawned custom monster now counts through its `base`, and so do catalog monsters shown as tokens and quest items given by a single name. Before, a custom Shoggoth or an expansion item left `packs` empty, so Valkyrie offered the scenario to players without that expansion.
+
 ## [2.3.1] - 2026-09-27
 
 ### Fixed
