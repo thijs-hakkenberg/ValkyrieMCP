@@ -4,7 +4,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { TILE_GEOMETRY } from '../catalogs/data/tile-geometry.js';
-import { decodeDds, encodePng, resize, rotateCcw, type RgbaImage } from '../io/image.js';
+import { decodeValkyrieDds, encodePng, resize, rotateCcw, type RgbaImage } from '../io/image.js';
 import type { ScenarioModel } from '../model/scenario-model.js';
 import { layoutTiles, tileAt, type PlacedTile, type Rect } from './layout.js';
 
@@ -102,7 +102,7 @@ function loadArtwork(dir: string | undefined, image: string): RgbaImage | null {
   if (!dir) return null;
   const file = path.join(dir, `${image}.dds`);
   if (!artworkCache.has(file)) {
-    try { artworkCache.set(file, fs.existsSync(file) ? decodeDds(fs.readFileSync(file)) : null); }
+    try { artworkCache.set(file, fs.existsSync(file) ? decodeValkyrieDds(fs.readFileSync(file)) : null); }
     catch { artworkCache.set(file, null); }
   }
   return artworkCache.get(file) ?? null;

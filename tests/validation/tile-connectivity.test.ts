@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { ScenarioModel } from '../../src/model/scenario-model.js';
 import { checkTileConnectivity, checkTokenPlacement } from '../../src/validation/rules/tile-connectivity.js';
 
-// Doors used below were verified by eye on the tile artwork:
-//   Lobby 7x7: doors on every side; Interior Hall 7x7: doors only west (2) and east (1, lower)
-//   Study 7x3.5: doors north (right) and west (middle); Library 7x3.5: doors north (left) and east
+// Doors as Valkyrie displays the artwork (checked against in-app screenshots):
+//   Lobby 7x7: one north door (centre), two on each other side; Interior Hall 7x7: west (2) and east (1, upper)
+//   Study 7x3.5: doors south (right) and west (middle); Library 7x3.5: doors south (left) and east
 
 function hubWith(extra: Record<string, Record<string, string>>): ScenarioModel {
   const model = new ScenarioModel();
@@ -20,7 +20,8 @@ describe('tile-connectivity', () => {
   });
 
   it('accepts a rotated tile whose door faces the hub', () => {
-    const model = hubWith({ TileLib: { side: 'TileSideLibrary', xposition: '7', yposition: '0', rotation: '180' } });
+    // Library rotated 270 (standing 3.5 wide, 7 tall) with its door on the lobby's north door
+    const model = hubWith({ TileLib: { side: 'TileSideLibrary', xposition: '5.25', yposition: '7', rotation: '270' } });
     expect(checkTileConnectivity(model)).toHaveLength(0);
   });
 

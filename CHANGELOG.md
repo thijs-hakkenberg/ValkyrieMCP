@@ -17,6 +17,9 @@ Checked against the community "Valkyrie MoM Tutorial" (the scenario-creation man
 
 ### Fixed
 
+- **Tile artwork was read upside down.** Valkyrie passes the DDS data to Unity's `LoadRawTextureData`, which treats the first row as the bottom, and the MoM app's textures are authored for that. The tile geometry (all 174 tiles) and `render_map` now use the orientation players see, confirmed against an in-app screenshot and the golden scenario. North/south doors were swapped and east/west positions mirrored before, so layouts from `place_tile_relative` could put a wall against open ground.
+- `place_tile_relative` prefers the widest connection (open ground against open ground) over a gate in a wall, before preferring no rotation.
+- A clickable token without text, or missing button labels, was accepted (and briefly recommended). Valkyrie shows an empty dialog with a raw `TokenX.button1` button unless the token has `display=false`, which is what the editor writes for empty text. This is now an error, with the fix in the message.
 - `event-graph` used direct references only, so events run by monster activations, `Var` triggers or `Defeated` triggers were reported as unreachable, and every dialog that simply closes was a "dead-end". It now uses the game-flow reachability and reports only events that can never run, including `Defeated` triggers for monsters that never spawn.
 - Tokens without text (which run their event on click, a documented pattern) no longer need `.text`/`.button1`.
 - Explore tokens: event chains were read from the whole `event1` string, so candidate lists (`EventA EventB`) were missed; removal via `#tokens` and chains that end the scenario now count.

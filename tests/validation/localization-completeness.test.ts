@@ -76,14 +76,24 @@ describe('localization-completeness', () => {
     expect(eventWarnings).toHaveLength(0);
   });
 
-  it('accepts a token without text (clicking it runs its event directly)', () => {
+  it('errors on a clickable token without text that still shows a dialog (Herbert West playtest)', () => {
     const model = new ScenarioModel();
-    model.upsert('TokenSearch1', { type: 'TokenSearch', buttons: '1', event1: 'EventSearch1' });
+    model.upsert('TokenGraveC', { type: 'TokenInteract', buttons: '1', event1: 'EventGraveC' });
     model.localization.set('quest.name', 'Test');
     model.localization.set('quest.description', 'Desc');
 
-    const results = checkLocalizationCompleteness(model);
-    expect(results.filter(r => r.component === 'TokenSearch1')).toHaveLength(0);
+    const r = checkLocalizationCompleteness(model).find(x => x.component === 'TokenGraveC');
+    expect(r?.severity).toBe('error');
+    expect(r?.message).toContain('set display=false');
+  });
+
+  it('accepts a token with display=false and no text (clicking runs its event directly)', () => {
+    const model = new ScenarioModel();
+    model.upsert('TokenGraveC', { type: 'TokenInteract', display: 'false', buttons: '1', event1: 'EventGraveC' });
+    model.localization.set('quest.name', 'Test');
+    model.localization.set('quest.description', 'Desc');
+
+    expect(checkLocalizationCompleteness(model).filter(r => r.component === 'TokenGraveC')).toHaveLength(0);
   });
 
   it('returns warning for token missing button1 key', () => {
@@ -97,7 +107,7 @@ describe('localization-completeness', () => {
     const results = checkLocalizationCompleteness(model);
     const btnWarning = results.find(r => r.component === 'TokenSearch1' && r.message.includes('button1'));
     expect(btnWarning).toBeDefined();
-    expect(btnWarning!.severity).toBe('warning');
+    expect(btnWarning!.severity).toBe('error');
   });
 
   it('does not warn for token with display=false', () => {

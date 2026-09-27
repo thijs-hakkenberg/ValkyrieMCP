@@ -78,15 +78,18 @@ describe('map tools', () => {
       expect(best.passages.length).toBeGreaterThan(0);
     });
 
-    it('rotates a tile whose only door faces away (library north of the hub)', () => {
-      const [best] = placeTileRelative(model, 'TileHub', 'north', 'TileSideLibrary');
-      // Library's door is on its north edge; rotated 180 around its anchor it faces south
-      expect(best).toMatchObject({ x: 7, y: 0, rotation: 180 });
-      expect(best.rect).toEqual({ minX: 0, maxX: 7, minY: 0, maxY: 3.5 });
+    it('shifts or rotates a tile so its door meets the hub (library north of the lobby)', () => {
+      // The lobby has one north door (centre); the library's only south door is off-centre
+      const candidates = placeTileRelative(model, 'TileHub', 'north', 'TileSideLibrary');
+      expect(candidates[0].passages.length).toBeGreaterThan(0);
+      expect(candidates[0].rect.minY).toBe(0);
+      expect(candidates.find(c => c.passages.length === 0)?.x).toBe(0);
     });
 
     it('places a large tile south and west', () => {
-      expect(placeTileRelative(model, 'TileHub', 'south', 'TileSideRootCellar')[0]).toMatchObject({ x: 0, y: -7, rotation: 0 });
+      const south = placeTileRelative(model, 'TileHub', 'south', 'TileSideRootCellar')[0];
+      expect(south.rect).toEqual({ minX: 0, maxX: 7, minY: -14, maxY: -7 });
+      expect(south.passages.length).toBe(2); // rotated so both of the lobby's south doors lead in
       expect(placeTileRelative(model, 'TileHub', 'west', 'TileSideAttic')[0]).toMatchObject({ x: -7, y: 0, rotation: 0 });
     });
 
@@ -104,6 +107,15 @@ describe('map tools', () => {
     it('throws for non-existent tile or unknown side', () => {
       expect(() => placeTileRelative(model, 'TileNope', 'north', 'TileSideStudy')).toThrow('not found');
       expect(() => placeTileRelative(model, 'TileHub', 'north', 'TileSideNope')).toThrow('Unknown tile side');
+    });
+
+    it('prefers open ground against open ground over a gate in a wall (Herbert West playtest)', () => {
+      const m = new ScenarioModel();
+      m.upsert('TileField', { side: 'TileSideToolShed', xposition: '0', yposition: '0' });
+      const [best] = placeTileRelative(m, 'TileField', 'north', 'TileSideYard2');
+      // Yard 2 has a wall with a gate on its south edge and open grass to the north: turn it round
+      expect(best.rotation).toBe(180);
+      expect(best.passages[0].to - best.passages[0].from).toBeGreaterThan(3);
     });
   });
 });
