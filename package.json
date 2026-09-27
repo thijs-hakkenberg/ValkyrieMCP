@@ -44,7 +44,8 @@
     "extract-catalogs": "tsx src/catalogs/extract-catalogs.ts",
     "lint": "tsc --noEmit",
     "convert-tiles": "tsx scripts/convert-tile-images.ts",
-    "prepublishOnly": "npm run lint && npm run test && npm run build"
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
+    "hermes:tools": "tsx scripts/export-hermes-tools.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

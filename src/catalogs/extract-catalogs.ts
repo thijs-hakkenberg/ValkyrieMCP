@@ -140,10 +140,10 @@ const isMainModule = process.argv[1] && (
 );
 
 if (isMainModule) {
-  const valkyrieContentDir = path.resolve(
-    import.meta.dirname ?? '.',
-    '../../../valkyrie/unity/Assets/StreamingAssets/content/MoM',
-  );
+  // The Valkyrie source checkout, by default next to this repository
+  const valkyrieRepo = process.env.VALKYRIE_SOURCE_DIR
+    ?? path.join(path.dirname(path.dirname(path.dirname(import.meta.dirname ?? '.'))), 'valkyrie');
+  const valkyrieContentDir = path.join(valkyrieRepo, 'unity', 'Assets', 'StreamingAssets', 'content', 'MoM');
 
   if (!fs.existsSync(valkyrieContentDir)) {
     console.error(`Valkyrie content not found at: ${valkyrieContentDir}`);

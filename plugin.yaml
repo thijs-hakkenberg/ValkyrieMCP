@@ -1,0 +1,41 @@
+name: valkyrie-mom
+version: "2.2.0"
+description: "AI-assisted Mansions of Madness scenario editor for the Valkyrie app: create, lay out, validate and package scenarios, review the storyline as an event tree, and generate artwork with a local ComfyUI. Runs the valkyrie-mom MCP server (Node.js 20+ with npx required)."
+author: "Thijs Hakkenberg"
+license: MIT
+homepage: https://github.com/thijs-hakkenberg/ValkyrieMCP
+tags:
+  - valkyrie
+  - mansions-of-madness
+  - board-game
+  - scenario-editor
+provides_tools:
+  - list_scenarios
+  - create_scenario
+  - load_scenario
+  - get_scenario_state
+  - validate_scenario
+  - save_scenario
+  - build_scenario
+  - set_quest_config
+  - upsert_event
+  - upsert_tile
+  - upsert_token
+  - upsert_spawn
+  - upsert_item
+  - upsert_puzzle
+  - upsert_ui
+  - upsert_custom_monster
+  - upsert_mplace
+  - upsert_activation
+  - delete_component
+  - set_localization
+  - get_map_ascii
+  - render_map
+  - story_graph
+  - artwork_status
+  - generate_artwork
+  - suggest_tile_layout
+  - place_tile_relative
+  - search_game_content
+  - export_bug_report

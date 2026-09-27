@@ -53,6 +53,16 @@ Add to your MCP client config (e.g., `~/.claude/mcp.json` or Claude Desktop sett
 
 This gives you the MCP tools and resources, but not the skills or agent (those require Claude Code).
 
+### As a Hermes Agent plugin
+
+[Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins) installs the repository as a plugin with every tool and all skills:
+
+```bash
+hermes plugins install thijs-hakkenberg/ValkyrieMCP --enable
+```
+
+The plugin registers the MCP tools as native Hermes tools (toolset `valkyrie-mom`) and the skills as `valkyrie-mom:<skill>` (e.g. `skill_view("valkyrie-mom:artwork")`). On the first tool call it starts the matching `@thijshakkenberg/valkyrie-mom-mcp` version with `npx` (Node.js 20+ required) and keeps it running for the session, since the scenario being edited lives there. Pictures that tools return, such as `render_map`, are saved under `~/.hermes/cache/valkyrie-mom/` and their paths are given in the result. For a local checkout, set `VALKYRIE_MCP_COMMAND="npx tsx /path/to/ValkyrieMCP/src/index.ts"`.
+
 ### From source
 
 ```bash
@@ -216,24 +226,29 @@ The server validates scenarios against 18 rule categories, checked against Valky
 ## Development
 
 ```bash
-npm test          # Run all tests (1067 tests across 44 files)
+npm test           # Run all tests
 npm run test:watch # Watch mode
 npm run lint       # Type check
 npm run build      # Compile to dist/
+npm run hermes:tools  # Re-export the Hermes plugin tool list after changing tools or the version
 ```
 
 ## Project Structure
 
 ```
-.claude-plugin/    Plugin manifest
-skills/            8 skill SKILL.md files
+.claude-plugin/    Claude Code plugin manifest
+plugin.yaml        Hermes Agent plugin manifest (+ __init__.py entry point)
+hermes_bridge/     Hermes plugin: MCP stdio client, tool registration, exported tools.json
+skills/            8 skill SKILL.md files (Claude Code and Hermes)
 agents/            Scenario designer agent
 src/
   io/              INI parser/writer, localization CSV, ZIP packager
   model/           ScenarioModel, LocalizationStore, component types
-  validation/      15 rules + orchestrator
+  validation/      Rules + orchestrator
     rules/         Individual validation rule implementations
   tools/           MCP tool implementations
+  story/           Storyline graph: outline, Mermaid, HTML
+  artwork/         ComfyUI (FLUX.2 [klein]) artwork generation
   resources/       Format documentation resources
   catalogs/        846-entry game content catalog
   diagnostics/     Bug report builder, session trace, ring buffer

@@ -1,0 +1,689 @@
+[
+  {
+    "name": "list_scenarios",
+    "description": "List all MoM scenarios in the Valkyrie editor directory",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "dir": {
+          "type": "string",
+          "description": "Custom editor directory (defaults to platform Valkyrie editor path)"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "create_scenario",
+    "description": "Create a new MoM scenario with default scaffold. Defaults to the Valkyrie editor directory.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Scenario name"
+        },
+        "dir": {
+          "type": "string",
+          "description": "Custom output directory (defaults to Valkyrie editor dir)"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "load_scenario",
+    "description": "Load an existing scenario from a directory",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "dir": {
+          "type": "string",
+          "description": "Path to scenario directory"
+        }
+      },
+      "required": [
+        "dir"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "get_scenario_state",
+    "description": "Get current scenario state summary",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "validate_scenario",
+    "description": "Run all validation rules on the current scenario",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "save_scenario",
+    "description": "Write the current scenario to its folder (INI files, localization, quest.ini) so Valkyrie's editor sees the changes. Edits made with the other tools stay in memory until save_scenario or build_scenario",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "build_scenario",
+    "description": "Save and build the .valkyrie package with the files Valkyrie's editor \"Create Package\" writes: <Package>.valkyrie, the <Package>.ini manifest (scenario list entry: quest settings, name, synopsis, description, authors, SHA-256 version) and the cover image. Without outputPath it goes where Valkyrie puts it: <Desktop>/<Package>/. Refuses when validate_scenario reports errors (they break the game in Valkyrie) unless force is true",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "outputPath": {
+          "type": "string",
+          "description": "A .valkyrie file path, or a folder to create <Package>/ in (default: the Desktop, like Valkyrie)"
+        },
+        "force": {
+          "type": "boolean",
+          "description": "Build even when validation reports errors"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "set_quest_config",
+    "description": "Set quest.ini [Quest] settings. format, type and packs are managed automatically on save.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "difficulty": {
+          "type": "number",
+          "description": "0.0 (easy) to 1.0 (hard)"
+        },
+        "lengthmin": {
+          "type": "integer",
+          "description": "Minimum play time in minutes"
+        },
+        "lengthmax": {
+          "type": "integer",
+          "description": "Maximum play time in minutes"
+        },
+        "minhero": {
+          "type": "integer",
+          "description": "Minimum investigators (1-5, Valkyrie default 2)"
+        },
+        "maxhero": {
+          "type": "integer",
+          "description": "Maximum investigators (1-5, Valkyrie default 5)"
+        },
+        "image": {
+          "type": "string",
+          "description": "Scenario cover image path, relative to the scenario folder"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "Hide the scenario from the scenario list"
+        },
+        "defaultmusicon": {
+          "type": "boolean",
+          "description": "Play default music"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_event",
+    "description": "Create or update an event component. IMPORTANT: buttons must be >= highest populated eventN index or Valkyrie will silently drop the excess event references on re-save. A hidden event (display=false) always follows button 1 — branch by listing several targets in event1 (\"EventA EventB\") with vartests on each target; the first whose tests pass runs. vartests and conditions must not both be set (conditions is ignored). remove also accepts #monsters #boardcomponents #shop #uicomponents #doors #tiles #qitems #tokens",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Event name (must start with \"Event\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_tile",
+    "description": "Create or update a tile component. Needs side (catalog TileSide) or customImage (image path relative to the scenario folder, optional top/left pixel anchor)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tile name (must start with \"Tile\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_token",
+    "description": "Create or update a token component. Optional: tokensize (small|medium|huge|massive|Original|<number>), clickeffect=false (decorative, not clickable), customImage (image path; replaces type), type may also be a catalog Monster ID to show that monster",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Token name (must start with \"Token\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_spawn",
+    "description": "Create or update a spawn component",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Spawn name (must start with \"Spawn\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_item",
+    "description": "Create or update a quest item component",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Item name (must start with \"QItem\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_puzzle",
+    "description": "Create or update a puzzle. A puzzle is an event: start it from a button (event1=PuzzleX), never add=. Fields: class (slide default, code, image, tower), skill ({observation}...), puzzlelevel (code: positions, image: columns, slide/tower: min moves), puzzlealtlevel (code: symbols 1..N, image: rows), puzzlesolution (code: \"3 6 1\"), image (image puzzle picture), buttons=1 + event1 (runs after solving). The window shows no text: tell the story in the event before it; <name>.button1 labels the finish button",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Puzzle name (must start with \"Puzzle\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_ui",
+    "description": "Create or update a UI overlay. With vunits=True, size is the height in screen heights and xposition/yposition offset from the screen CENTRE (0,0 = centred) unless halign/valign anchor to an edge. image: built-in (ImageCutsceneBG) or scenario file (img/X.jpg, see generate_artwork). Text: <name>.uitext; buttons=1 + event1 makes it clickable. Show with an event add=, remove later; add buttons last",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Ui name (must start with \"UI\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_custom_monster",
+    "description": "Create or update a custom monster. Fields: base (catalog Monster ID), health, healthperhero, horror, awareness, traits, image, imageplace, activation (MoM: ONE Event name, run every monster phase, e.g. activation=EventBossActivation with randomevents to pick moves/attacks; Descent-style: Activation component names without the prefix), evadeevent, horrorevent (Event names)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Custom_monster name (must start with \"CustomMonster\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_mplace",
+    "description": "Create or update a monster placement (MPlace). Fields: xposition, yposition, master, rotate, tokensize (small|medium|huge|massive|Original|<number>)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Mplace name (must start with \"MPlace\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "upsert_activation",
+    "description": "Create or update a custom monster activation. Fields: minionfirst, masterfirst; text goes in localization keys <name>.ability, <name>.minion, <name>.master, <name>.movebutton, <name>.move",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Activation name (must start with \"Activation\")"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Component field key-value pairs"
+        }
+      },
+      "required": [
+        "name",
+        "data"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "delete_component",
+    "description": "Delete a component and cascade-clean references",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Component name to delete"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "set_localization",
+    "description": "Set localization key-value pairs",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value pairs to set"
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "get_map_ascii",
+    "description": "Describe the board: each tile's area, its doors and where they lead (with a spot for an explore token), every token and the tile it sits on, and an ASCII sketch. Coordinates: x east, y north; a tile hangs east and south from its position, tokens are centred on theirs",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "render_map",
+    "description": "Render the board as an image exactly as Valkyrie lays it out: tile artwork (from Valkyrie's imported app data, schematic otherwise), tiles labelled A, B, …, tokens numbered and coloured by type (yellow explore, blue search, red interact, green investigators; red ring = not on a tile). Use it to check a layout before playing",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "outputPath": {
+          "type": "string",
+          "description": "Also save the PNG to this path"
+        },
+        "maxSize": {
+          "type": "integer",
+          "description": "Maximum width/height in pixels (default 1600)"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "story_graph",
+    "description": "Project the scenario's storyline as a graph: what each button, trigger, placed token, item inspection and monster event leads to. format=outline (default) is a condensed text tree: one line per event with its first words, conditions (if ...), effects (variables, +placed/−removed) and END; straight chains stay on one level, decisions indent, repeats point back (↩), and endings and never-reached events are listed. format=mermaid gives a flowchart definition. outputPath (.html) writes a page with the rendered chart and the outline for people. Use it to review or explain the plot, and to find dead ends and loops",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "outline",
+            "mermaid"
+          ],
+          "description": "outline (default) or mermaid"
+        },
+        "root": {
+          "type": "string",
+          "description": "Only the part of the story that follows this component (e.g. EventScream)"
+        },
+        "maxDepth": {
+          "type": "integer",
+          "description": "Stop expanding below this depth (default 30)"
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "Also write the result: .html (chart + outline page), .mmd/.md (Mermaid) or .txt (outline)"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "artwork_status",
+    "description": "Check whether a local ComfyUI server with FLUX.2 [klein] 4B is ready for generate_artwork, and how to set up what is missing (comfy-cli install, launch and model downloads)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "comfyUrl": {
+          "type": "string",
+          "description": "ComfyUI address (default http://127.0.0.1:8188, or VALKYRIE_COMFYUI_URL)"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "generate_artwork",
+    "description": "Generate scenario artwork with FLUX.2 [klein] 4B on a local ComfyUI (4 steps, CFG 1, euler) and save it into the scenario folder. Presets: cover/intro 896x896 (quest.ini image, intro cutscene), handout 768x1024 (letters, parchments, photos), scene 1024x768 (pictures during play), monster 768x768 (CustomMonster image), token 512x512 (Token customImage). Describe the subject only; a house style is appended so all pictures match. The first image of a session also loads the model (minutes); later ones take ~30 s. Reference the returned path from ui image=, customImage= etc.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "What the picture shows (subject, setting, mood)"
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "File to write, relative to the loaded scenario folder (e.g. \"img/Letter.jpg\") or absolute. .jpg keeps packages small; .png is lossless"
+        },
+        "preset": {
+          "type": "string",
+          "enum": [
+            "cover",
+            "intro",
+            "handout",
+            "scene",
+            "monster",
+            "token"
+          ],
+          "description": "Image size for the intended use (default scene)"
+        },
+        "width": {
+          "type": "integer",
+          "description": "Override the preset width (rounded to 16)"
+        },
+        "height": {
+          "type": "integer",
+          "description": "Override the preset height (rounded to 16)"
+        },
+        "seed": {
+          "type": "integer",
+          "description": "Fixed seed to reproduce or vary an image (random by default)"
+        },
+        "steps": {
+          "type": "integer",
+          "description": "Sampling steps (default 4 for the distilled model, 20 for base)"
+        },
+        "style": {
+          "type": "string",
+          "description": "Replaces the default style suffix; \"\" for none"
+        },
+        "comfyUrl": {
+          "type": "string",
+          "description": "ComfyUI address (default http://127.0.0.1:8188)"
+        }
+      },
+      "required": [
+        "prompt",
+        "outputPath"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "suggest_tile_layout",
+    "description": "Suggest anchor coordinates for large (7x7) tiles placed edge to edge. For real tiles, prefer place_tile_relative, which also lines up doors and handles small (7x3.5) tiles",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "Number of tiles"
+        },
+        "style": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "l_shape",
+            "hub_spoke"
+          ],
+          "description": "Layout style"
+        }
+      },
+      "required": [
+        "count",
+        "style"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "place_tile_relative",
+    "description": "Find xposition, yposition and rotation for a new tile so it sits against an existing tile with a door lined up. Returns the best candidates first; each lists the passages (door stretches) connecting the two tiles and any tiles it would overlap",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "existingTile": {
+          "type": "string",
+          "description": "Name of the existing tile component, e.g. TileHall"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "north",
+            "south",
+            "east",
+            "west"
+          ],
+          "description": "Side of the existing tile to attach to"
+        },
+        "side": {
+          "type": "string",
+          "description": "TileSide ID of the new tile, e.g. TileSideLibrary"
+        },
+        "rotation": {
+          "type": "number",
+          "description": "Force a rotation (0, 90, 180, 270); by default all are tried"
+        }
+      },
+      "required": [
+        "existingTile",
+        "direction",
+        "side"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "search_game_content",
+    "description": "Search game content catalogs (monsters, tiles, audio, etc.)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Search query"
+        },
+        "type": {
+          "type": "string",
+          "description": "Filter by type"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "export_bug_report",
+    "description": "Generate a ZIP bug report bundle with session trace, scenario files, and validation results",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "outputDir": {
+          "type": "string",
+          "description": "Directory to write the ZIP to (defaults to OS temp dir)"
+        },
+        "includeScenario": {
+          "type": "boolean",
+          "description": "Include scenario INI files (default true)"
+        },
+        "includeValkyrieLog": {
+          "type": "boolean",
+          "description": "Include Valkyrie Player.log (default true)"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  }
+]
