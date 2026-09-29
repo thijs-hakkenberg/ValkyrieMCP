@@ -4635,7 +4635,74 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideDiningCar2: { desc: "Dining car kitchen with checkered tile floor and cooking station", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideDiningCar2: {
+    desc: "Train dining-car corridor with patterned carpet and a serving trolley, wrapped around a galley kitchen with a cast-iron range, dish sink, ice box, apple crate and barrel",
+    roomTypes: [
+      "kitchen",
+      "hallway"
+    ],
+    tags: [
+      "indoor",
+      "train",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "dining car corridor",
+        outline: [[0, 0], [7, 0], [7, 3.5], [5.4, 3.5], [5.35, 1.4], [1.7, 1.4], [1.65, 3.5], [0, 3.5]],
+        anchor: [0.98, 0.98],
+        spots: [[5.98, 0.98], [0.83, 2.38]],
+        links: [
+          { to: "s2", via: "door" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "galley kitchen",
+        outline: [[1.7, 1.4], [5.35, 1.4], [5.4, 3.5], [1.65, 3.5]],
+        anchor: [4.73, 2.38],
+        links: [
+          { to: "s1", via: "door" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "table", label: "serving trolley with plates and bottles", space: "s1", at: [4.35, 0.62], box: [3.88, 0.27, 4.85, 1.02], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "furnace", label: "cast-iron cooking range", space: "s2", at: [2.95, 1.8], box: [2.4, 1.5, 3.54, 2.13], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "sink", label: "dish sink with stacked plates", space: "s2", at: [4.1, 1.8], box: [3.52, 1.5, 4.71, 2.12], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "cabinet", label: "small cupboard with dishes", space: "s2", at: [2.12, 1.8], box: [1.87, 1.5, 2.37, 2.1], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "crate", label: "crate of red apples", space: "s2", at: [2.28, 2.42], box: [2.04, 2.21, 2.52, 2.62], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "table", label: "wooden prep table with plates and knife", space: "s2", at: [2.88, 2.99], box: [2.13, 2.75, 3.62, 3.23], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "cabinet", label: "ice box", space: "s2", at: [4.1, 2.9], box: [3.62, 2.56, 4.57, 3.27], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "barrel", label: "barrel of green apples", space: "s2", at: [4.86, 3], box: [4.62, 2.71, 5.1, 3.27], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "sack", label: "burlap sack", space: "s2", at: [4.83, 1.8], box: [4.65, 1.56, 5.02, 2.06], affords: [
+          "search"
+        ] }
+    ]
+  },
   TileSideDiningRoomMAD27: {
     desc: "An elegant dining room with five round tables set for dinner on a herringbone brick floor, flanked by sideboard cabinets stocked with dishes.",
     roomTypes: [
@@ -4870,7 +4937,61 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideFreightCar1: { desc: "Dark wooden freight car interior with crates and machinery", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideFreightCar1: {
+    desc: "Dim plank-floored freight car with sliding cargo doors, crates and barrels stacked in one corner and a toppled animal cage beside an open box at the other end",
+    roomTypes: [
+      "storage"
+    ],
+    tags: [
+      "indoor",
+      "train",
+      "dark",
+      "shabby"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "freight car west",
+        outline: [[0, 0], [4.4, 0], [4.4, 3.5], [0, 3.5]],
+        anchor: [2.73, 1.88],
+        spots: [[1.38, 2.43], [3.53, 0.73]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "freight car east",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [4.4, 3.5]],
+        anchor: [5.33, 0.93],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "crate", label: "stacked wooden crates", space: "s1", at: [0.85, 0.9], box: [0.4, 0.35, 1.35, 1.45], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "barrel", label: "barrels", space: "s1", at: [1.5, 0.8], box: [1.12, 0.35, 1.82, 1.25], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "cage", label: "toppled animal cage", space: "s2", at: [5.75, 2.6], box: [5.1, 1.85, 6.5, 3.25], affords: [
+          "search", "interact"
+        ] },
+      { id: "f4", kind: "crate", label: "open cardboard box", space: "s2", at: [5.05, 2.84], box: [4.7, 2.62, 5.4, 3.06], affords: [
+          "search"
+        ] }
+    ]
+  },
   TileSideFreightCar2: {
     desc: "The interior of a freight car packed with roped crates and canvas-wrapped cargo bundles, split by a shaft of light leaking through the wall.",
     roomTypes: [
@@ -4960,7 +5081,103 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideLifeBoat: { desc: "Wooden lifeboat with ropes and nautical equipment on water", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideLifeBoat: {
+    desc: "Wooden lifeboat adrift on open sea, its thwarts strewn with oars, rope, an anchor, bottles, a bucket and two red life rings",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "water",
+      "ship",
+      "desperate"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "open sea (off boat, west)",
+        outline: [[0, 0], [3.1, 0], [3.1, 0.25], [2.05, 0.35], [1.1, 0.7], [0.35, 1.35], [0.15, 1.85], [0.3, 2.2], [0.55, 2.45], [1.55, 3.1], [2.7, 3.3], [3.95, 3.3], [3.95, 3.5], [0, 3.5]],
+        anchor: [0.53, 0.53],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "open sea (off boat, east)",
+        outline: [[3.1, 0], [7, 0], [7, 3.5], [3.95, 3.5], [3.95, 3.3], [5.05, 3.2], [6.05, 2.85], [6.8, 2.1], [6.9, 1.7], [6.5, 1.1], [5.75, 0.65], [4.45, 0.3], [3.1, 0.25]],
+        anchor: [6.43, 0.53],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "lifeboat west half",
+        outline: [[2.9, 0.25], [3.1, 0.25], [3.1, 1.4], [3.8, 2.1], [3.95, 2.15], [3.95, 3.3], [2.7, 3.3], [1.55, 3.1], [1, 2.8], [0.3, 2.2], [0.15, 1.75], [0.35, 1.35], [0.75, 0.95], [1.1, 0.7], [1.85, 0.4]],
+        anchor: [2.38, 0.98],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "lifeboat east half",
+        outline: [[3.1, 0.25], [4.45, 0.3], [5.75, 0.65], [6.3, 0.95], [6.7, 1.3], [6.85, 1.55], [6.9, 1.9], [6.65, 2.3], [6.05, 2.85], [5.05, 3.2], [3.95, 3.3], [3.95, 2.15], [3.8, 2.1], [3.1, 1.4]],
+        anchor: [4.38, 1.43],
+        links: [
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "boat", label: "wooden lifeboat", space: "s4", at: [3.5, 0.5] },
+      { id: "f2", kind: "water", label: "open sea", space: "s2", at: [6.7, 3.2] },
+      { id: "f3", kind: "other", label: "bundle of oars", space: "s3", at: [2.9, 2.45], box: [1.9, 2.1, 3.95, 2.95], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "other", label: "red life ring", space: "s3", at: [1.71, 2.77], box: [1.48, 2.62, 1.94, 2.92], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "other", label: "red life ring", space: "s4", at: [5.15, 2.23], box: [4.96, 2.02, 5.33, 2.44], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "coiled rope", space: "s4", at: [6.2, 1.67], box: [5.96, 1.35, 6.44, 1.98], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "other", label: "small anchor with rope", space: "s3", at: [1, 1.75], box: [0.75, 1.55, 1.4, 1.95], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "other", label: "green bottles", space: "s3", at: [1.85, 1.5], box: [1.7, 1.25, 2, 1.8], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "other", label: "wooden bucket", space: "s4", at: [5.8, 1.08], box: [5.63, 0.92, 5.98, 1.25], affords: [
+          "search"
+        ] }
+    ]
+  },
   TileSideLoungeCar: {
     desc: "An ornate train lounge car: velvet armchairs and side tables on one side of a light rug border, a row of stools, a writing desk with correspondence, and a chess set on the other.",
     roomTypes: [
@@ -5020,8 +5237,119 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideMedicalOffice: { desc: "Medical office with tiled floor, exam table, and cabinets", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideObservationCar: { desc: "Open observation car with wooden bench and railing at rear of train", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideMedicalOffice: {
+    desc: "Tiled medical office with a blood-stained reclining surgical chair, a long instrument table, a metal cabinet with a bone saw, a bucket of bloody remains and cabinets of specimen jars",
+    roomTypes: [
+      "office",
+      "laboratory"
+    ],
+    tags: [
+      "indoor",
+      "medical",
+      "grim",
+      "bloody"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "office west",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.95], [3.5, 1.75], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.73, 1.58],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "surgery east",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 1.75], [2.65, 0.95]],
+        anchor: [3.78, 1.48],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "cabinet", label: "metal instrument cabinet with bone saw", space: "s2", at: [3.12, 0.64], box: [2.48, 0.23, 3.75, 1.04], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "chair", label: "stool", space: "s2", at: [4.46, 0.58], box: [4.29, 0.37, 4.63, 0.79] },
+      { id: "f3", kind: "operating_table", label: "blood-stained reclining surgical chair", space: "s2", at: [4.92, 1.2], box: [4.27, 0.65, 5.58, 1.75], affords: [
+          "interact", "search"
+        ] },
+      { id: "f4", kind: "other", label: "bucket of bloody remains", space: "s2", at: [5.73, 1.81], box: [5.54, 1.6, 5.92, 2.02], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "table", label: "long table of surgical instruments", space: "s2", at: [4.47, 2.27], box: [3.04, 2, 5.9, 2.54], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "cabinet", label: "glass case of specimen jars", space: "s2", at: [6.35, 1.68], box: [6.17, 0.27, 6.52, 3.08], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "shelf", label: "low shelf of jars and bottles", space: "s2", at: [3.95, 3.08], box: [1.38, 2.92, 6.52, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "cabinet", label: "glass-front cupboard", space: "s1", at: [0.54, 0.69], box: [0.25, 0.25, 0.83, 1.13], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "bookcase", label: "glass-front bookcase", space: "s1", at: [0.54, 2.81], box: [0.23, 2.4, 0.85, 3.23], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideObservationCar: {
+    desc: "Open-air observation car with a plank floor between iron side railings, a long back-to-back wooden bench down the middle and an open wooden crate",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "train"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "observation deck west",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.2], [2.8, 1.5], [3.2, 1.85], [3.5, 2.3], [3.5, 3.5], [0, 3.5]],
+        anchor: [0.83, 1.13],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "observation deck east",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.3], [3.2, 1.85], [2.7, 1.35]],
+        anchor: [6.43, 2.48],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bench", label: "long back-to-back wooden bench", space: "s2", at: [3.98, 1.57], box: [1.73, 0.98, 6.23, 2.17] },
+      { id: "f2", kind: "crate", label: "open wooden crate", space: "s1", at: [1.01, 2.44], box: [0.37, 1.96, 1.65, 2.92], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "fence", label: "iron side railing (north)", space: "s2", at: [3.6, 0.22], box: [0.45, 0.1, 6.8, 0.35] },
+      { id: "f4", kind: "fence", label: "iron side railing (south)", space: "s2", at: [3.6, 3.2], box: [0.45, 3.05, 6.8, 3.32] }
+    ]
+  },
   TileSidePassengerCar1: {
     desc: "Opulent train parlor car with tufted armchairs around a richly patterned rug, a card table, a drinks cabinet and a built-in wall cabinet.",
     roomTypes: [
@@ -5239,7 +5567,101 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideProw: { desc: "Ship prow deck with raised platform and railing over water", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideProw: {
+    desc: "Ship's prow deck behind a curved railing with life rings, a raised scalloped bandstand with four bentwood chairs and music stands, and two wicker deck chairs with red blankets beside a round drinks table",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "ship",
+      "water",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "open sea (off deck, west)",
+        outline: [[0, 0], [3.5, 0], [3.5, 0.3], [3.2, 0.3], [2.3, 0.6], [1.3, 1.3], [0.7, 2.3], [0.45, 3.25], [0.3, 3.55], [0.1, 3.7], [0, 3.7]],
+        anchor: [0.78, 0.78],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "open sea (off deck, east)",
+        outline: [[3.5, 0], [7, 0], [7, 3.7], [6.65, 3.4], [6.15, 1.9], [5.65, 1.15], [5.1, 0.7], [3.9, 0.3], [3.5, 0.3]],
+        anchor: [6.23, 0.78],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "prow deck west",
+        outline: [[3.2, 0.3], [3.5, 0.3], [3.5, 7], [0, 7], [0, 3.7], [0.3, 3.55], [0.7, 2.3], [1.3, 1.3], [2, 0.75]],
+        anchor: [1.43, 5.58],
+        spots: [[2.68, 4.93], [2.63, 6.33]],
+        links: [
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "prow deck east",
+        outline: [[3.5, 0.3], [3.9, 0.3], [5.1, 0.7], [5.65, 1.15], [6.15, 1.9], [6.6, 3.3], [6.75, 3.55], [7, 3.7], [7, 7], [3.5, 7]],
+        anchor: [6.33, 4.43],
+        links: [
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "fence", label: "curved ship's railing", space: "s1", at: [1.2, 1.3] },
+      { id: "f2", kind: "water", label: "open sea beyond the railing", space: "s1", at: [0.4, 0.8] },
+      { id: "f3", kind: "other", label: "red life ring", space: "s1", at: [1.76, 0.76], box: [1.56, 0.54, 1.96, 0.98], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "other", label: "red life ring", space: "s2", at: [5.29, 0.76], box: [5.08, 0.54, 5.5, 0.98], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "other", label: "raised scalloped bandstand platform", space: "s4", at: [3.5, 2.8], box: [1.05, 1.35, 5.95, 4.2] },
+      { id: "f6", kind: "chair", label: "bentwood chairs", space: "s3", at: [2.8, 1.95], box: [2.37, 1.23, 3.21, 2.65] },
+      { id: "f7", kind: "chair", label: "bentwood chairs", space: "s4", at: [4.43, 2.03], box: [4.06, 1.33, 4.81, 2.73] },
+      { id: "f8", kind: "papers", label: "music stands with sheet music", space: "s3", at: [3, 2.37], box: [2.71, 1.73, 3.29, 3.02], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "papers", label: "music stands with sheet music", space: "s4", at: [3.99, 2.3], box: [3.81, 1.73, 4.17, 2.87], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "sofa", label: "wicker deck chair with red blanket", space: "s4", at: [3.85, 5.79], box: [3.46, 4.79, 4.25, 6.79], affords: [
+          "search", "hide"
+        ] },
+      { id: "f11", kind: "sofa", label: "wicker deck chair with red blanket", space: "s4", at: [5.07, 5.44], box: [4.44, 4.44, 5.71, 6.44], affords: [
+          "search", "hide"
+        ] },
+      { id: "f12", kind: "table", label: "round side table with drinks", space: "s4", at: [6, 5.51], box: [5.63, 5.15, 6.38, 5.88], affords: [
+          "search"
+        ] }
+    ]
+  },
   TileSideShipDeck1: {
     desc: "Wooden ship deck at the curved bow rail, piled with cargo crates and barrels under a large black tarpaulin tied down with ropes, open sea beyond the railing",
     roomTypes: [
@@ -5328,15 +5750,664 @@ export const TILE_CONTENT: Record<string, TileContent> = {
       { id: "f13", kind: "water", label: "open sea beyond the rail", space: "s3", at: [5.8, 0.8], box: [4.3, 0.1, 6.95, 3.4] }
     ]
   },
-  TileSideShipDeck2: { desc: "Open ship deck with curved railing and scattered crates", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideShipDeck3: { desc: "Open wooden ship deck with shuffleboard courts and railing", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideShipDeck4: { desc: "Wooden ship deck with central buffet table and seating", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideShipDeck5: { desc: "Ship deck with lounge chairs and scattered reading materials", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideShipDeck6: { desc: "Ship deck with small dining tables, chairs, and potted plants", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideSleeperCar: { desc: "Train sleeper car with two private cabins and ornate carpet", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideSpa: { desc: "Tiled spa room with soaking pool and bath supplies", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideStation: { desc: "Train station interior with ticket counter, benches, and cargo area", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideStorageHold: { desc: "Cluttered ship storage hold packed with crates and luggage", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideShipDeck2: {
+    desc: "Plank ship deck curving along a steel railing above the open sea, with an open steamer trunk spilling clothes, a bowler hat and two red hatboxes",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "ship",
+      "water"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "open sea (off deck)",
+        outline: [[0, 0], [3.65, 0.05], [3, 0.8], [1.95, 1.5], [1.1, 2.25], [1.1, 2.35], [0.6, 2.9], [0.4, 3.5], [0, 3.5]],
+        anchor: [1.08, 1.08],
+        links: [],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "deck west",
+        outline: [[3.65, 0], [4.4, 0], [4.4, 0.7], [4.2, 1.05], [3.75, 1.25], [3.2, 1.3], [2.7, 1.7], [2.65, 3.5], [0.4, 3.5], [0.6, 2.9], [1.1, 2.35], [1.1, 2.25], [1.95, 1.5], [3, 0.8]],
+        anchor: [1.73, 2.63],
+        links: [
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "deck east",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.7, 1.7], [3.2, 1.3], [3.75, 1.25], [4.2, 1.05], [4.4, 0.7]],
+        anchor: [3.78, 2.33],
+        spots: [[5.18, 2.53]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "fence", label: "curved ship's railing", space: "s1", at: [1.6, 1.6] },
+      { id: "f2", kind: "water", label: "open sea beyond the railing", space: "s1", at: [0.5, 0.5] },
+      { id: "f3", kind: "chest", label: "open steamer trunk", space: "s3", at: [5.26, 0.81], box: [4.73, 0.25, 5.79, 1.37], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "other", label: "spilled clothes", space: "s3", at: [5.6, 1.1], box: [4.13, 0.37, 6.1, 1.6], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "other", label: "bowler hat", space: "s3", at: [4.38, 1.43] },
+      { id: "f6", kind: "other", label: "red hatboxes", space: "s3", at: [4.84, 1.44], box: [4.63, 1.13, 5.04, 1.75], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideShipDeck3: {
+    desc: "Open plank ship deck with a red shuffleboard court painted across it, two shuffleboard discs and a cue lying on the boards",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "ship",
+      "leisure"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "deck west",
+        outline: [[0, 0], [3.5, 0], [3.55, 1.3], [4.35, 2.25], [4.4, 3.5], [0, 3.5]],
+        anchor: [0.68, 0.68],
+        spots: [[0.63, 2.78]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "deck east",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.35, 2.25], [3.55, 1.3]],
+        anchor: [6.33, 0.68],
+        spots: [[6.38, 2.83]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "other", label: "painted shuffleboard court", space: "s1", at: [3.5, 1.8], box: [0.85, 1.17, 6.2, 2.45] },
+      { id: "f2", kind: "other", label: "shuffleboard discs", space: "s1", at: [2.85, 0.77], box: [2.55, 0.58, 3.13, 0.97], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "other", label: "shuffleboard cue", space: "s2", at: [4.97, 2.76], box: [4.56, 2.5, 5.37, 3.02], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideShipDeck4: {
+    desc: "Plank ship deck with an open-air U-shaped bar crowded with bottles, a cash register and a potted plant, bar stools around it and sacks, crates of wine and apples, a barrel and plates stored inside",
+    roomTypes: [
+      "lounge"
+    ],
+    tags: [
+      "outdoor",
+      "ship",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "deck west",
+        outline: [[0, 0], [3.5, 0], [3.5, 0.9], [3, 1.4], [2.9, 1.4], [2.65, 1.75], [2.65, 3.5], [0, 3.5]],
+        anchor: [1.28, 1.83],
+        spots: [[2.08, 0.68]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "deck bar",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 1.75], [2.8, 1.5], [3.5, 0.9]],
+        anchor: [6.48, 0.53],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "counter", label: "U-shaped bar counter with bottles", space: "s2", at: [4.65, 1.1], box: [2.85, 0.94, 6.44, 3.13], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "chair", label: "bar stool", space: "s2", at: [3.88, 0.56], box: [3.71, 0.37, 4.06, 0.75] },
+      { id: "f3", kind: "chair", label: "bar stool", space: "s2", at: [4.81, 0.58], box: [4.62, 0.4, 5, 0.77] },
+      { id: "f4", kind: "chair", label: "bar stool", space: "s2", at: [5.57, 0.61], box: [5.37, 0.42, 5.77, 0.81] },
+      { id: "f5", kind: "chair", label: "bar stool", space: "s1", at: [2.4, 1.35], box: [2.2, 1.15, 2.6, 1.55] },
+      { id: "f6", kind: "chair", label: "bar stool", space: "s1", at: [2.42, 2.7], box: [2.25, 2.54, 2.6, 2.87] },
+      { id: "f7", kind: "other", label: "cash register", space: "s2", at: [4.88, 1.11], box: [4.6, 0.85, 5.17, 1.37], affords: [
+          "interact", "search"
+        ] },
+      { id: "f8", kind: "plant", label: "potted plant", space: "s2", at: [3.58, 1.12], box: [3.37, 0.87, 3.79, 1.37] },
+      { id: "f9", kind: "sack", label: "sacks of provisions", space: "s2", at: [3.94, 1.66], box: [3.4, 1.44, 4.48, 1.88], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "crate", label: "crate of wine bottles", space: "s2", at: [3.81, 2.25], box: [3.54, 1.92, 4.08, 2.58], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "crate", label: "crate of red apples", space: "s2", at: [4.9, 1.93], box: [4.58, 1.62, 5.23, 2.25], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "barrel", space: "s2", at: [5.57, 1.77], box: [5.27, 1.52, 5.88, 2.02], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "other", label: "stacks of plates", space: "s2", at: [5.59, 2.3], box: [5.35, 2.04, 5.83, 2.56] }
+    ]
+  },
+  TileSideShipDeck5: {
+    desc: "Plank ship deck lined with four wicker steamer chairs, one torn apart with a bloodied body slumped on it, with newspapers, a bowler hat and scattered pages around them",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "ship",
+      "grim"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "deck west",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.6], [2.8, 0.75], [3.35, 0.95], [3.65, 1.2], [3.7, 2.5], [3.9, 2.7], [4.35, 2.8], [4.4, 3.5], [0, 3.5]],
+        anchor: [0.73, 0.73],
+        spots: [[2.13, 0.73]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "deck east",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.35, 2.8], [3.9, 2.7], [3.7, 2.5], [3.65, 1.2], [3.35, 0.95], [3.1, 0.9], [2.65, 0.6]],
+        anchor: [6.33, 0.58],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "sofa", label: "wicker deck chair", space: "s1", at: [1.49, 2.1], box: [1.1, 1.06, 1.88, 3.13], affords: [
+          "search", "hide"
+        ] },
+      { id: "f2", kind: "papers", label: "newspaper", space: "s1", at: [1.45, 1.49], box: [1.23, 1.27, 1.67, 1.71], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "other", label: "bowler hat", space: "s1", at: [1.52, 1.92] },
+      { id: "f4", kind: "sofa", label: "wicker deck chair", space: "s1", at: [3.15, 2.1], box: [2.75, 1.1, 3.54, 3.1], affords: [
+          "search", "hide"
+        ] },
+      { id: "f5", kind: "sofa", label: "torn wicker deck chair", space: "s2", at: [4.4, 1.9], box: [3.77, 0.77, 5.04, 2.81], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "body", label: "bloodied body slumped on the torn chair", space: "s2", at: [4.4, 1.37], box: [4.21, 0.98, 4.6, 1.75], affords: [
+          "search", "interact"
+        ] },
+      { id: "f7", kind: "papers", label: "scattered newspaper pages", space: "s2", at: [4.86, 0.66], box: [4.6, 0.42, 5.12, 0.9], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "sofa", label: "wicker deck chair", space: "s2", at: [5.9, 2.06], box: [5.52, 1.04, 6.29, 3.08], affords: [
+          "search", "hide"
+        ] },
+      { id: "f9", kind: "papers", label: "rolled newspaper", space: "s2", at: [5.97, 2.05], box: [5.83, 1.88, 6.12, 2.23], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideShipDeck6: {
+    desc: "Wooden ship deck with four round marble café tables, each set with two wrought-iron chairs, and a large potted flowering plant",
+    roomTypes: [
+      "dining",
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "ship",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west deck",
+        outline: [[0, 0], [4.4, 0], [4.4, 0.75], [4.1, 1.2], [3.95, 1.2], [3.6, 1.45], [3.4, 2.15], [2.75, 2.55], [2.65, 2.8], [2.65, 3.5], [0, 3.5]],
+        anchor: [0.93, 0.93],
+        spots: [[3.68, 0.68], [2.28, 2.23]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east deck",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 2.8], [2.75, 2.55], [3.35, 2.2], [3.5, 2], [3.6, 1.45], [3.75, 1.3], [4.1, 1.2], [4.3, 1], [4.4, 0.75]],
+        anchor: [5.18, 2.08],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "table", label: "round marble café table with two chairs", space: "s1", at: [2.73, 1.2], box: [2.3, 0.75, 3.15, 1.63], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "table", label: "round marble café table with flower vase", space: "s1", at: [1.2, 2.47], box: [0.75, 2.03, 1.63, 2.9], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "table", label: "round marble café table with fruit bowl", space: "s2", at: [4.18, 2.5], box: [3.75, 2.05, 4.62, 2.93], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "table", label: "round marble café table with potted plant", space: "s2", at: [5.78, 1.2], box: [5.35, 0.77, 6.22, 1.65], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "chair", label: "wrought-iron café chair", space: "s1", at: [1.95, 1.3], box: [1.7, 1, 2.25, 1.58] },
+      { id: "f6", kind: "chair", label: "wrought-iron café chair", space: "s1", at: [0.5, 2.6], box: [0.12, 2.3, 0.8, 2.85] },
+      { id: "f7", kind: "chair", label: "wrought-iron café chair", space: "s2", at: [5.05, 1.25], box: [4.85, 1, 5.35, 1.5] },
+      { id: "f8", kind: "chair", label: "wrought-iron café chair", space: "s2", at: [3.5, 2.6], box: [3.35, 2.35, 3.75, 2.85] },
+      { id: "f9", kind: "plant", label: "large potted flowering plant", space: "s2", at: [6.2, 2.6], box: [5.75, 2.1, 6.6, 2.97], affords: [
+          "search", "hide"
+        ] }
+    ]
+  },
+  TileSideSleeperCar: {
+    desc: "Railway sleeper car: a carpeted corridor along two private compartments, one with a made-up berth and a red chair, the other with a wooden bench seat, a red chair and a plaid suitcase",
+    roomTypes: [
+      "bedroom",
+      "hallway"
+    ],
+    tags: [
+      "indoor",
+      "train",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "corridor",
+        outline: [[0, 0], [7, 0], [7, 3.5], [5.65, 3.5], [5.6, 1.4], [1.4, 1.4], [1.35, 3.5], [0, 3.5]],
+        anchor: [0.88, 0.88],
+        spots: [[6.03, 0.88], [2.28, 0.68]],
+        links: [
+          { to: "s2", via: "door" },
+          { to: "s3", via: "door" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "west compartment",
+        outline: [[1.4, 1.4], [3.5, 1.4], [3.5, 3.5], [1.35, 3.5]],
+        anchor: [2.83, 2.03],
+        links: [
+          { to: "s1", via: "door" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "east compartment",
+        outline: [[3.5, 1.4], [5.6, 1.4], [5.65, 3.5], [3.5, 3.5]],
+        anchor: [3.98, 1.88],
+        links: [
+          { to: "s1", via: "door" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bed", label: "berth with white sheets", space: "s2", at: [2.45, 2.95], box: [1.55, 2.65, 3.35, 3.25], affords: [
+          "search", "hide"
+        ] },
+      { id: "f2", kind: "armchair", label: "red upholstered chair", space: "s2", at: [1.95, 2.2], box: [1.65, 1.95, 2.25, 2.47] },
+      { id: "f3", kind: "bench", label: "wooden berth bench", space: "s3", at: [4.55, 3], box: [3.65, 2.7, 5.5, 3.3], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "chest", label: "red plaid suitcase", space: "s3", at: [4.3, 2.45], box: [4.08, 2.2, 4.5, 2.72], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "armchair", label: "red upholstered chair", space: "s3", at: [5.1, 1.95], box: [4.8, 1.7, 5.37, 2.2] },
+      { id: "f6", kind: "shelf", label: "brass luggage rack", space: "s1", at: [0.9, 3.15], box: [0.55, 3.03, 1.25, 3.28], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "papers", label: "open book on a wall shelf by a side door", space: "s1", at: [5.82, 2.55], box: [5.73, 2.23, 5.95, 2.83], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "rug", label: "patterned runner carpet", space: "s1", at: [3.5, 0.85], box: [0.7, 0.45, 6.3, 1.25] }
+    ]
+  },
+  TileSideSpa: {
+    desc: "Tiled bathhouse spa with a leather massage table, a marble counter piled with towels, a corner washbasin and an octagonal plunge pool lined with brass handrails",
+    roomTypes: [
+      "bathroom"
+    ],
+    tags: [
+      "indoor",
+      "water",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "massage room",
+        outline: [[0, 0], [3.5, 0], [3.5, 3.5], [0, 3.5]],
+        anchor: [0.78, 1.68],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "plunge pool",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [3.5, 3.5]],
+        anchor: [4.78, 1.78],
+        spots: [[6.13, 1.38]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "operating_table", label: "leather massage table", space: "s1", at: [2.65, 1.75], box: [2.05, 1.2, 3.5, 2.3], affords: [
+          "search", "interact"
+        ] },
+      { id: "f2", kind: "counter", label: "marble counter with folded towels", space: "s1", at: [1.55, 0.5], box: [0.45, 0.28, 2.65, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "sink", label: "corner washbasin", space: "s1", at: [0.9, 2.95], box: [0.55, 2.45, 1.4, 3.25], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "crate", label: "wooden tray with towels and a newspaper", space: "s1", at: [2, 2.95], box: [1.55, 2.72, 2.45, 3.22], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "papers", label: "newspaper", space: "s1", at: [2.25, 2.9], box: [2.1, 2.72, 2.45, 3.08], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "pile of towels on the floor", space: "s1", at: [3, 1.1], box: [2.75, 0.85, 3.2, 1.35], affords: [
+          "search", "hide"
+        ] },
+      { id: "f7", kind: "water", label: "octagonal plunge pool", space: "s2", at: [4.95, 1.75], box: [4, 0.92, 5.9, 2.65], affords: [
+          "interact"
+        ] },
+      { id: "f8", kind: "stairs_down", label: "step down into the pool", space: "s2", at: [4.1, 1.75], box: [3.98, 1.32, 4.22, 2.2], affords: [
+          "climb"
+        ] },
+      { id: "f9", kind: "fence", label: "brass handrail along the north wall", space: "s2", at: [4.85, 0.45], box: [3.4, 0.33, 6.28, 0.55] },
+      { id: "f10", kind: "fence", label: "brass handrail along the south wall", space: "s2", at: [4.85, 3.1], box: [3.4, 2.98, 6.28, 3.2] }
+    ]
+  },
+  TileSideStation: {
+    desc: "Railway station: a wooden waiting room with long benches, luggage and a timetable board, a corner ticket office with a counter and ticket machine, and a dark platform with back-to-back benches",
+    roomTypes: [
+      "foyer",
+      "office",
+      "street"
+    ],
+    tags: [
+      "indoor",
+      "outdoor",
+      "train",
+      "dark"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "waiting room west",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.35], [4.4, 2.2], [4.4, 3.65], [0, 3.65]],
+        anchor: [2.18, 1.93],
+        spots: [[1.53, 0.63]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s5", via: "door" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "waiting room east",
+        outline: [[2.65, 0], [7, 0], [7, 2.15], [5.7, 2.15], [4.5, 3.4], [4.4, 3.4], [4.4, 2.2], [2.65, 1.35]],
+        anchor: [5.38, 1.68],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "door" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "ticket office",
+        outline: [[5.7, 2.15], [7, 2.15], [7, 3.6], [5.6, 4.95], [4.7, 4], [4.4, 3.8], [4.4, 3.45]],
+        anchor: [5.43, 3.08],
+        links: [
+          { to: "s2", via: "door" }
+        ],
+        openings: []
+      },
+      {
+        id: "s4",
+        label: "platform east",
+        outline: [[6.95, 3.6], [7, 7], [4.4, 7], [4.35, 6], [4.15, 5.75], [3.7, 5.55], [3.55, 5.35], [3.5, 3.65], [4.4, 3.65], [4.4, 3.8], [5.65, 4.95]],
+        anchor: [5.08, 5.53],
+        spots: [[6.28, 6.28], [4.13, 4.43]],
+        links: [
+          { to: "s5", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s5",
+        label: "platform west",
+        outline: [[0, 3.65], [3.5, 3.65], [3.55, 5.35], [3.7, 5.55], [4.15, 5.75], [4.35, 6], [4.4, 7], [0, 7]],
+        anchor: [0.78, 5.53],
+        spots: [[3.53, 6.13]],
+        links: [
+          { to: "s1", via: "door" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bench", label: "long bench along the west wall", space: "s1", at: [0.67, 1.92], box: [0.37, 0.65, 0.98, 3.2] },
+      { id: "f2", kind: "chest", label: "brown leather suitcase", space: "s1", at: [1.1, 1.45], box: [0.85, 1.08, 1.37, 1.83], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "bench", label: "long bench along the north wall", space: "s2", at: [4.7, 0.62], box: [2.75, 0.3, 6.6, 0.95] },
+      { id: "f4", kind: "chest", label: "yellow suitcase", space: "s2", at: [4.72, 0.9], box: [4.35, 0.55, 5.1, 1.25], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "bench", label: "bench in the middle of the waiting room", space: "s1", at: [3, 3.15], box: [1.9, 2.9, 4.05, 3.4] },
+      { id: "f6", kind: "papers", label: "timetable notice board", space: "s2", at: [6.52, 1.55], box: [6.33, 1.06, 6.72, 2.02], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "counter", label: "ticket office counter with papers", space: "s3", at: [6.45, 3.3], box: [6, 2.35, 6.85, 4.3], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "counter", label: "ticket window with tickets", space: "s3", at: [5.12, 4.02], box: [4.7, 3.72, 5.45, 4.45], affords: [
+          "search", "interact"
+        ] },
+      { id: "f9", kind: "machinery", label: "ticket stamping machine", space: "s3", at: [5.97, 4.05], box: [5.75, 3.85, 6.2, 4.3], affords: [
+          "interact"
+        ] },
+      { id: "f10", kind: "bench", label: "back-to-back platform benches", space: "s5", at: [2.15, 5.3], box: [1.5, 3.94, 2.82, 6.7] },
+      { id: "f11", kind: "chest", label: "small case with a bowler hat", space: "s5", at: [1.22, 4.6], box: [0.94, 4.2, 1.5, 5], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "sack", label: "leather handbag on the bench", space: "s5", at: [1.75, 6.03], box: [1.58, 5.8, 1.93, 6.27], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideStorageHold: {
+    desc: "Ship's cargo hold on a riveted steel floor, crammed with crates, barrels and sacks, a rope-bound carved figurehead, a rolled red carpet, a mannequin and a motorcycle in a shipping crate",
+    roomTypes: [
+      "storage"
+    ],
+    tags: [
+      "indoor",
+      "ship",
+      "cluttered",
+      "industrial"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west hold",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.25], [4.25, 1.4], [2.65, 2.2], [2.65, 3.5], [0, 3.5]],
+        anchor: [2.33, 1.53],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east hold",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 2.2], [4.25, 1.4], [4.4, 1.25]],
+        anchor: [6.33, 1.78],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "statue", label: "rope-bound carved wooden figurehead", space: "s1", at: [0.65, 1.4], box: [0.25, 0.37, 1.06, 2.44], affords: [
+          "search", "interact"
+        ] },
+      { id: "f2", kind: "sack", label: "grey canvas sack", space: "s1", at: [1.35, 0.8], box: [1.05, 0.55, 1.65, 1.1], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "crate", label: "labelled wooden crate", space: "s1", at: [1.55, 1.2], box: [1.25, 0.95, 1.83, 1.47], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "crate", label: "stack of slatted crates", space: "s1", at: [1.5, 1.97], box: [1.15, 1.62, 1.85, 2.3], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "crate", label: "wooden crate", space: "s1", at: [0.55, 2.95], box: [0.25, 2.65, 0.85, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "sack", label: "grey canvas sack", space: "s1", at: [1.4, 2.95], box: [1.1, 2.55, 1.75, 3.3], affords: [
+          "search", "hide"
+        ] },
+      { id: "f7", kind: "crate", label: "crates with red labels", space: "s1", at: [2.1, 2.9], box: [1.7, 2.6, 2.35, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "statue", label: "dressmaker's mannequin torso", space: "s1", at: [2.25, 2.45], box: [1.8, 2.25, 2.6, 2.65], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "sack", label: "green duffel bag", space: "s1", at: [2.45, 2.95], box: [2.2, 2.72, 2.7, 3.3], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "rug", label: "rolled red carpet tied with rope", space: "s2", at: [3.3, 2.55], box: [3.1, 1.85, 3.6, 3.25], affords: [
+          "search", "hide"
+        ] },
+      { id: "f11", kind: "crate", label: "stacked crates", space: "s1", at: [3.05, 0.8], box: [2.6, 0.35, 3.45, 1.25], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "chest", label: "green metal footlocker", space: "s1", at: [4.1, 0.52], box: [3.83, 0.25, 4.44, 0.79], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "barrel", space: "s1", at: [3.82, 0.97], box: [3.56, 0.67, 4.06, 1.25], affords: [
+          "search"
+        ] },
+      { id: "f14", kind: "crate", label: "pile of crates", space: "s1", at: [4.35, 1.2], box: [4, 0.75, 4.75, 1.6], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "other", label: "rope-bound bundle under a dust sheet", space: "s2", at: [5.3, 1.2], box: [4.8, 0.75, 5.9, 1.65], affords: [
+          "search", "hide"
+        ] },
+      { id: "f16", kind: "crate", label: "stacked crates along the north wall", space: "s2", at: [5.8, 0.6], box: [4.55, 0.3, 6.75, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f17", kind: "vehicle", label: "motorcycle in a wooden shipping crate", space: "s2", at: [4.65, 2.8], box: [3.65, 2.3, 5.7, 3.3], affords: [
+          "search", "interact"
+        ] },
+      { id: "f18", kind: "crate", label: "pile of crates and bundles", space: "s2", at: [6.15, 2.8], box: [5.6, 2.35, 6.7, 3.25], affords: [
+          "search"
+        ] }
+    ]
+  },
   TileSideTracks: { desc: "Outdoor railroad tracks on gravel bed between platforms", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideViewingRoom1: { desc: "Ship viewing room with cushioned seats and windows along walls", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideViewingRoom2: { desc: "Large ornate viewing room with velvet chairs and globe decorations", roomTypes: [], tags: [], spaces: [], features: [] },
