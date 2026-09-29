@@ -48,9 +48,14 @@ export function polygonArea(outline: Point[]): number {
   return Math.abs(a) / 2;
 }
 
-/** The space containing a local point, or the nearest one within `tolerance` */
+/**
+ * The space containing a local point, or the nearest one within `tolerance`.
+ * A space can sit inside another as an island (a pit in a grove), so the smallest match wins.
+ */
 export function spaceAt(content: TileContent, p: Point, tolerance = 0): TileSpace | undefined {
-  const inside = content.spaces.find(s => pointInPolygon(p, s.outline));
+  const inside = content.spaces
+    .filter(s => pointInPolygon(p, s.outline))
+    .sort((a, b) => polygonArea(a.outline) - polygonArea(b.outline))[0];
   if (inside || tolerance <= 0) return inside;
   let best: TileSpace | undefined;
   let bestD = tolerance;

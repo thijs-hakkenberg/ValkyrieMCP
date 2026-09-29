@@ -7080,16 +7080,716 @@ export const TILE_CONTENT: Record<string, TileContent> = {
       { id: "f8", kind: "rock", label: "boulders against the north wall", space: "s2", at: [6.13, 0.57], box: [5.88, 0.4, 6.38, 0.73] }
     ]
   },
-  TileSideRopeBridge: { desc: "Wooden rope bridge spanning a rocky gorge between cliff edges", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideHollowGrove: { desc: "Forest clearing with three large hollow tree trunk pools", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideCrumblingPlaza: { desc: "Overgrown circular stone plaza with crumbling mosaic pattern", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideShrine: { desc: "Jungle clearing with ancient carved stone shrine disc", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideJungleRuins1: { desc: "Jungle path winding through crumbled stone building ruins", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideJungleRuins2: { desc: "Dense jungle with scattered broken stone walls and carvings", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRiver1: { desc: "River flowing east-west through grassy banks with rocks", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRiver2: { desc: "Wide river curving through mossy banks with muddy shore", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRiverCrossing: { desc: "Shallow river crossing with rocky stepping stones in center", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRiverEdge: { desc: "River corner with wooden bridge crossing to forested clearing", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideRopeBridge: {
+    desc: "Rope bridge of wooden planks spanning a dark rocky chasm between two grassy banks",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "dangerous",
+      "jungle"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chasm",
+        outline: [[0, 0], [0.8, 0.6], [2.45, 1.5], [2.65, 1.7], [2.65, 5.45], [1.55, 6.15], [0.1, 6.9], [0.05, 7]],
+        anchor: [0.58, 0.98],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "north bank",
+        outline: [[0.05, 0], [6.95, 0.05], [4.45, 1.6], [4.4, 3.5], [2.65, 3.5], [2.6, 1.6], [0.8, 0.6], [0.2, 0.2]],
+        anchor: [3.88, 0.63],
+        links: [
+          { to: "s3", via: "line" },
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "N", index: 1 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "east chasm",
+        outline: [[6.95, 0], [7, 7], [4.75, 5.75], [4.4, 5.45], [4.4, 1.7], [4.5, 1.55], [6.55, 0.35]],
+        anchor: [6.38, 0.98],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 1 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "south bank",
+        outline: [[2.65, 3.5], [4.4, 3.5], [4.45, 5.55], [6.9, 6.9], [6.95, 7], [0.05, 7], [0.1, 6.9], [1.55, 6.15], [2.65, 5.45]],
+        anchor: [1.83, 6.48],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "other", label: "rope bridge", space: "s2", at: [3.5, 2.6], box: [2.75, 1.3, 4.35, 5.8], affords: [
+          "climb"
+        ] },
+      { id: "f2", kind: "hole", label: "chasm", space: "s4", at: [3.5, 3.5], box: [1.9, 1.9, 5.2, 5.3] },
+      { id: "f3", kind: "rock", label: "rocky chasm wall", space: "s1", at: [0.8, 3.5], box: [0.1, 1.5, 1.6, 5.5], affords: [
+          "climb"
+        ] },
+      { id: "f4", kind: "rock", label: "rocky chasm wall", space: "s3", at: [6.2, 3.5], box: [5.4, 1.5, 6.9, 5.5], affords: [
+          "climb"
+        ] },
+      { id: "f5", kind: "pillar", label: "rope anchor post", space: "s2", at: [2.4, 0.95], box: [2, 0.7, 2.6, 1.2] },
+      { id: "f6", kind: "pillar", label: "rope anchor post", space: "s2", at: [4.6, 0.95], box: [4.35, 0.7, 4.95, 1.2] },
+      { id: "f7", kind: "pillar", label: "rope anchor post", space: "s4", at: [2.4, 6], box: [2, 5.8, 2.7, 6.2] },
+      { id: "f8", kind: "pillar", label: "rope anchor post", space: "s4", at: [4.7, 6], box: [4.4, 5.75, 4.95, 6.3] },
+      { id: "f9", kind: "rock", label: "stones", space: "s2", at: [2.8, 1], box: [2.2, 0.7, 3.4, 1.4] },
+      { id: "f10", kind: "rock", label: "stones", space: "s4", at: [3.1, 6.3], box: [2.5, 5.8, 3.8, 6.7] }
+    ]
+  },
+  TileSideHollowGrove: {
+    desc: "Tangle of tree roots and undergrowth around three round earthen hollows, each entered over a yellow-marked gap",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "overgrown",
+      "jungle"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "roots",
+        outline: [[0, 0], [7, 0], [7, 3.5], [0, 3.5]],
+        anchor: [4.78, 0.58],
+        links: [
+          { to: "s2", via: "barrier" },
+          { to: "s3", via: "barrier" },
+          { to: "s4", via: "barrier" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "middle hollow",
+        outline: [[3.25, 0.25], [3.65, 0.25], [4, 0.4], [4.25, 0.65], [4.35, 0.9], [4.25, 1.4], [3.75, 1.8], [3, 1.75], [2.6, 1.2], [2.6, 0.85], [2.75, 0.55]],
+        anchor: [3.33, 0.98],
+        links: [
+          { to: "s1", via: "barrier" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "east hollow",
+        outline: [[5, 1.3], [5.55, 1.3], [6.1, 1.85], [6.1, 2.5], [6, 2.7], [5.65, 2.95], [5.05, 3], [4.65, 2.8], [4.5, 2.6], [4.45, 1.9]],
+        anchor: [5.28, 2.18],
+        links: [
+          { to: "s1", via: "barrier" }
+        ],
+        openings: []
+      },
+      {
+        id: "s4",
+        label: "west hollow",
+        outline: [[1.7, 1.45], [2, 1.45], [2.35, 1.6], [2.75, 2.1], [2.75, 2.65], [2.5, 2.95], [2.1, 3.15], [1.6, 3.15], [1.35, 3.05], [1, 2.55], [1, 2.1], [1.1, 1.85], [1.35, 1.6]],
+        anchor: [1.83, 2.28],
+        links: [
+          { to: "s1", via: "barrier" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "hole", label: "earthen hollow", space: "s4", at: [1.85, 2.3], box: [1.05, 1.5, 2.65, 3.1], affords: [
+          "hide"
+        ] },
+      { id: "f2", kind: "hole", label: "earthen hollow", space: "s2", at: [3.46, 1], box: [2.65, 0.3, 4.3, 1.7], affords: [
+          "hide"
+        ] },
+      { id: "f3", kind: "hole", label: "earthen hollow", space: "s3", at: [5.28, 2.17], box: [4.5, 1.4, 6.1, 2.95], affords: [
+          "hide"
+        ] },
+      { id: "f4", kind: "tree", label: "tangled roots", space: "s1", at: [1.2, 1], box: [0.3, 0.4, 2.4, 1.5] },
+      { id: "f5", kind: "tree", label: "tangled roots", space: "s1", at: [3.5, 2.6], box: [2.8, 2, 4.3, 3.3] },
+      { id: "f6", kind: "bush", label: "undergrowth with red flowers", space: "s1", at: [6.2, 0.6], box: [5.4, 0.1, 6.9, 1.2] }
+    ]
+  },
+  TileSideCrumblingPlaza: {
+    desc: "Round, crumbling stone plaza with a wheel-patterned paving and a central hub, set in overgrown ferns scattered with stones",
+    roomTypes: [
+      "courtyard",
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "ruins",
+      "overgrown",
+      "jungle"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north undergrowth",
+        outline: [[0, 0], [7, 0], [7, 3.5], [5.65, 3.5], [5.65, 3.15], [5.45, 2.5], [5.05, 1.95], [4.4, 1.5], [3.55, 1.3], [2.85, 1.4], [2.25, 1.7], [1.65, 2.35], [1.45, 2.8], [1.35, 3.5], [0, 3.5]],
+        anchor: [5.98, 1.03],
+        spots: [[2.28, 0.83], [0.68, 0.68]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "N", index: 1 },
+          { side: "N", index: 2 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "stone plaza",
+        outline: [[3.45, 1.3], [4.4, 1.5], [5.05, 1.95], [5.45, 2.5], [5.65, 3.15], [5.65, 3.85], [5.3, 4.75], [4.75, 5.3], [3.85, 5.65], [3.15, 5.65], [2.25, 5.3], [1.65, 4.65], [1.35, 3.75], [1.45, 2.8], [1.75, 2.2], [2.5, 1.55]],
+        anchor: [3.48, 1.98],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "south undergrowth",
+        outline: [[0, 3.5], [1.35, 3.5], [1.45, 4.2], [1.75, 4.8], [2.25, 5.3], [3.15, 5.65], [3.85, 5.65], [4.75, 5.3], [5.4, 4.6], [5.65, 3.85], [5.65, 3.5], [7, 3.5], [7, 7], [0, 7]],
+        anchor: [6.03, 5.98],
+        spots: [[0.88, 5.23], [6.23, 4.38]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "other", label: "circular stone paving with central hub", space: "s2", at: [3.5, 3.7], box: [2.4, 2.6, 4.6, 4.7], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "rubble", label: "crumbling paving stones", space: "s2", at: [4.7, 4.9], box: [4.3, 4.4, 5.2, 5.4], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "rock", label: "stones", space: "s1", at: [1.3, 1.6], box: [0.9, 1.1, 1.8, 2.1] },
+      { id: "f4", kind: "rock", label: "stones", space: "s1", at: [1.1, 2.6], box: [0.9, 2.2, 1.4, 3] },
+      { id: "f5", kind: "rock", label: "stones", space: "s1", at: [4.5, 1.25], box: [4.1, 1, 5, 1.6] },
+      { id: "f6", kind: "rock", label: "boulder", space: "s3", at: [5, 5.3], box: [4.9, 5.1, 5.3, 5.8] },
+      { id: "f7", kind: "rock", label: "stones", space: "s3", at: [0.8, 3.9], box: [0.5, 3.7, 1.2, 4.4] },
+      { id: "f8", kind: "rock", label: "stones", space: "s3", at: [1.9, 5.8], box: [1.4, 5.5, 2.3, 6.1] },
+      { id: "f9", kind: "bush", label: "red-flowering shrub", space: "s1", at: [6.2, 2.6], box: [5.7, 2.1, 6.8, 3.2] }
+    ]
+  },
+  TileSideShrine: {
+    desc: "Overgrown jungle floor strewn with pale stones, with a round carved stone disc bearing a coiled serpent to the east",
+    roomTypes: [
+      "wilderness",
+      "ritual"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "occult",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west undergrowth",
+        outline: [[0, 0], [4.4, 0], [4.35, 1.2], [3.7, 1.8], [3.55, 2.1], [3.5, 3.5], [0, 3.5]],
+        anchor: [0.93, 2.03],
+        spots: [[2.18, 0.73], [0.63, 0.63]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "shrine",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.55, 2.1], [3.7, 1.8], [4.35, 1.2]],
+        anchor: [6.48, 1.58],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "altar", label: "carved serpent stone disc", space: "s2", at: [5.17, 2.18], box: [4.4, 1.38, 5.94, 2.98], affords: [
+          "interact", "search"
+        ] },
+      { id: "f2", kind: "rock", label: "stones", space: "s1", at: [1.35, 1.1], box: [1.15, 0.8, 1.6, 1.4] },
+      { id: "f3", kind: "rock", label: "stones", space: "s1", at: [3.2, 1.1], box: [2.85, 0.85, 3.7, 1.5] },
+      { id: "f4", kind: "rock", label: "stones", space: "s1", at: [1.95, 2.35], box: [1.75, 2.2, 2.25, 2.5] },
+      { id: "f5", kind: "rock", label: "boulders", space: "s1", at: [3.1, 2.2], box: [2.9, 1.9, 3.45, 2.8] },
+      { id: "f6", kind: "rock", label: "stones", space: "s1", at: [2.65, 2.95], box: [2.45, 2.8, 2.85, 3.1] },
+      { id: "f7", kind: "rock", label: "stones", space: "s2", at: [5.95, 1.15], box: [5.8, 0.95, 6.25, 1.35] },
+      { id: "f8", kind: "rock", label: "stones", space: "s2", at: [4.8, 0.85], box: [4.6, 0.6, 5, 1.1] },
+      { id: "f9", kind: "bush", label: "red-flowering undergrowth", space: "s2", at: [6.3, 0.5], box: [5.7, 0.2, 6.8, 1] }
+    ]
+  },
+  TileSideJungleRuins1: {
+    desc: "Jungle floor with the tumbled, vine-wrapped stone blocks of a collapsed ruin to the west and a scatter of rocks and red-flowered shrubs to the east",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "ruins",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "ruins",
+        outline: [[0, 0], [3.5, 0], [3.4, 1.6], [3.75, 2.15], [4.15, 2.45], [4.4, 3.1], [4.4, 3.5], [0, 3.5]],
+        anchor: [0.78, 1.48],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east undergrowth",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 3.1], [4.15, 2.45], [3.75, 2.15], [3.4, 1.6]],
+        anchor: [5.63, 1.13],
+        spots: [[4.23, 0.88]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "rubble", label: "collapsed vine-wrapped stone blocks", space: "s1", at: [2.3, 1.5], box: [1.65, 0.75, 3.1, 2.3], affords: [
+          "search", "climb"
+        ] },
+      { id: "f2", kind: "rubble", label: "fallen wall blocks", space: "s1", at: [1.5, 2.1], box: [1.05, 1.9, 2.1, 2.5], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "rubble", label: "stone blocks", space: "s1", at: [2.55, 2.7], box: [2.3, 2.45, 2.85, 2.95], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "rubble", label: "stone blocks", space: "s1", at: [0.7, 2.65], box: [0.45, 2.4, 0.95, 2.95] },
+      { id: "f5", kind: "rock", label: "stones", space: "s1", at: [1.4, 1], box: [1.2, 0.9, 1.6, 1.2] },
+      { id: "f6", kind: "rock", label: "stones", space: "s1", at: [2, 3.2], box: [1.7, 3, 2.35, 3.4] },
+      { id: "f7", kind: "rock", label: "vine-covered stones", space: "s1", at: [3.3, 2.6], box: [3.1, 2.3, 3.7, 2.8] },
+      { id: "f8", kind: "rock", label: "boulder", space: "s2", at: [4.2, 2], box: [3.95, 1.8, 4.35, 2.1] },
+      { id: "f9", kind: "rock", label: "rock pile", space: "s2", at: [5.1, 2.4], box: [4.55, 2.1, 5.55, 2.75] },
+      { id: "f10", kind: "bush", label: "red-flowering shrub", space: "s2", at: [6.4, 2.4], box: [5.9, 2, 6.8, 2.9] }
+    ]
+  },
+  TileSideJungleRuins2: {
+    desc: "Jungle clearing littered with carved ruins: fallen serpent-head statues, a carved stone disc and the collapsed stonework of a wall",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "ruins",
+      "occult"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west ruins",
+        outline: [[0, 0], [3.5, 0], [3.4, 0.75], [3.55, 1.15], [3.55, 1.8], [2.75, 2.55], [2.65, 2.85], [2.65, 3.5], [0, 3.5]],
+        anchor: [2.43, 0.73],
+        spots: [[0.68, 1.98]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east ruins",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 2.85], [2.75, 2.55], [3.55, 1.8], [3.55, 1.15], [3.4, 0.75]],
+        anchor: [4.83, 2.93],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "statue", label: "fallen serpent-head carving", space: "s1", at: [1, 1.05], box: [0.7, 0.75, 1.3, 1.4], affords: [
+          "interact", "search"
+        ] },
+      { id: "f2", kind: "statue", label: "fallen serpent-head carving", space: "s2", at: [3.2, 2.7], box: [2.85, 2.35, 3.55, 3], affords: [
+          "interact", "search"
+        ] },
+      { id: "f3", kind: "statue", label: "broken serpent-head carving", space: "s2", at: [3.6, 0.65], box: [3.35, 0.4, 3.9, 0.95], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "other", label: "carved stone disc", space: "s2", at: [3.95, 2.6], box: [3.6, 2.25, 4.35, 2.9], affords: [
+          "interact", "search"
+        ] },
+      { id: "f5", kind: "rubble", label: "collapsed stone wall", space: "s2", at: [5.3, 1.4], box: [4.3, 0.5, 6.2, 2.4], affords: [
+          "search", "climb"
+        ] },
+      { id: "f6", kind: "rubble", label: "broken stones", space: "s2", at: [6.45, 1.35], box: [6.2, 0.9, 6.75, 1.9], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "rubble", label: "carved stone block", space: "s2", at: [4.2, 0.7], box: [3.95, 0.5, 4.45, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "rubble", label: "carved stones", space: "s1", at: [2.7, 1.65], box: [2.45, 1.45, 2.95, 1.85], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "rubble", label: "carved blocks", space: "s1", at: [1.5, 2.35], box: [1.25, 2.1, 1.8, 2.65], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "rubble", label: "curved carved segment", space: "s1", at: [1.15, 2.8], box: [0.9, 2.45, 1.5, 3.1], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "rock", label: "carved stones", space: "s1", at: [1.8, 1.05], box: [1.7, 0.85, 1.9, 1.25] },
+      { id: "f12", kind: "rock", label: "round carved stone", space: "s2", at: [6, 2.7], box: [5.85, 2.5, 6.2, 2.9] },
+      { id: "f13", kind: "rock", label: "broken stone", space: "s2", at: [5.55, 2.95], box: [5.45, 2.8, 5.65, 3.05] }
+    ]
+  },
+  TileSideRiver1: {
+    desc: "A shallow jungle river winding across the tile between overgrown banks, with a muddy spit on the north bank and boulders on the south",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "water"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north bank and river",
+        outline: [[0, 0], [7, 0], [7, 1.75], [6.05, 1.9], [5.15, 1.9], [4.05, 1.4], [3.35, 1.2], [1.95, 1.15], [1.1, 1.4], [0.5, 1.7], [0, 1.8]],
+        anchor: [0.78, 0.78],
+        spots: [[4.13, 0.73], [6.38, 0.63]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "south bank and river",
+        outline: [[1.95, 1.15], [3.35, 1.2], [4.05, 1.4], [5.15, 1.9], [6.05, 1.9], [7, 1.75], [7, 3.5], [0, 3.5], [0, 1.8], [0.5, 1.7], [1.1, 1.4]],
+        anchor: [4.13, 2.48],
+        spots: [[6.08, 2.68], [2.38, 2.78]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "water", label: "river", space: "s1", at: [1.2, 1.2], box: [0.1, 0.55, 2.4, 1.9] },
+      { id: "f2", kind: "water", label: "river", space: "s1", at: [3.3, 0.9], box: [2.4, 0.6, 4.3, 1.75] },
+      { id: "f3", kind: "water", label: "river", space: "s2", at: [5.6, 2.1], box: [4.3, 1.5, 6.9, 2.75] },
+      { id: "f4", kind: "water", label: "river", space: "s1", at: [6.4, 1.1], box: [5.9, 0.6, 6.9, 1.5] },
+      { id: "f5", kind: "rock", label: "boulders", space: "s2", at: [1.55, 2.25], box: [1.3, 1.95, 1.9, 2.65] },
+      { id: "f6", kind: "rock", label: "stones", space: "s2", at: [1, 2.85], box: [0.8, 2.6, 1.2, 3.05] },
+      { id: "f7", kind: "rock", label: "mud bank with stones", space: "s2", at: [2.8, 1.95], box: [2.2, 1.8, 3.5, 2.15] },
+      { id: "f8", kind: "rock", label: "stones on muddy spit", space: "s1", at: [5.6, 0.95], box: [4.9, 0.6, 5.8, 1.1] }
+    ]
+  },
+  TileSideRiver2: {
+    desc: "A rushing jungle river crossing the tile, with a pebbly mud bank, boulders and a leafless thicket on the north side and overgrown bushes on the south",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "water"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north bank and river",
+        outline: [[0, 0], [7, 0], [7, 1.75], [5.65, 1.7], [4.1, 2.25], [3.3, 2.2], [2.7, 1.95], [1.65, 1.75], [0, 1.75]],
+        anchor: [2.18, 0.93],
+        spots: [[0.78, 0.78], [6.33, 0.68]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "south bank and river",
+        outline: [[0.6, 1.7], [2.05, 1.8], [3.6, 2.25], [4.55, 2.15], [5.65, 1.7], [7, 1.75], [7, 3.5], [0, 3.5], [0, 1.75]],
+        anchor: [2.43, 2.68],
+        spots: [[4.58, 2.78], [0.63, 2.88]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "water", label: "river", space: "s1", at: [1.1, 1.2], box: [0.1, 0.55, 2.2, 2.3] },
+      { id: "f2", kind: "water", label: "river", space: "s1", at: [3.3, 1.7], box: [2.2, 1.2, 4.3, 2.8] },
+      { id: "f3", kind: "water", label: "river", space: "s1", at: [5.6, 1.4], box: [4.3, 0.75, 6.9, 2.5] },
+      { id: "f4", kind: "tree", label: "leafless thicket", space: "s1", at: [3.7, 0.65], box: [3.3, 0.2, 4.2, 1.2] },
+      { id: "f5", kind: "rock", label: "boulder", space: "s1", at: [4.25, 0.4], box: [3.95, 0.2, 4.55, 0.6] },
+      { id: "f6", kind: "rock", label: "boulder", space: "s1", at: [3.55, 0.55], box: [3.35, 0.35, 3.75, 0.75] },
+      { id: "f7", kind: "rock", label: "pebbly mud bank", space: "s1", at: [4.9, 1], box: [4.3, 0.6, 5.7, 1.4] },
+      { id: "f8", kind: "rock", label: "stones", space: "s1", at: [3.6, 1.1], box: [3.4, 0.95, 3.8, 1.35] },
+      { id: "f9", kind: "rock", label: "stones", space: "s2", at: [1.5, 3.1], box: [1.3, 2.95, 1.7, 3.3] },
+      { id: "f10", kind: "bush", label: "dark thorny shrub", space: "s2", at: [1.3, 2.25], box: [0.8, 1.95, 1.9, 2.5] },
+      { id: "f11", kind: "bush", label: "reeds", space: "s2", at: [5.8, 2.6], box: [5.2, 2.3, 6.4, 2.9] }
+    ]
+  },
+  TileSideRiverCrossing: {
+    desc: "A jungle river breaking into white rapids over a ford of large boulders, between overgrown banks with leafless thickets",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "water"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north bank and river",
+        outline: [[0, 0], [7, 0], [7, 1.75], [5.85, 1.7], [5.1, 1.55], [4.65, 1.7], [3.8, 1.7], [3, 1.4], [2.4, 1.4], [1.8, 1.6], [0.8, 1.75], [0, 1.75]],
+        anchor: [6.18, 0.83],
+        spots: [[0.63, 0.98]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "south bank and river",
+        outline: [[2.4, 1.4], [3, 1.4], [3.8, 1.7], [4.65, 1.7], [5.1, 1.55], [5.85, 1.7], [7, 1.75], [7, 3.5], [0, 3.5], [0, 1.75], [1.2, 1.7]],
+        anchor: [6.18, 2.53],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "rock", label: "boulders in rapids", space: "s2", at: [3, 1.9], box: [1.9, 0.5, 4, 2.75], affords: [
+          "climb"
+        ] },
+      { id: "f2", kind: "water", label: "river", space: "s1", at: [1, 1.2], box: [0.1, 0.6, 1.9, 2.1] },
+      { id: "f3", kind: "water", label: "river", space: "s1", at: [5.5, 1.3], box: [4, 0.8, 6.9, 2.3] },
+      { id: "f4", kind: "tree", label: "leafless thicket", space: "s2", at: [1.2, 2.2], box: [0.7, 1.7, 1.7, 2.8] },
+      { id: "f5", kind: "tree", label: "leafless thicket", space: "s1", at: [4.9, 0.55], box: [4.3, 0.1, 5.4, 1] },
+      { id: "f6", kind: "tree", label: "leafless thicket", space: "s2", at: [4.8, 2.3], box: [4.2, 1.85, 5.4, 2.7] },
+      { id: "f7", kind: "rock", label: "boulder", space: "s1", at: [4.3, 0.4], box: [4.1, 0.2, 4.55, 0.65] },
+      { id: "f8", kind: "rock", label: "boulder", space: "s2", at: [2.85, 2.95], box: [2.65, 2.8, 3.05, 3.15] },
+      { id: "f9", kind: "rock", label: "stone", space: "s1", at: [1.1, 0.68], box: [0.98, 0.55, 1.25, 0.8] }
+    ]
+  },
+  TileSideRiverEdge: {
+    desc: "Jungle riverbank of cracked mud and stones, scattered with a skull and bones, beside a boulder-strewn river crossed by a rope-lashed plank bridge",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "water",
+      "dangerous"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "northwest bank",
+        outline: [[0, 0], [5.25, 0], [5.3, 2.65], [0, 2.65]],
+        anchor: [1.13, 1.43],
+        spots: [[4.13, 1.43], [2.53, 0.68]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "river and east bank",
+        outline: [[5.25, 0], [7, 0], [7, 4.4], [5.3, 4.4]],
+        anchor: [6.13, 0.88],
+        spots: [[6.18, 3.08]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "west bank",
+        outline: [[0, 2.65], [5.3, 2.65], [5.3, 4.4], [4.2, 4.4], [3.9, 4.8], [3.65, 4.9], [3.4, 5.15], [3.5, 7], [0, 7]],
+        anchor: [3.93, 3.63],
+        spots: [[2.23, 3.78], [0.73, 4.08]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "bridge",
+        outline: [[5.7, 4.35], [7, 4.4], [7, 7], [3.5, 7], [3.4, 5.8], [3.45, 5.05], [3.9, 4.8], [4.2, 4.4]],
+        anchor: [4.23, 6.58],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "water", label: "river", space: "s2", at: [5.6, 3.5], box: [4, 0.1, 6.4, 4.4] },
+      { id: "f2", kind: "water", label: "river", space: "s4", at: [5.8, 6.7], box: [4.3, 6.35, 6.5, 6.95] },
+      { id: "f3", kind: "other", label: "rope-lashed plank bridge", space: "s4", at: [5.3, 5.6], box: [4, 5, 6.8, 6.25], affords: [
+          "climb"
+        ] },
+      { id: "f4", kind: "rock", label: "boulder in river", space: "s1", at: [4.95, 0.78], box: [4.75, 0.55, 5.15, 1] },
+      { id: "f5", kind: "rock", label: "boulder in river", space: "s2", at: [5.83, 1.9], box: [5.6, 1.6, 6.05, 2.15] },
+      { id: "f6", kind: "rock", label: "boulder in river", space: "s2", at: [5.65, 2.45], box: [5.5, 2.25, 5.8, 2.7] },
+      { id: "f7", kind: "rock", label: "stepping stones", space: "s3", at: [4.6, 2.85], box: [4.35, 2.5, 4.8, 3.1] },
+      { id: "f8", kind: "rock", label: "boulder in river", space: "s4", at: [5.8, 4.7], box: [5.65, 4.45, 5.95, 4.95] },
+      { id: "f9", kind: "rock", label: "boulders in river", space: "s4", at: [5, 6.6], box: [4.8, 6.4, 5.2, 6.9] },
+      { id: "f10", kind: "bones", label: "skull and ribs", space: "s1", at: [3.25, 2.35], box: [3.05, 2.2, 3.45, 2.55], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "bones", label: "scattered bones", space: "s3", at: [1.6, 3.3], box: [1.4, 3.1, 1.75, 3.6], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "rock", label: "boulder", space: "s3", at: [1.3, 3.55], box: [1.1, 3.35, 1.5, 3.8] },
+      { id: "f13", kind: "rock", label: "stones", space: "s3", at: [2.1, 2.9], box: [1.9, 2.55, 2.4, 3.1] },
+      { id: "f14", kind: "rock", label: "stones", space: "s1", at: [2.1, 2.3], box: [1.8, 2.1, 2.2, 2.45] },
+      { id: "f15", kind: "rock", label: "stones", space: "s3", at: [1.9, 5.2], box: [1.4, 4.8, 2.35, 5.6] },
+      { id: "f16", kind: "rock", label: "stones", space: "s3", at: [1.7, 4.4], box: [1.4, 4.2, 1.8, 4.6] },
+      { id: "f17", kind: "rock", label: "stones", space: "s3", at: [2.8, 5.85], box: [2.7, 5.6, 2.95, 6] },
+      { id: "f18", kind: "rock", label: "stones", space: "s3", at: [3, 3.95], box: [2.85, 3.8, 3.2, 4.1] },
+      { id: "f19", kind: "rock", label: "stones", space: "s1", at: [2.9, 1.4], box: [2.7, 1.2, 3.05, 1.5] },
+      { id: "f20", kind: "rock", label: "stones", space: "s1", at: [1.75, 0.75], box: [1.6, 0.6, 1.9, 0.85] },
+      { id: "f21", kind: "bush", label: "dead thorny shrub", space: "s3", at: [1.1, 5.35], box: [0.7, 5.1, 1.5, 5.7] },
+      { id: "f22", kind: "pillar", label: "wooden post", space: "s4", at: [3.82, 6.5], box: [3.75, 6.2, 3.9, 6.85] }
+    ]
+  },
   TileSideCampsite: { desc: "Rocky campsite with boulders, mushrooms, and scattered supplies", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideClearing1: { desc: "Forest clearing with winding path and fallen autumn leaves", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideClearing2: { desc: "Circular stone ruins in an overgrown forest clearing with debris", roomTypes: [], tags: [], spaces: [], features: [] },

@@ -1,5 +1,5 @@
 // Where things are on placed tiles, using the annotated tile content (spaces and objects).
-import { TILE_CONTENT, distanceToOutline, isAnnotated, pointInPolygon, polygonArea } from '../catalogs/tile-content.js';
+import { TILE_CONTENT, distanceToOutline, isAnnotated, polygonArea, spaceAt } from '../catalogs/tile-content.js';
 import { kindsForTerm } from '../catalogs/data/feature-vocabulary.js';
 import type { Point, TileContent, TileFeature, TileSpace } from '../catalogs/tile-content-types.js';
 import type { ScenarioModel } from '../model/scenario-model.js';
@@ -28,7 +28,7 @@ export function locate(tiles: PlacedTile[], x: number, y: number): TileLocation 
   const content = tileContent(tile);
   if (!content) return { tile };
   const local = worldToLocal(tile, x, y);
-  const space = content.spaces.find(s => pointInPolygon(local, s.outline));
+  const space = spaceAt(content, local);
   let nearest: TileLocation['nearest'];
   for (const f of content.features) {
     const d = Math.hypot(f.at[0] - local[0], f.at[1] - local[1]);

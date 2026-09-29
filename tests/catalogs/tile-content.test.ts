@@ -65,6 +65,14 @@ describe('checkTileContent', () => {
     expect(spaceAt(bathroom(), [3.5, 1])).toBeUndefined();
   });
 
+  it('finds an island space inside a larger one', () => {
+    const island = bathroom();
+    island.spaces[0].outline = [[0, 0], [7, 0], [7, 7], [0, 7]];
+    island.spaces[1].outline = [[4, 0.5], [6, 0.5], [6, 2], [4, 2]];
+    expect(spaceAt(island, [5, 1])?.id).toBe('s2');
+    expect(spaceAt(island, [1, 5])?.id).toBe('s1');
+  });
+
   it('reports broken references and positions', () => {
     const c = bathroom();
     c.spaces[0].anchor = [5, 1];
