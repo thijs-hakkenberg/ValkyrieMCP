@@ -14,17 +14,13 @@
  * Usage: npx tsx scripts/extract-tile-geometry.ts
  */
 import { execSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { homedir } from 'node:os';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { decodeValkyrieDds, resize, type RgbaImage } from '../src/io/image.js';
+import { IMPORT_IMG, VALKYRIE_REPO, loadBundled } from './tile-art.js';
 import { TILES } from '../src/catalogs/data/all-catalogs.js';
-import { TILE_GEOMETRY as PREVIOUS } from '../src/catalogs/data/tile-geometry.js';
 import { MOM_PIXELS_PER_UNIT } from '../src/map/layout.js';
 
-const VALKYRIE_REPO = resolve(homedir(), 'projects/repos/valkyrie');
-const IMPORT_IMG = resolve(homedir(), '.config/Valkyrie/MoM/import/img');
 const PACKS = ['base', 'btt', 'hj', 'pots', 'soa', 'sot'];
 const OUTPUT = resolve(process.cwd(), 'src/catalogs/data/tile-geometry.ts');
 
@@ -125,38 +121,6 @@ function detectOpenings(img: RgbaImage, size: { width: number; height: number })
   return result;
 }
 
-/** Parse an uncompressed 24/32-bit BMP (what `sips -s format bmp` writes) */
-function decodeBmp(buf: Buffer): RgbaImage {
-  const offset = buf.readUInt32LE(10);
-  const width = buf.readInt32LE(18);
-  const rawHeight = buf.readInt32LE(22);
-  const height = Math.abs(rawHeight);
-  const bpp = buf.readUInt16LE(28) / 8;
-  const stride = Math.ceil(width * bpp / 4) * 4;
-  const data = new Uint8Array(width * height * 4);
-  for (let y = 0; y < height; y++) {
-    const row = rawHeight > 0 ? height - 1 - y : y;
-    for (let x = 0; x < width; x++) {
-      const s = offset + row * stride + x * bpp;
-      const d = (y * width + x) * 4;
-      data[d] = buf[s + 2]; data[d + 1] = buf[s + 1]; data[d + 2] = buf[s]; data[d + 3] = 255;
-    }
-  }
-  return { width, height, data };
-}
-
-/** Artwork shipped inside Valkyrie (not imported from the FFG app): extract from git and convert via sips */
-function loadBundled(c: TileContent): RgbaImage | undefined {
-  const base = `unity/Assets/StreamingAssets/content/MoM/${c.pack}/img/${c.image}`;
-  const files = execSync(`git -C "${VALKYRIE_REPO}" ls-tree -r --name-only origin/master ${base}.png ${base}.jpg`, { encoding: 'utf-8' }).trim().split('\n').filter(Boolean);
-  if (files.length === 0) return undefined;
-  const dir = mkdtempSync(join(tmpdir(), 'tile-'));
-  const src = join(dir, `src${files[0].slice(-4)}`);
-  writeFileSync(src, execSync(`git -C "${VALKYRIE_REPO}" show origin/master:${files[0]}`));
-  execSync(`sips -s format bmp "${src}" --out "${join(dir, 'out.bmp')}"`, { stdio: 'ignore' });
-  return decodeBmp(readFileSync(join(dir, 'out.bmp')));
-}
-
 /** Tiles whose artwork can't be scanned reliably (low-resolution bundled scans), read by eye */
 const MANUAL_OPENINGS: Record<string, Record<Side, Opening[]>> = {
   TileSideAlleyEnd: {
@@ -176,7 +140,7 @@ for (const tile of TILES) {
   const c = content.get(tile.id);
   const file = c && join(IMPORT_IMG, `${c.image}.dds`);
   const full = !c ? undefined
-    : c.bundled ? loadBundled(c)
+    : c.bundled ? loadBundled(c.pack, c.image)
     : file && existsSync(file) ? decodeValkyrieDds(readFileSync(file)) : undefined;
   if (!c || !full) {
     missing.push(tile.id);
@@ -190,7 +154,7 @@ for (const tile of TILES) {
     currentPack = tile.pack;
     entries.push(`  // --- ${currentPack} ---`);
   }
-  entries.push(`  ${tile.id}: { width: ${size.width}, height: ${size.height}, image: ${JSON.stringify(c.image)},${c.bundled ? ' bundled: true,' : ''} openings: { N: ${fmt(openings.N)}, E: ${fmt(openings.E)}, S: ${fmt(openings.S)}, W: ${fmt(openings.W)} }, desc: ${JSON.stringify(PREVIOUS[tile.id]?.desc ?? '')} },`);
+  entries.push(`  ${tile.id}: { width: ${size.width}, height: ${size.height}, image: ${JSON.stringify(c.image)},${c.bundled ? ' bundled: true,' : ''} openings: { N: ${fmt(openings.N)}, E: ${fmt(openings.E)}, S: ${fmt(openings.S)}, W: ${fmt(openings.W)} } },`);
 }
 
 if (missing.length > 0) {
@@ -217,7 +181,6 @@ export interface TileGeometry {
   /** true when the image ships with Valkyrie rather than being imported from the FFG app */
   bundled?: boolean;
   openings: { N: TileOpening[]; E: TileOpening[]; S: TileOpening[]; W: TileOpening[] };
-  desc: string;
 }
 
 export const TILE_GEOMETRY: Record<string, TileGeometry> = {

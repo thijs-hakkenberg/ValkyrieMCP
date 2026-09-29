@@ -1,6 +1,7 @@
 import type { ValidationResult } from '../../model/component-types.js';
 import type { ScenarioModel } from '../../model/scenario-model.js';
 import { findBoundaries, layoutTiles, overlapArea, tileAt, SIDE_NAMES } from '../../map/layout.js';
+import { locate } from '../../map/tile-spots.js';
 
 /**
  * Checks the board layout using Valkyrie's placement rules (see src/map/layout.ts):
@@ -70,8 +71,22 @@ export function checkTokenPlacement(model: ScenarioModel): ValidationResult[] {
     if (comp.data.xposition === undefined || comp.data.yposition === undefined) continue;
     const x = parseFloat(comp.data.xposition);
     const y = parseFloat(comp.data.yposition);
-    const tolerance = comp.data.type?.startsWith('TokenWall') ? 0.6 : 0.2;
-    if (tileAt(tiles, x, y, tolerance)) continue;
+    const wall = comp.data.type?.startsWith('TokenWall') ?? false;
+    const tolerance = wall ? 0.6 : 0.2;
+    if (tileAt(tiles, x, y, tolerance)) {
+      // On an annotated tile, a token should sit inside one space, not on the line between two
+      const where = wall ? undefined : locate(tiles, x, y);
+      if (where && where.tile.known && (where.edgeDistance ?? 1) < 0.2 && where.space) {
+        results.push({
+          rule: 'token-placement',
+          severity: 'warning',
+          message: `"${comp.name}" at (${x}, ${y}) sits on the edge of space ${where.space.id} (${where.space.label}) of ${where.tile.name}, so it is unclear which space it is in. Use at="${where.tile.name}:${where.space.id}" to put it on a free spot`,
+          component: comp.name,
+          field: 'xposition',
+        });
+      }
+      continue;
+    }
     results.push({
       rule: 'token-placement',
       severity: 'warning',

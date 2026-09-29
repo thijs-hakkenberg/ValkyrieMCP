@@ -69,13 +69,13 @@ function formatUpsertResult(r: UpsertResult): string {
 const UPSERT_TOOLS = [
   { name: 'upsert_event',  desc: 'Create or update an event component. IMPORTANT: buttons must be >= highest populated eventN index or Valkyrie will silently drop the excess event references on re-save. A hidden event (display=false) always follows button 1 — branch by listing several targets in event1 ("EventA EventB") with vartests on each target; the first whose tests pass runs. vartests and conditions must not both be set (conditions is ignored). remove also accepts #monsters #boardcomponents #shop #uicomponents #doors #tiles #qitems #tokens',  prefix: 'Event',  fn: upsertEvent },
   { name: 'upsert_tile',   desc: 'Create or update a tile component. Needs side (catalog TileSide) or customImage (image path relative to the scenario folder, optional top/left pixel anchor)',        prefix: 'Tile',   fn: upsertTile },
-  { name: 'upsert_token',  desc: 'Create or update a token component. Optional: tokensize (small|medium|huge|massive|Original|<number>), clickeffect=false (decorative, not clickable), customImage (image path; replaces type), type may also be a catalog Monster ID to show that monster',       prefix: 'Token',  fn: upsertToken },
+  { name: 'upsert_token',  desc: 'Create or update a token component. Optional: tokensize (small|medium|huge|massive|Original|<number>), clickeffect=false (decorative, not clickable), customImage (image path; replaces type), type may also be a catalog Monster ID to show that monster. Position: xposition/yposition, or at="TileName" | "TileName:s2" (a free spot in that space) | "TileName:f3" or "TileName:desk" (on that object) — get_map_ascii lists each tile\'s spaces and objects',       prefix: 'Token',  fn: upsertToken },
   { name: 'upsert_spawn',  desc: 'Create or update a spawn component',       prefix: 'Spawn',  fn: upsertSpawn },
   { name: 'upsert_item',   desc: 'Create or update a quest item component',  prefix: 'QItem',  fn: upsertItem },
   { name: 'upsert_puzzle', desc: 'Create or update a puzzle. A puzzle is an event: start it from a button (event1=PuzzleX), never add=. Fields: class (slide default, code, image, tower), skill ({observation}...), puzzlelevel (code: positions, image: columns, slide/tower: min moves), puzzlealtlevel (code: symbols 1..N, image: rows), puzzlesolution (code: "3 6 1"), image (image puzzle picture), buttons=1 + event1 (runs after solving). The window shows no text: tell the story in the event before it; <name>.button1 labels the finish button', prefix: 'Puzzle', fn: upsertPuzzle },
   { name: 'upsert_ui',     desc: 'Create or update a UI overlay. With vunits=True, size is the height in screen heights and xposition/yposition offset from the screen CENTRE (0,0 = centred) unless halign/valign anchor to an edge. image: built-in (ImageCutsceneBG) or scenario file (img/X.jpg, see generate_artwork). Text: <name>.uitext; buttons=1 + event1 makes it clickable. Show with an event add=, remove later; add buttons last', prefix: 'UI', fn: upsertUI },
   { name: 'upsert_custom_monster', desc: 'Create or update a custom monster. Fields: base (catalog Monster ID), health, healthperhero, horror, awareness, traits, image, imageplace, activation (MoM: ONE Event name, run every monster phase, e.g. activation=EventBossActivation with randomevents to pick moves/attacks; Descent-style: Activation component names without the prefix), evadeevent, horrorevent (Event names)', prefix: 'CustomMonster', fn: upsertCustomMonster },
-  { name: 'upsert_mplace', desc: 'Create or update a monster placement (MPlace). Fields: xposition, yposition, master, rotate, tokensize (small|medium|huge|massive|Original|<number>)', prefix: 'MPlace', fn: upsertMPlace },
+  { name: 'upsert_mplace', desc: 'Create or update a monster placement (MPlace). Fields: xposition, yposition (or at="TileName:s2", see upsert_token), master, rotate, tokensize (small|medium|huge|massive|Original|<number>)', prefix: 'MPlace', fn: upsertMPlace },
   { name: 'upsert_activation', desc: 'Create or update a custom monster activation. Fields: minionfirst, masterfirst; text goes in localization keys <name>.ability, <name>.minion, <name>.master, <name>.movebutton, <name>.move', prefix: 'Activation', fn: upsertActivation },
 ] as const;
 
@@ -299,10 +299,11 @@ export function createServer(): McpServer {
     {
       outputPath: z.string().optional().describe('Also save the PNG to this path'),
       maxSize: z.number().int().optional().describe('Maximum width/height in pixels (default 1600)'),
+      showSpaces: z.boolean().optional().describe('Also outline each tile\'s spaces (white, with token spots s1, s2, …) and mark its objects (orange f1, f2, …), as listed by get_map_ascii'),
     },
-    async ({ outputPath, maxSize }) => {
+    async ({ outputPath, maxSize, showSpaces }) => {
       const importImageDir = path.join(path.dirname(getEditorDir()), 'import', 'img');
-      const r = renderMap(getModel(), { importImageDir, maxSize });
+      const r = renderMap(getModel(), { importImageDir, maxSize, showContent: showSpaces });
       if (outputPath) fs.writeFileSync(outputPath, r.png);
       const note = r.artwork ? '' : ' (schematic: Valkyrie\'s imported tile images were not found)';
       return {
@@ -433,10 +434,16 @@ export function createServer(): McpServer {
 
   server.tool(
     'search_game_content',
-    'Search game content catalogs (monsters, tiles, audio, etc.)',
-    { query: z.string().describe('Search query'), type: z.string().optional().describe('Filter by type') },
-    async ({ query, type }) => {
-      const results = searchGameContent(query, type);
+    'Search game content catalogs (monsters, tiles, audio, etc.). Tiles also match on what is drawn on them: '
+    + 'object kinds and synonyms ("bookcase", "stove", "stairs"), room types and mood tags. '
+    + 'Use `has` to find tiles showing all of several objects, e.g. has=["fireplace","piano"]',
+    {
+      query: z.string().describe('Search query (may be empty when `has` is given)'),
+      type: z.string().optional().describe('Filter by type'),
+      has: z.array(z.string()).optional().describe('Tiles only: objects the tile must show, all of them'),
+    },
+    async ({ query, type, has }) => {
+      const results = searchGameContent(query, type, has);
       return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
     },
   );

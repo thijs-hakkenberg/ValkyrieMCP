@@ -1,8 +1,9 @@
 import { ScenarioModel } from '../model/scenario-model.js';
 import {
-  findBoundaries, layoutTiles, placeTileRelative as placeRelative, tileAt, tileSpots, SIDE_NAMES,
+  findBoundaries, layoutTiles, localToWorld, placeTileRelative as placeRelative, tileAt, tileSpots, SIDE_NAMES,
   type PlacementCandidate,
 } from '../map/layout.js';
+import { featureText, locate, tileContent } from '../map/tile-spots.js';
 
 /** Spacing for suggestTileLayout: the width of a standard large (7x7) MoM tile */
 const LARGE_TILE = 7;
@@ -22,6 +23,8 @@ export function getMapAscii(model: ScenarioModel): string {
   const lines: string[] = [
     'Coordinates: x grows east, y grows north. A tile hangs east and south from its (xposition, yposition);',
     'tokens are centred on theirs. Large tiles are 7x7 units, small ones 7x3.5.',
+    'Where a tile lists spaces and objects, place tokens with upsert_token at="Tile:s2" (a free spot in that space)',
+    'or at="Tile:f3" / at="Tile:desk" (on that object) instead of raw coordinates.',
     '',
   ];
 
@@ -36,6 +39,17 @@ export function getMapAscii(model: ScenarioModel): string {
       const other = link && (link.a === t.name ? link.b : link.a);
       lines.push(`   ${o.kind} on ${SIDE_NAMES[o.side]} edge (${o.side === 'N' || o.side === 'S' ? 'x' : 'y'} ${o.from}..${o.to}) -> ${other ? `connects to ${other}` : 'leads off the map'}; token spot (${spot.x}, ${spot.y})`);
     });
+    const content = tileContent(t);
+    if (content) {
+      const pt = (p: [number, number]) => { const [x, y] = localToWorld(t, p); return `(${x}, ${y})`; };
+      for (const sp of content.spaces) {
+        const links = sp.links.map(l => `${l.to}${l.via === 'line' ? '' : ` by ${l.via}`}`).join(', ');
+        lines.push(`   space ${sp.id} ${sp.label}: token spot ${pt(sp.anchor)}${sp.spots?.length ? `, more ${sp.spots.map(pt).join(' ')}` : ''}${links ? `; next to ${links}` : ''}`);
+      }
+      if (content.features.length) {
+        lines.push(`   objects: ${content.features.map(f => `${f.id} ${featureText(f)} ${pt(f.at)} in ${f.space}`).join('; ')}`);
+      }
+    }
   }
 
   const tokens = [...model.getByType('Token'), ...model.getAll().filter(c => c.name.startsWith('MPlace'))]
@@ -46,7 +60,11 @@ export function getMapAscii(model: ScenarioModel): string {
       const x = parseFloat(c.data.xposition!);
       const y = parseFloat(c.data.yposition!);
       const tile = tileAt(tiles, x, y, c.data.type?.startsWith('TokenWall') ? 0.6 : 0.2);
-      lines.push(`   ${c.name} (${c.data.type ?? 'placement'}) at (${x}, ${y}) -> ${tile ? `on ${labels.get(tile.name)} ${tile.name}` : 'NOT ON ANY TILE'}`);
+      const where = tile && !c.data.type?.startsWith('TokenWall') ? locate(tiles, x, y) : undefined;
+      const detail = where?.space
+        ? `, space ${where.space.id} ${where.space.label}${where.nearest ? `, by ${where.nearest.feature.id} ${featureText(where.nearest.feature)}` : ''}${(where.edgeDistance ?? 1) < 0.2 ? ' (ON A SPACE LINE)' : ''}`
+        : '';
+      lines.push(`   ${c.name} (${c.data.type ?? 'placement'}) at (${x}, ${y}) -> ${tile ? `on ${labels.get(tile.name)} ${tile.name}${detail}` : 'NOT ON ANY TILE'}`);
     }
   }
 

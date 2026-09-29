@@ -119,4 +119,4 @@ Use these skills for detailed pattern guidance:
 
 ## Available MCP Tools
 
-All tools from the `valkyrie-mom` MCP server are available. Place tiles with `place_tile_relative`, put tokens on the spots `get_map_ascii` lists, and check the board with `render_map` (tiles hang east and south from their position, so floors have negative y). Run `validate_scenario` after major changes. Use `search_game_content` to find valid catalog entries for tiles, monsters, and items.
+All tools from the `valkyrie-mom` MCP server are available. Place tiles with `place_tile_relative`, put tokens on the spots `get_map_ascii` lists (or by name: `at: "TileStudy:desk"` / `"TileStudy:s2"`), and check the board with `render_map` (tiles hang east and south from their position, so floors have negative y). Run `validate_scenario` after major changes. Use `search_game_content` to find valid catalog entries for tiles, monsters, and items; for tiles it also matches drawn objects, and `has: ["fireplace"]` filters by them.

@@ -14,6 +14,7 @@ Valkyrie places components like this. Getting it wrong puts tokens beside the ti
 - **x grows east, y grows north.**
 - **A tile hangs east and south from its `xposition`/`yposition`**: that point is the tile's top-left corner, border included. A tile at (0, 0) covers x 0..7 and y -7..0, so its floor has **negative** y.
 - **Sizes:** large tiles are 7×7 units and small ones 7×3.5. Use `search_game_content` to see a tile's `size` and `openings`.
+- **Finding tiles by what's on them:** `search_game_content` also matches drawn objects and their synonyms ("bookshelf" finds bookcases, "stove" finds furnaces), room types and mood tags. `has: ["fireplace", "piano"]` returns only tiles showing all of them, with the matching objects listed.
 - **`rotation` turns the tile counter-clockwise around that corner**, so a rotated tile no longer extends east and south. Let `place_tile_relative` work out the anchor for you.
 - **Tokens and monster placements are centred on their position.** They must lie inside a tile's area.
 
@@ -22,6 +23,7 @@ Valkyrie places components like this. Getting it wrong puts tokens beside the ti
 1. Put the first tile at (0, 0).
 2. For each next tile, call `place_tile_relative(existingTile, direction, side)`. It returns `xposition`, `yposition` and `rotation` with a door lined up, and lists the stretch where the two tiles connect. Take the first candidate unless it overlaps something.
 3. Call `get_map_ascii`. For every tile it gives the area, the centre, and each door with where it leads plus a **token spot** just inside it. Put explore tokens on the spots of doors that "lead off the map", search and interact tokens inside the area, and `TokenInvestigators` near the centre of the start tile.
+   Tiles whose contents are annotated also list their **spaces** (with a free token spot in each) and their **objects** (f1, f2, …). Place tokens by name instead of coordinates: `upsert_token("TokenSearchDesk", { type: "TokenSearch", at: "TileStudy:desk" })` puts it on the desk, `at: "TileStudy:s2"` on a free spot in space s2, and `at: "TileStudy"` in the largest space. The same works for `upsert_mplace`.
 4. Call `render_map` to see the board as Valkyrie will draw it. Red rings mark tokens that are not on a tile.
 5. `validate_scenario` warns about overlapping tiles, touching tiles with no lined-up door, tiles that touch nothing, and tokens off the map.
 
@@ -217,6 +219,7 @@ Consistent naming keeps complex scenarios manageable:
 - Start with 2-3 tiles visible; reveal others through exploration
 - Never place tiles by fixed spacing: small tiles are only 3.5 deep, and a tile's door must face its neighbour. Use `place_tile_relative`
 - Place explore tokens on the token spot of the door that leads toward the next tile (from `get_map_ascii`)
+- Put search and interact tokens on the object they represent (`at: "TileStudy:desk"`), so the story matches the art; `validate_scenario` warns about tokens sitting on a space line
 - Check the layout with `get_map_ascii` and `render_map` after every new tile
 - Consider the camera: use `mincam`/`maxcam` events to control visible area
 - Hub-spoke layouts create a central nexus with branching paths

@@ -5,6 +5,7 @@ import { checkEventSemantics } from '../validation/rules/event-semantics.js';
 import { checkTriggers } from '../validation/rules/triggers.js';
 import { checkTileConnectivity, checkTokenPlacement } from '../validation/rules/tile-connectivity.js';
 import { getSharedCatalog } from '../catalogs/catalog-store.js';
+import { resolveSpot } from '../map/tile-spots.js';
 
 export interface UpsertResult {
   success: boolean;
@@ -148,6 +149,26 @@ function autoCorrectPositionFields(
   const w2 = renameField(data, name, 'y', 'yposition');
   if (w2) warnings.push(w2);
   return warnings;
+}
+
+/**
+ * `at` places a component by what is on the tiles instead of by coordinates:
+ * "TileName", "TileName:s2" (a space), "TileName:f3" or "TileName:desk" (an object).
+ */
+function resolveAtField(model: ScenarioModel, data: Record<string, string>, name: string): { notes: ValidationResult[]; error?: ValidationResult } {
+  if (data.at === undefined) return { notes: [] };
+  const at = data.at;
+  delete data.at;
+  try {
+    const spot = resolveSpot(model, at, name);
+    data.xposition = String(spot.x);
+    data.yposition = String(spot.y);
+    const notes: ValidationResult[] = [{ rule: 'placement', severity: 'warning', message: `"${name}": at="${at}" placed at (${spot.x}, ${spot.y}), ${spot.description}`, component: name, field: 'xposition' }];
+    if (spot.warning) notes.push({ rule: 'placement', severity: 'warning', message: `"${name}": ${spot.warning}`, component: name, field: 'xposition' });
+    return { notes };
+  } catch (e) {
+    return { notes: [], error: { rule: 'placement', severity: 'error', message: (e as Error).message, component: name, field: 'at' } };
+  }
 }
 
 const TOKEN_TYPE_ALIASES: Record<string, string> = {
@@ -319,7 +340,10 @@ export function upsertTile(model: ScenarioModel, name: string, data: Record<stri
 }
 
 export function upsertToken(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
+  const at = resolveAtField(model, data, name);
+  if (at.error) return { success: false, warnings: [], errors: [at.error] };
   const preWarnings = [
+    ...at.notes,
     ...autoCorrectPositionFields(data, name),
     ...autoCorrectTokenFields(data, name, model),
   ];
@@ -363,7 +387,11 @@ export function upsertCustomMonster(model: ScenarioModel, name: string, data: Re
 }
 
 export function upsertMPlace(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {
-  return upsertGeneric(model, name, data, COMPONENT_CONFIGS.MPlace);
+  const at = resolveAtField(model, data, name);
+  if (at.error) return { success: false, warnings: [], errors: [at.error] };
+  const result = upsertGeneric(model, name, data, COMPONENT_CONFIGS.MPlace);
+  result.warnings.unshift(...at.notes);
+  return result;
 }
 
 export function upsertActivation(model: ScenarioModel, name: string, data: Record<string, string>): UpsertResult {

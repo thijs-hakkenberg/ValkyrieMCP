@@ -6,13 +6,16 @@ import * as path from 'node:path';
 import { TILE_GEOMETRY } from '../catalogs/data/tile-geometry.js';
 import { decodeValkyrieDds, encodePng, resize, rotateCcw, type RgbaImage } from '../io/image.js';
 import type { ScenarioModel } from '../model/scenario-model.js';
-import { layoutTiles, tileAt, type PlacedTile, type Rect } from './layout.js';
+import { layoutTiles, localToWorld, tileAt, type PlacedTile, type Rect } from './layout.js';
+import { tileContent } from './tile-spots.js';
 
 export interface RenderOptions {
   /** Folder with Valkyrie's imported tile images (…/Valkyrie/MoM/import/img). Schematic tiles when missing. */
   importImageDir?: string;
   /** Maximum width or height of the image in pixels (default 1600) */
   maxSize?: number;
+  /** Draw the spaces (outlines, token spots) and objects of annotated tiles */
+  showContent?: boolean;
 }
 
 export interface RenderResult {
@@ -22,7 +25,7 @@ export interface RenderResult {
   artwork: boolean;
 }
 
-type Color = [number, number, number, number];
+export type Color = [number, number, number, number];
 
 const TOKEN_COLORS: Array<[RegExp, Color]> = [
   [/^TokenExplore/, [240, 200, 0, 255]],
@@ -44,10 +47,10 @@ const FONT: Record<string, string> = {
   K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010',
   P: '110101110100100', Q: '010101101111011', R: '110101110101101', S: '011100010001110', T: '111010010010010',
   U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101', Y: '101101010010010',
-  Z: '111001010100111',
+  Z: '111001010100111', '.': '000000000000010', '-': '000000111000000',
 };
 
-class Canvas implements RgbaImage {
+export class Canvas implements RgbaImage {
   data: Uint8Array;
   constructor(public width: number, public height: number, bg: Color) {
     this.data = new Uint8Array(width * height * 4);
@@ -78,6 +81,13 @@ class Canvas implements RgbaImage {
         if (d <= r && d >= r - width) this.set(x, y, c);
         else if (fill && d < r - width) this.set(x, y, fill);
       }
+  }
+  line(x0: number, y0: number, x1: number, y1: number, width: number, c: Color) {
+    const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0)));
+    for (let i = 0; i <= n; i++) {
+      const x = x0 + (x1 - x0) * i / n, y = y0 + (y1 - y0) * i / n;
+      this.fillRect(x - width / 2, y - width / 2, x + width / 2, y + width / 2, c);
+    }
   }
   text(s: string, x: number, y: number, scale: number, c: Color, bg?: Color) {
     const w = s.length * 4 * scale - scale;
@@ -149,6 +159,30 @@ export function renderMap(model: ScenarioModel, options: RenderOptions = {}): Re
     canvas.text(label, x0 + scale * 2, y0 + scale * 2, scale, [255, 230, 120, 255], [0, 0, 0, 200]);
     legend.push(`${label} = ${t.name}: ${t.side || '(no side)'}${t.rotation ? ` rotated ${t.rotation}` : ''}, x ${t.rect.minX}..${t.rect.maxX}, y ${t.rect.minY}..${t.rect.maxY}${t.known ? '' : ' (size estimated)'}`);
   });
+
+  if (options.showContent) {
+    const scale = Math.max(1, Math.round(unit / 30));
+    for (const t of tiles) {
+      const content = tileContent(t);
+      if (!content) continue;
+      for (const sp of content.spaces) {
+        const pts = sp.outline.map(p => toPx(...localToWorld(t, p)));
+        for (let k = 0; k < pts.length; k++) {
+          const [a, b] = [pts[k], pts[(k + 1) % pts.length]];
+          canvas.line(a[0], a[1], b[0], b[1], Math.max(2, unit / 25), [255, 255, 255, 200]);
+        }
+        const [ax, ay] = toPx(...localToWorld(t, sp.anchor));
+        canvas.ring(ax, ay, unit * 0.18, Math.max(2, unit / 25), [255, 255, 255, 230]);
+        canvas.text(sp.id, ax + unit * 0.22, ay - 2.5 * scale, scale, [255, 255, 255, 255], [0, 0, 0, 180]);
+      }
+      for (const f of content.features) {
+        const [fx, fy] = toPx(...localToWorld(t, f.at));
+        canvas.fillRect(fx - unit * 0.06, fy - unit * 0.06, fx + unit * 0.06, fy + unit * 0.06, [255, 200, 60, 255]);
+        canvas.text(f.id, fx + unit * 0.1, fy - 2.5 * scale, scale, [255, 200, 60, 255], [0, 0, 0, 180]);
+      }
+      legend.push(`${t.name} objects: ${content.features.map(f => `${f.id} ${f.kind.replace(/_/g, ' ')}`).join(', ')}`);
+    }
+  }
 
   const onTile = (x: number, y: number, wall: boolean) => tiles.length === 0 || !!tileAt(tiles, x, y, wall ? 0.6 : 0.2);
   let n = 0;

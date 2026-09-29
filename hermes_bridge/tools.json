@@ -197,7 +197,7 @@
   },
   {
     "name": "upsert_token",
-    "description": "Create or update a token component. Optional: tokensize (small|medium|huge|massive|Original|<number>), clickeffect=false (decorative, not clickable), customImage (image path; replaces type), type may also be a catalog Monster ID to show that monster",
+    "description": "Create or update a token component. Optional: tokensize (small|medium|huge|massive|Original|<number>), clickeffect=false (decorative, not clickable), customImage (image path; replaces type), type may also be a catalog Monster ID to show that monster. Position: xposition/yposition, or at=\"TileName\" | \"TileName:s2\" (a free spot in that space) | \"TileName:f3\" or \"TileName:desk\" (on that object) — get_map_ascii lists each tile's spaces and objects",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -353,7 +353,7 @@
   },
   {
     "name": "upsert_mplace",
-    "description": "Create or update a monster placement (MPlace). Fields: xposition, yposition, master, rotate, tokensize (small|medium|huge|massive|Original|<number>)",
+    "description": "Create or update a monster placement (MPlace). Fields: xposition, yposition (or at=\"TileName:s2\", see upsert_token), master, rotate, tokensize (small|medium|huge|massive|Original|<number>)",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -464,6 +464,10 @@
         "maxSize": {
           "type": "integer",
           "description": "Maximum width/height in pixels (default 1600)"
+        },
+        "showSpaces": {
+          "type": "boolean",
+          "description": "Also outline each tile's spaces (white, with token spots s1, s2, …) and mark its objects (orange f1, f2, …), as listed by get_map_ascii"
         }
       },
       "additionalProperties": false,
@@ -643,17 +647,24 @@
   },
   {
     "name": "search_game_content",
-    "description": "Search game content catalogs (monsters, tiles, audio, etc.)",
+    "description": "Search game content catalogs (monsters, tiles, audio, etc.). Tiles also match on what is drawn on them: object kinds and synonyms (\"bookcase\", \"stove\", \"stairs\"), room types and mood tags. Use `has` to find tiles showing all of several objects, e.g. has=[\"fireplace\",\"piano\"]",
     "inputSchema": {
       "type": "object",
       "properties": {
         "query": {
           "type": "string",
-          "description": "Search query"
+          "description": "Search query (may be empty when `has` is given)"
         },
         "type": {
           "type": "string",
           "description": "Filter by type"
+        },
+        "has": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tiles only: objects the tile must show, all of them"
         }
       },
       "required": [

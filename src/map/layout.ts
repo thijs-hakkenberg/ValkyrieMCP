@@ -37,7 +37,7 @@ export interface PlacedTile {
 }
 
 const EPS = 0.15;
-const round2 = (n: number) => Math.round(n * 100) / 100;
+const round2 = (n: number) => Math.round(n * 100) / 100 + 0;
 
 /** Rotate a point counter-clockwise by a multiple of 90 degrees */
 function rotatePoint(x: number, y: number, rotation: number): [number, number] {
@@ -293,6 +293,21 @@ export function placeTileRelative(
     // Prefer the wider connection: open ground against open ground beats a gate in a wall
     || Math.round(width(b)) - Math.round(width(a))
     || (a.rotation === 0 ? 0 : 1) - (b.rotation === 0 ? 0 : 1));
+}
+
+/**
+ * A point in a catalog tile's local coordinates (TILE_CONTENT convention: x east from the west edge,
+ * y south from the north edge, rotation 0) to world coordinates for the tile as placed.
+ */
+export function localToWorld(tile: Pick<PlacedTile, 'x' | 'y' | 'rotation'>, [lx, ly]: [number, number]): [number, number] {
+  const [rx, ry] = rotatePoint(lx, -ly, tile.rotation);
+  return [round2(rx + tile.x), round2(ry + tile.y)];
+}
+
+/** Inverse of localToWorld */
+export function worldToLocal(tile: Pick<PlacedTile, 'x' | 'y' | 'rotation'>, x: number, y: number): [number, number] {
+  const [lx, ny] = rotatePoint(x - tile.x, y - tile.y, -tile.rotation);
+  return [round2(lx), round2(-ny)];
 }
 
 /** Points inside a tile useful for tokens: centre, and just inside each opening (for explore tokens) */

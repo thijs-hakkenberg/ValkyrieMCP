@@ -9,6 +9,12 @@ import {
   TOKENS,
 } from './data/all-catalogs.js';
 import { TILE_GEOMETRY } from './data/tile-geometry.js';
+import { TILE_CONTENT } from './data/tile-content.js';
+import { kindsForTerm } from './data/feature-vocabulary.js';
+import { isAnnotated } from './tile-content.js';
+import type { TileFeature } from './tile-content-types.js';
+
+const featureName = (f: TileFeature) => f.label ? `${f.kind.replace(/_/g, ' ')} (${f.label})` : f.kind.replace(/_/g, ' ');
 
 /** Maps lowercase catalog pack IDs to Valkyrie's case-sensitive pack IDs */
 export const PACK_ID_MAP: Record<string, string> = {
@@ -56,7 +62,16 @@ export class CatalogStore {
         if (geo) {
           entry.size = `${geo.width}x${geo.height} units`;
           entry.openings = geo.openings;
-          entry.desc = geo.desc;
+        }
+        const content = TILE_CONTENT[entry.id];
+        if (content) {
+          entry.desc = content.desc;
+          if (isAnnotated(content)) {
+            entry.roomTypes = content.roomTypes;
+            entry.contentTags = content.tags;
+            entry.spaces = content.spaces.length;
+            entry.objects = [...new Set(content.features.map(featureName))];
+          }
         }
       }
     }
@@ -85,8 +100,46 @@ export class CatalogStore {
       if (entry.name.toLowerCase().includes(q)) return true;
       if (entry.traits.some(t => t.toLowerCase().includes(q))) return true;
       if (typeof entry.desc === 'string' && entry.desc.toLowerCase().includes(q)) return true;
+      if (entry.type === 'tile' && this.tileObjectMatches(entry.id, query).length > 0) return true;
+      const content = entry.type === 'tile' ? TILE_CONTENT[entry.id] : undefined;
+      if (content && [...content.roomTypes, ...content.tags].some(t => t.includes(q))) return true;
       return false;
     });
+  }
+
+  /**
+   * Objects on a tile that a term refers to: features of a kind the term names (or a synonym of),
+   * or whose label contains it. Returns descriptions like "bookcase (tall bookshelf) in s1 study".
+   */
+  tileObjectMatches(tileId: string, term: string): string[] {
+    const content = TILE_CONTENT[tileId];
+    const q = term.trim().toLowerCase();
+    if (!isAnnotated(content) || !q) return [];
+    const kinds = new Set<string>(kindsForTerm(q));
+    return content.features
+      .filter(f => kinds.has(f.kind) || (f.label?.toLowerCase().includes(q) ?? false))
+      .map(f => `${featureName(f)} in ${f.space} ${content.spaces.find(s => s.id === f.space)?.label ?? ''}`.trim());
+  }
+
+  /**
+   * Tiles showing every one of `terms` (object kinds, synonyms or label words). Tiles that are not
+   * annotated yet fall back to their description text. Each result lists the objects that matched.
+   */
+  tilesWith(terms: string[]): Array<CatalogEntry & { matchedObjects: Record<string, string[]> }> {
+    const wanted = terms.map(t => t.trim().toLowerCase()).filter(Boolean);
+    const results: Array<CatalogEntry & { matchedObjects: Record<string, string[]> }> = [];
+    for (const entry of this.byType.get('tile') ?? []) {
+      const matchedObjects: Record<string, string[]> = {};
+      const ok = wanted.every(term => {
+        const found = this.tileObjectMatches(entry.id, term);
+        if (found.length === 0 && !isAnnotated(TILE_CONTENT[entry.id]) && typeof entry.desc === 'string'
+          && entry.desc.toLowerCase().includes(term)) found.push('(mentioned in the description; not annotated yet)');
+        matchedObjects[term] = found;
+        return found.length > 0;
+      });
+      if (ok) results.push({ ...entry, matchedObjects });
+    }
+    return results;
   }
 
   /** Get a catalog entry by exact ID. */
