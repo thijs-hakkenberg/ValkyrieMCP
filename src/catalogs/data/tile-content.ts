@@ -7790,15 +7790,666 @@ export const TILE_CONTENT: Record<string, TileContent> = {
       { id: "f22", kind: "pillar", label: "wooden post", space: "s4", at: [3.82, 6.5], box: [3.75, 6.2, 3.9, 6.85] }
     ]
   },
-  TileSideCampsite: { desc: "Rocky campsite with boulders, mushrooms, and scattered supplies", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideClearing1: { desc: "Forest clearing with winding path and fallen autumn leaves", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideClearing2: { desc: "Circular stone ruins in an overgrown forest clearing with debris", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideTempleStairs: { desc: "Broad stone staircase leading up to walled temple entrance", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideThroneChamber: { desc: "Grand throne chamber with ornate floor patterns and two south doors", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideOvergrownPath: { desc: "Dirt path winding through dense overgrown autumn foliage", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideAltarChamber: { desc: "Stone altar chamber with carved relief, rubble, and west door", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideSunlitChamber: { desc: "Stone chamber with glowing orbs and arcane floor circles", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRuinedHut: { desc: "Overgrown ruined hut with muddy ground and vegetation", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideCampsite: {
+    desc: "Overgrown forest campsite with three bedrolls, a stone-ringed campfire with a wooden spit, a wicker basket, a spilled cooking pot, a sack and a dead thornbush.",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "forest",
+      "abandoned"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west camp",
+        outline: [[0, 0], [3.5, 0], [3.45, 1.65], [3.6, 1.95], [4.25, 2.55], [4.4, 3.5], [0, 3.5]],
+        anchor: [0.73, 0.73],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "campfire",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.25, 2.55], [3.6, 1.95], [3.45, 1.65]],
+        anchor: [5.03, 2.83],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bed", label: "bedroll", space: "s1", at: [2.6, 1], box: [1.8, 0.3, 3.3, 1.6], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "bed", label: "bedroll", space: "s1", at: [3, 2.6], box: [2.2, 2, 3.8, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "bed", label: "bedroll", space: "s2", at: [6, 1.2], box: [5.1, 0.5, 6.8, 1.8], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "fireplace", label: "stone campfire ring with spit", space: "s2", at: [4.7, 1.6], box: [4.2, 0.7, 5.6, 2.2], affords: [
+          "interact", "light"
+        ] },
+      { id: "f5", kind: "other", label: "wicker basket with bottle", space: "s2", at: [4.15, 0.6], box: [3.8, 0.35, 4.5, 0.9], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "overturned cooking pot", space: "s2", at: [3.65, 1.3], box: [3.5, 0.85, 3.9, 1.8], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "sack", space: "s2", at: [5.95, 2.6], box: [5.75, 2.35, 6.2, 2.8], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "bush", label: "dead thornbush", space: "s1", at: [1, 2.2], box: [0.45, 1.45, 1.65, 2.9], affords: [
+          "hide"
+        ] },
+      { id: "f9", kind: "other", label: "green bottle", space: "s1", at: [3.4, 2.9], box: [3.3, 2.75, 3.5, 3.1] }
+    ]
+  },
+  TileSideClearing1: {
+    desc: "Dense forest undergrowth with a large fungus-covered fallen log, a dark thorny bush and a few scattered stones.",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "forest",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west clearing",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.85], [2.95, 1.25], [3.35, 1.5], [4.15, 2.3], [4.3, 2.65], [4.4, 3.5], [0, 3.5]],
+        anchor: [1.58, 1.28],
+        spots: [[0.98, 2.58], [2.38, 2.78]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "fallen log",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.3, 2.65], [4.05, 2.15], [2.75, 1.05], [2.65, 0.85]],
+        anchor: [3.28, 0.63],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "tree", label: "fallen log with fungus", space: "s2", at: [5.1, 1.7], box: [4.2, 0.6, 6.4, 2.6], affords: [
+          "search", "hide"
+        ] },
+      { id: "f2", kind: "bush", label: "dark thornbush", space: "s1", at: [3.1, 1.95], box: [2.7, 1.5, 3.6, 2.45], affords: [
+          "hide"
+        ] },
+      { id: "f3", kind: "rock", label: "small stones", space: "s1", at: [0.7, 1.8], box: [0.6, 1.65, 0.75, 1.95] },
+      { id: "f4", kind: "rock", label: "small stones", space: "s2", at: [3.5, 1.25], box: [3.4, 1.15, 3.6, 1.35] },
+      { id: "f5", kind: "rock", label: "small stones", space: "s2", at: [6.55, 1.4], box: [6.45, 1.2, 6.65, 1.6] }
+    ]
+  },
+  TileSideClearing2: {
+    desc: "Forest clearing ringed by a broken wooden palisade with a gap in the southeast, holding a vine-covered collapsed lean-to, a campfire with a spit and cooking pot, animal remains and spilled coins.",
+    roomTypes: [
+      "wilderness",
+      "yard"
+    ],
+    tags: [
+      "outdoor",
+      "forest",
+      "abandoned",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north forest",
+        outline: [[0, 0], [7, 0], [7, 2.65], [5.75, 2.7], [5.5, 1.85], [5.05, 1.35], [5.05, 1.25], [4.7, 0.95], [3.65, 0.45], [2.5, 0.45], [1.45, 0.95], [0.85, 1.6], [0.55, 2.2], [0.4, 2.75], [0.4, 3.65], [0.6, 4.4], [0, 4.4]],
+        anchor: [5.98, 1.03],
+        spots: [[0.78, 0.78]],
+        links: [
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "west enclosure",
+        outline: [[2.85, 0.4], [3.65, 0.45], [4.4, 0.75], [5.05, 1.25], [5.35, 1.75], [3.95, 1.8], [2.25, 3.45], [2.2, 5.8], [2.1, 5.8], [1.45, 5.45], [0.75, 4.65], [0.4, 3.65], [0.4, 2.75], [0.7, 1.85], [1.45, 0.95], [2.05, 0.6]],
+        anchor: [3.48, 1.28],
+        spots: [[1.03, 3.48]],
+        links: [
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "east enclosure",
+        outline: [[5.3, 1.75], [5.5, 1.85], [5.8, 3], [5.7, 4], [5.3, 4.85], [4.35, 5.7], [3.95, 5.85], [3.55, 5.95], [2.65, 5.95], [2.2, 5.85], [2.25, 3.45], [3.95, 1.8]],
+        anchor: [4.58, 4.28],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s4", via: "door" }
+        ],
+        openings: []
+      },
+      {
+        id: "s4",
+        label: "south forest",
+        outline: [[5.8, 2.65], [7, 2.65], [7, 7], [0, 7], [0, 4.4], [0.65, 4.35], [0.85, 4.8], [1.45, 5.45], [2.2, 5.85], [2.65, 5.95], [3.55, 5.95], [3.95, 5.85], [4.35, 5.7], [4.5, 5.5], [4.85, 5.3], [5.45, 4.6], [5.75, 3.75]],
+        anchor: [6.18, 4.68],
+        spots: [[4.78, 6.18], [0.78, 5.58]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "door" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "rubble", label: "vine-covered collapsed lean-to", space: "s2", at: [2, 2.3], box: [1.2, 1.5, 2.95, 3.1], affords: [
+          "search", "hide"
+        ] },
+      { id: "f2", kind: "fireplace", label: "stone campfire ring with spit", space: "s3", at: [3.1, 3.5], box: [2.45, 2.7, 3.95, 4], affords: [
+          "interact", "light"
+        ] },
+      { id: "f3", kind: "other", label: "black cooking pot", space: "s3", at: [3.15, 2.8], box: [2.9, 2.55, 3.45, 3], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "other", label: "iron ring object with spilled gold coins", space: "s3", at: [4.7, 2.2], box: [4.2, 1.9, 5, 2.6], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "bones", label: "animal remains", space: "s2", at: [1.35, 4.3], box: [1.05, 4.05, 1.65, 4.55], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "rubble", label: "fallen fence posts", space: "s3", at: [2.8, 4.45], box: [2.55, 4.05, 3.05, 4.85] },
+      { id: "f7", kind: "rubble", label: "fallen fence posts", space: "s3", at: [3.3, 4.85], box: [3, 4.45, 3.65, 5.2] },
+      { id: "f8", kind: "tree", label: "cut log", space: "s4", at: [5.25, 5.4], box: [4.95, 5.25, 5.4, 5.55] },
+      { id: "f9", kind: "rubble", label: "broken fence planks", space: "s4", at: [1.4, 6.4], box: [1, 6.05, 1.75, 6.7] },
+      { id: "f10", kind: "tree", label: "stump", space: "s4", at: [6.35, 5.75], box: [6.2, 5.65, 6.5, 5.85] },
+      { id: "f11", kind: "tree", label: "stump", space: "s4", at: [5.35, 6.7], box: [5.25, 6.55, 5.45, 6.85] }
+    ]
+  },
+  TileSideTempleStairs: {
+    desc: "Wide weathered stone temple stairs flanked by two carved stone posts, rising out of dense jungle undergrowth scattered with boulders, with a flagstone landing at the south.",
+    roomTypes: [
+      "wilderness",
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "ruins",
+      "ancient"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west jungle",
+        outline: [[0, 0], [3.55, 0], [3.5, 1.35], [3.25, 2.05], [2.95, 2.45], [2.65, 3.1], [2.6, 4.35], [0.9, 4.3], [0, 4.4]],
+        anchor: [1.53, 1.23],
+        spots: [[1.83, 2.93], [2.83, 0.68]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east jungle",
+        outline: [[3.55, 0], [7, 0], [7, 4.35], [5.65, 4.55], [4.5, 4.6], [3.3, 4.55], [2.6, 4.4], [2.65, 3.1], [2.75, 2.8], [3.25, 2.05], [3.5, 1.35]],
+        anchor: [4.53, 2.78],
+        spots: [[4.98, 1.18], [3.43, 3.68]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "temple stairs",
+        outline: [[0.9, 4.3], [2.6, 4.35], [2.95, 4.5], [3.85, 4.6], [5.65, 4.55], [7, 4.35], [7, 7], [0, 7], [0, 4.4]],
+        anchor: [1.33, 5.63],
+        spots: [[2.83, 5.73], [5.78, 5.68]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 },
+          { side: "W", index: 1 },
+          { side: "W", index: 2 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "stairs_up", label: "stone temple stairs, direction unclear", space: "s3", at: [3.5, 4.8], box: [0.9, 3.6, 6.3, 6], affords: [
+          "climb"
+        ] },
+      { id: "f2", kind: "pillar", label: "carved stone post", space: "s1", at: [0.75, 3.35], box: [0.5, 2.85, 1, 3.85] },
+      { id: "f3", kind: "pillar", label: "carved stone post", space: "s2", at: [6.3, 3.3], box: [6.05, 2.85, 6.55, 3.6] },
+      { id: "f4", kind: "rock", label: "boulders", space: "s1", at: [0.55, 2.2], box: [0.2, 1.8, 0.95, 2.7] },
+      { id: "f5", kind: "rock", label: "boulders", space: "s2", at: [5.95, 1.95], box: [5.6, 1.7, 6.3, 2.2] },
+      { id: "f6", kind: "rock", space: "s2", at: [3.85, 1.5], box: [3.6, 1.3, 4, 1.7] },
+      { id: "f7", kind: "rock", space: "s1", at: [2.1, 2.1], box: [1.95, 1.95, 2.25, 2.25] },
+      { id: "f8", kind: "rubble", label: "loose stones on the steps", space: "s3", at: [4.4, 5.65], box: [4.15, 5.5, 4.65, 5.8] }
+    ]
+  },
+  TileSideThroneChamber: {
+    desc: "Cobwebbed ancient stone throne chamber with glyph-carved floor borders, a carved stone throne on a stepped dais in the south, toppled statues, rubble and wall-mounted lamps.",
+    roomTypes: [
+      "ritual",
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "ruins",
+      "temple"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west hall",
+        outline: [[0, 0], [3.5, 0], [3.5, 1.8], [2.65, 2.6], [2.65, 3.5], [0, 3.5]],
+        anchor: [2.43, 1.03],
+        spots: [[1.83, 2.33]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east hall",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 2.6], [3.5, 1.8]],
+        anchor: [4.18, 2.28],
+        spots: [[6.13, 1.33]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "throne",
+        outline: [[0, 3.5], [7, 3.5], [7, 7], [0, 7]],
+        anchor: [5.88, 4.53],
+        spots: [[1.03, 5.98]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "chair", label: "carved stone throne on stepped dais", space: "s3", at: [3.45, 5.4], box: [2.2, 4, 4.8, 6.5], affords: [
+          "interact", "search"
+        ] },
+      { id: "f2", kind: "statue", label: "toppled idol", space: "s2", at: [4.45, 0.95], box: [4.2, 0.6, 4.75, 1.15], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "statue", label: "broken statue", space: "s2", at: [5.25, 0.9], box: [4.95, 0.55, 5.5, 1.15], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "statue", label: "toppled statue", space: "s3", at: [1.4, 4.65], box: [0.9, 4.15, 1.85, 5], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "statue", label: "broken statue", space: "s3", at: [5.65, 5.8], box: [5.35, 5.55, 5.95, 6.05], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "rubble", space: "s1", at: [1.2, 1.35], box: [0.9, 1.05, 1.5, 1.7] },
+      { id: "f7", kind: "rubble", space: "s2", at: [6.1, 2.6], box: [5.8, 2.2, 6.35, 3] },
+      { id: "f8", kind: "rubble", space: "s3", at: [5.1, 3.9], box: [4.95, 3.6, 5.35, 4.1] },
+      { id: "f9", kind: "lamp", label: "wall lamp", space: "s1", at: [0.85, 0.4], box: [0.75, 0.3, 0.95, 0.5], affords: [
+          "light"
+        ] },
+      { id: "f10", kind: "lamp", label: "wall lamp", space: "s2", at: [5.65, 0.4], box: [5.55, 0.3, 5.75, 0.5], affords: [
+          "light"
+        ] },
+      { id: "f11", kind: "lamp", label: "wall lamp", space: "s3", at: [0.35, 3.7], box: [0.25, 3.6, 0.45, 3.8], affords: [
+          "light"
+        ] },
+      { id: "f12", kind: "lamp", label: "wall lamp", space: "s2", at: [6.65, 3.1], box: [6.55, 3, 6.75, 3.2], affords: [
+          "light"
+        ] },
+      { id: "f13", kind: "lamp", label: "wall lamp", space: "s3", at: [1.6, 6.7], box: [1.5, 6.6, 1.7, 6.8], affords: [
+          "light"
+        ] },
+      { id: "f14", kind: "lamp", label: "wall lamp", space: "s3", at: [6.2, 6.7], box: [6.1, 6.6, 6.3, 6.8], affords: [
+          "light"
+        ] }
+    ]
+  },
+  TileSideOvergrownPath: {
+    desc: "Dense jungle undergrowth crossed east to west by an overgrown dirt path strewn with pale stones, with dark thornbushes along its edges.",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west path",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.05], [3.95, 1.85], [3.95, 2], [3.55, 2.5], [3.5, 3.5], [0, 3.5]],
+        anchor: [2.98, 2.08],
+        spots: [[0.68, 1.78]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east path",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.55, 2.5], [3.95, 2], [3.95, 1.85], [4.4, 1.05]],
+        anchor: [5.58, 2.58],
+        spots: [[5.03, 1.28], [6.33, 0.68]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bush", label: "dark thornbush", space: "s1", at: [1.5, 0.9], box: [1, 0.3, 2, 1.5], affords: [
+          "hide"
+        ] },
+      { id: "f2", kind: "bush", label: "dark thornbush", space: "s1", at: [3.1, 0.65], box: [2.7, 0.2, 3.6, 1.1], affords: [
+          "hide"
+        ] },
+      { id: "f3", kind: "bush", label: "dark thornbush", space: "s1", at: [1.4, 2.8], box: [0.9, 2.3, 1.9, 3.4], affords: [
+          "hide"
+        ] },
+      { id: "f4", kind: "rock", label: "path stones", space: "s1", at: [2.2, 1.55], box: [2, 1.35, 2.4, 1.85] },
+      { id: "f5", kind: "rock", label: "path stones", space: "s2", at: [6.3, 1.65], box: [6, 1.35, 6.6, 1.9] },
+      { id: "f6", kind: "rock", space: "s2", at: [6.6, 2.4], box: [6.4, 2.25, 6.8, 2.55] },
+      { id: "f7", kind: "rock", space: "s2", at: [4.85, 2.2], box: [4.7, 2.1, 5, 2.3] },
+      { id: "f8", kind: "plant", label: "red and blue flowers", space: "s2", at: [5.2, 0.4], box: [4.9, 0.2, 5.5, 0.6] }
+    ]
+  },
+  TileSideAltarChamber: {
+    desc: "Ancient stone chamber with glyph-carved borders, a large relief-carved stone altar slab in the east, toppled statues, broken rubble and scattered red ceramic urns.",
+    roomTypes: [
+      "ritual",
+      "crypt"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "ruins",
+      "temple"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chamber",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.35], [3.5, 2.15], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.43, 2.63],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "altar",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.15], [2.65, 1.35]],
+        anchor: [3.68, 1.63],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "altar", label: "relief-carved stone altar slab", space: "s2", at: [5.3, 1.8], box: [4.3, 1.05, 6.15, 2.5], affords: [
+          "interact", "search"
+        ] },
+      { id: "f2", kind: "statue", label: "toppled statue", space: "s1", at: [1.15, 1.2], box: [0.8, 0.6, 1.45, 1.75], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "statue", label: "broken statue", space: "s2", at: [3.7, 0.75], box: [3.3, 0.5, 4, 1], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "statue", label: "broken statue", space: "s2", at: [5.95, 0.75], box: [5.65, 0.5, 6.2, 1], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "statue", label: "broken statue fragment", space: "s1", at: [2.3, 2.2], box: [2, 1.95, 2.6, 2.4], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "toppled red ceramic urn", space: "s2", at: [3.05, 0.9], box: [2.85, 0.65, 3.5, 1.05], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "other", label: "red ceramic vessel and bowl", space: "s1", at: [0.95, 1.95], box: [0.75, 1.75, 1.15, 2.15], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "other", label: "broken urn and goblet", space: "s2", at: [5.8, 2.95], box: [5.45, 2.75, 6.1, 3.1], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "rubble", space: "s1", at: [3.2, 2.95], box: [2.9, 2.65, 3.6, 3.1] },
+      { id: "f10", kind: "rubble", label: "stones", space: "s1", at: [2.2, 1.6], box: [2.05, 1.35, 2.35, 1.85] }
+    ]
+  },
+  TileSideSunlitChamber: {
+    desc: "Ancient stone chamber with glyph-carved borders and six carved sun-stone discs set into the floor, lit by shafts of light from above.",
+    roomTypes: [
+      "ritual",
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "occult"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chamber",
+        outline: [[0, 0], [3.5, 0], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.88, 1.88],
+        spots: [[0.98, 0.73], [2.68, 0.73]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east chamber",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [3.5, 3.5]],
+        anchor: [5.43, 1.58],
+        spots: [[4.43, 2.58], [4.28, 0.78]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "ritual_circle", label: "sunlit carved sun-stone floor disc", space: "s1", at: [1.3, 1.1], box: [1, 0.8, 1.65, 1.4], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "ritual_circle", label: "large sunlit carved sun-stone floor disc", space: "s1", at: [2.2, 1.75], box: [1.75, 1.3, 2.7, 2.2], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "ritual_circle", label: "sunlit carved sun-stone floor disc", space: "s1", at: [1.3, 2.45], box: [1, 2.15, 1.65, 2.8], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "ritual_circle", label: "large sunlit carved sun-stone floor disc", space: "s2", at: [4.75, 1.7], box: [4.3, 1.25, 5.25, 2.2], affords: [
+          "interact"
+        ] },
+      { id: "f5", kind: "ritual_circle", label: "sunlit carved sun-stone floor disc", space: "s2", at: [5.6, 1.05], box: [5.3, 0.75, 5.9, 1.4], affords: [
+          "interact"
+        ] },
+      { id: "f6", kind: "ritual_circle", label: "sunlit carved sun-stone floor disc", space: "s2", at: [5.6, 2.5], box: [5.3, 2.15, 5.95, 2.85], affords: [
+          "interact"
+        ] },
+      { id: "f7", kind: "bones", label: "skulls in wall niches", space: "s1", at: [0.7, 1.3], box: [0.6, 1.2, 0.8, 1.4] },
+      { id: "f8", kind: "rubble", space: "s2", at: [5.15, 3.05], box: [5, 2.95, 5.3, 3.15] }
+    ]
+  },
+  TileSideRuinedHut: {
+    desc: "Roofless ruined stone hut with a flagstone floor, a wooden door to the west and a plank door to the south, its crumbled east wall opening onto jungle clearing scattered with boulders.",
+    roomTypes: [
+      "wilderness",
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "ruins",
+      "abandoned"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "hut north",
+        outline: [[0, 0], [3.5, 0], [3.5, 3.5], [1.7, 3.5], [0.9, 4.4], [0, 4.4]],
+        anchor: [1.43, 2.33],
+        spots: [[0.98, 0.98], [0.78, 3.58]],
+        links: [
+          { to: "s2", via: "barrier" },
+          { to: "s3", via: "barrier" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "north jungle",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [6.45, 3.55], [6.1, 3.45], [5.55, 2.5], [5.35, 2.4], [4.95, 1.95], [4.65, 1.8], [3.5, 1.8]],
+        anchor: [5.63, 1.28],
+        spots: [[4.23, 0.73], [6.28, 2.53]],
+        links: [
+          { to: "s1", via: "barrier" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "south jungle",
+        outline: [[3.5, 1.8], [4.65, 1.8], [4.95, 1.95], [5.35, 2.4], [5.55, 2.5], [6.1, 3.45], [6.45, 3.55], [7, 3.5], [7, 7], [3.5, 7]],
+        anchor: [4.68, 5.68],
+        spots: [[6.18, 4.33], [6.38, 6.28]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "barrier" },
+          { to: "s4", via: "barrier" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 1 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "hut south",
+        outline: [[1.7, 3.5], [3.5, 3.5], [3.5, 7], [0, 7], [0, 4.4], [0.9, 4.4]],
+        anchor: [1.63, 4.88],
+        spots: [[2.03, 6.23]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "barrier" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "rubble", label: "crumbled stone wall", space: "s1", at: [3.3, 1.2], box: [3.1, 0.4, 3.5, 2.1], affords: [
+          "hide"
+        ] },
+      { id: "f2", kind: "rubble", label: "crumbled stone wall", space: "s4", at: [3.2, 5.3], box: [2.8, 3.9, 3.5, 6.7], affords: [
+          "hide"
+        ] },
+      { id: "f3", kind: "rubble", label: "tumbled stones", space: "s1", at: [2.7, 1.6], box: [2.45, 1.2, 2.95, 2] },
+      { id: "f4", kind: "rock", label: "boulders", space: "s3", at: [4.7, 2.5], box: [4.3, 2.2, 5.1, 2.9] },
+      { id: "f5", kind: "rock", label: "boulders", space: "s3", at: [5.4, 3.75], box: [5.2, 3.45, 5.75, 4] },
+      { id: "f6", kind: "rock", label: "boulders", space: "s3", at: [4.1, 3.75], box: [3.9, 3.55, 4.3, 3.95] },
+      { id: "f7", kind: "rock", label: "stones", space: "s3", at: [5.2, 4.6], box: [4.9, 4.4, 5.5, 4.8] },
+      { id: "f8", kind: "rock", space: "s3", at: [6.05, 5.7], box: [5.85, 5.5, 6.2, 5.9] },
+      { id: "f9", kind: "rock", space: "s3", at: [5.15, 6.6], box: [5, 6.45, 5.3, 6.75] },
+      { id: "f10", kind: "rock", space: "s2", at: [3.85, 1.3], box: [3.7, 1.15, 4, 1.45] },
+      { id: "f11", kind: "plant", label: "hanging vines", space: "s4", at: [0.6, 6], box: [0.3, 5.5, 1, 6.6] }
+    ]
+  },
   TileSideHallChamber1: { desc: "Temple hall with scattered rubble and green idol statue", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideHallChamber2: { desc: "Cracked stone chamber with bookshelf alcove on east side", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideStorageChamber: { desc: "Temple storage room with shelves, crates, and cracked floor", roomTypes: [], tags: [], spaces: [], features: [] },
