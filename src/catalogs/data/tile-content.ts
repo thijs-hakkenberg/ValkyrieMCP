@@ -6408,16 +6408,678 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideTracks: { desc: "Outdoor railroad tracks on gravel bed between platforms", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideViewingRoom1: { desc: "Ship viewing room with cushioned seats and windows along walls", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideViewingRoom2: { desc: "Large ornate viewing room with velvet chairs and globe decorations", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideViewingRoom3: { desc: "Sunlit ship viewing room with wooden crates and bench seating", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideStatueChamber: { desc: "Stone chamber with large serpent statues and carved floor", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideBurialChamber: { desc: "Rectangular tomb room with cracked floor and burial urns", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideBedChamber: { desc: "Temple sleeping quarters with ornate archway and stone bed", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideVerdantChamber: { desc: "Overgrown chamber with lush vegetation and mossy stone floor", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSidePit: { desc: "Half-collapsed chamber with deep rocky pit and carved walls", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideTunnel: { desc: "Narrow rocky cave tunnel with rough uneven stone walls", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideTracks: {
+    desc: "Railway track on a bed of dark ballast, two steel rails running east-west across wooden sleepers",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "outdoor",
+      "industrial",
+      "dark"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west track",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.05], [2.95, 1.5], [3.85, 1.9], [4.2, 2.25], [4.4, 2.75], [4.4, 3.5], [0, 3.5]],
+        anchor: [1.18, 1.78],
+        spots: [[2.58, 2.03]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east track",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 2.75], [4.2, 2.25], [3.85, 1.9], [2.95, 1.5], [2.75, 1.25], [2.65, 1.05]],
+        anchor: [4.98, 1.78],
+        spots: [[6.33, 1.28]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "other", label: "steel rail (north)", space: "s2", at: [3.5, 0.52], box: [0, 0.35, 7, 0.65] },
+      { id: "f2", kind: "other", label: "steel rail (south)", space: "s1", at: [3.5, 3.12], box: [0, 2.95, 7, 3.3] }
+    ]
+  },
+  TileSideViewingRoom1: {
+    desc: "Wood-floored viewing room with tall windows, two red leather armchairs, a coffee table, a floral sofa and a loveseat with a newspaper",
+    roomTypes: [
+      "lounge"
+    ],
+    tags: [
+      "indoor",
+      "wealthy",
+      "bright"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west sitting area",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.35], [3.5, 2.2], [3.5, 3.5], [0, 3.5]],
+        anchor: [0.73, 2.78],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "N", index: 1 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east sitting area",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.2], [4.4, 1.35]],
+        anchor: [4.78, 2.83],
+        spots: [[6.23, 2.88]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 2 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "armchair", label: "red leather armchair", space: "s1", at: [0.7, 1.55], box: [0.12, 1.04, 1.25, 2.08], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "armchair", label: "red leather armchair", space: "s1", at: [1.75, 1.7], box: [1.2, 1.17, 2.3, 2.23], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "table", label: "coffee table with a book and teacup", space: "s1", at: [3.25, 1.5], box: [2.67, 1.13, 3.85, 1.92], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "sofa", label: "floral sofa with cushions", space: "s1", at: [3.2, 2.6], box: [2.23, 2.19, 4.2, 3.04], affords: [
+          "search", "hide"
+        ] },
+      { id: "f5", kind: "sofa", label: "floral loveseat with a newspaper", space: "s2", at: [5.5, 1.7], box: [4.85, 1, 6.2, 2.37], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "papers", label: "newspaper", space: "s2", at: [5.7, 1.45], box: [5.4, 1.2, 6, 1.7], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "table", label: "small round side table", space: "s1", at: [4.3, 0.54], box: [4.15, 0.35, 4.45, 0.72] },
+      { id: "f8", kind: "plant", label: "potted fern", space: "s2", at: [6.3, 0.7], box: [6.05, 0.45, 6.55, 0.95] },
+      { id: "f9", kind: "window", label: "tall east window", space: "s2", at: [6.8, 1.85], box: [6.6, 1.05, 7, 2.65], affords: [
+          "interact"
+        ] },
+      { id: "f10", kind: "window", label: "row of north windows", space: "s1", at: [3.3, 0.15], box: [0.2, 0, 6.3, 0.35], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideViewingRoom2: {
+    desc: "Dining room under a row of tall north windows, a large patterned rug set with five round tables and red-cushioned chairs, some tables draped with stained cloths and littered with bottles and plates",
+    roomTypes: [
+      "dining",
+      "lounge"
+    ],
+    tags: [
+      "indoor",
+      "wealthy",
+      "abandoned"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north dining area",
+        outline: [[0, 0], [7, 0], [7, 3.5], [0, 3.5]],
+        anchor: [1.23, 1.63],
+        spots: [[3.58, 1.48], [5.68, 1.43]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "N", index: 1 },
+          { side: "N", index: 2 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "southwest dining area",
+        outline: [[0, 3.5], [3.5, 3.5], [3.5, 4.4], [2.65, 5.25], [2.65, 7], [0, 7]],
+        anchor: [0.68, 6.33],
+        spots: [[2.83, 4.23]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "southeast dining area",
+        outline: [[3.5, 3.5], [7, 3.5], [7, 7], [2.65, 7], [2.65, 5.25], [3.5, 4.4]],
+        anchor: [5.18, 6.18],
+        spots: [[4.18, 4.18]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "table", label: "round table with stained cloth and ice bucket, two chairs", space: "s1", at: [2.55, 2.9], box: [1.83, 2.25, 3.33, 3.65], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "table", label: "round table with spilled wine bottle, four chairs", space: "s1", at: [4.7, 2.8], box: [4.02, 2.1, 5.42, 3.46], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "table", label: "round table with cloth, fruit bowl and tray, two chairs", space: "s2", at: [1.55, 5.05], box: [0.77, 4.3, 2.33, 5.8], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "table", label: "round table with stacked plates, two chairs", space: "s3", at: [3.7, 5.7], box: [3, 5, 4.46, 6.4], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "table", label: "round table with cloth and empty bottles, two chairs", space: "s3", at: [5.6, 4.7], box: [4.87, 4, 6.37, 5.45], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "chair", label: "red-cushioned chair", space: "s1", at: [6, 2.8], box: [5.65, 2.45, 6.4, 3.05] },
+      { id: "f7", kind: "rug", label: "large patterned rug", space: "s3", at: [3.5, 3.95], box: [0.15, 1.4, 6.9, 6.5] },
+      { id: "f8", kind: "window", label: "row of tall north windows", space: "s1", at: [3.5, 0.2], box: [0.2, 0, 6.8, 0.45], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideViewingRoom3: {
+    desc: "Sunlit wood-floored viewing room with windows on the north and west, a brass telescope on a wooden stand, potted plants and small round side tables set with tea and fruit",
+    roomTypes: [
+      "lounge"
+    ],
+    tags: [
+      "indoor",
+      "wealthy",
+      "bright"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west viewing area",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.4], [2.8, 1.45], [3.4, 2.1], [3.5, 2.1], [3.5, 3.5], [0, 3.5]],
+        anchor: [2.23, 2.23],
+        spots: [[1.08, 1.43]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east viewing area",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.1], [3.4, 2.1], [2.8, 1.45], [2.65, 1.4]],
+        anchor: [5.33, 1.93],
+        spots: [[4.18, 2.73], [6.38, 2.88]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 1 },
+          { side: "N", index: 2 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "other", label: "brass telescope", space: "s2", at: [3.8, 0.8], box: [3.5, 0.3, 4.08, 1.38], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "crate", label: "wooden telescope stand", space: "s2", at: [3.68, 1.5], box: [3.3, 1.25, 4.05, 1.77], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "table", label: "round side table with tea set and letter", space: "s1", at: [1.52, 0.6], box: [1.25, 0.3, 1.8, 0.9], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "table", label: "round side table with bowl of fruit", space: "s1", at: [0.75, 2.35], box: [0.48, 2.08, 1.02, 2.62], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "table", label: "small round side table with doily", space: "s2", at: [4.74, 0.55], box: [4.56, 0.36, 4.92, 0.73] },
+      { id: "f6", kind: "table", label: "round side table with folded napkins", space: "s2", at: [6, 0.6], box: [5.73, 0.3, 6.27, 0.88], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "plant", label: "potted plant", space: "s1", at: [0.67, 0.7], box: [0.44, 0.46, 0.9, 0.94] },
+      { id: "f8", kind: "plant", label: "flowering plant on a stand", space: "s2", at: [2.74, 0.58], box: [2.48, 0.3, 3, 0.85] },
+      { id: "f9", kind: "window", label: "tall west window", space: "s1", at: [0.2, 1.86], box: [0, 1.05, 0.4, 2.67], affords: [
+          "interact"
+        ] },
+      { id: "f10", kind: "window", label: "row of north windows", space: "s2", at: [3.7, 0.15], box: [0.7, 0, 6.8, 0.35], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideStatueChamber: {
+    desc: "Stone chamber with glyph-carved floor bands, crowded with weathered statues of blade-wielding serpent warriors and scattered rubble, with doors north, south and east",
+    roomTypes: [
+      "crypt",
+      "ritual"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "occult",
+      "dark"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "northwest hall",
+        outline: [[0, 0], [3.5, 0], [3.5, 1.45], [4.35, 3.55], [3.45, 4.45], [0, 4.4]],
+        anchor: [2.18, 0.68],
+        spots: [[2.08, 2.98]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "northeast hall",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.35, 3.5], [3.5, 1.45]],
+        anchor: [4.58, 2.48],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "southeast hall",
+        outline: [[4.4, 3.45], [7, 3.5], [7, 7], [3.5, 7], [3.45, 4.4]],
+        anchor: [6.18, 5.18],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "southwest hall",
+        outline: [[0, 4.4], [3.45, 4.45], [3.5, 7], [0, 7]],
+        anchor: [2.23, 5.03],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "statue", label: "serpent warrior statue", space: "s1", at: [1.1, 1.3], box: [0.56, 0.52, 1.56, 2.1], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "statue", label: "serpent warrior statue", space: "s1", at: [0.9, 2.6], box: [0.33, 1.9, 1.48, 3.2], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "statue", label: "serpent warrior statue with scimitar", space: "s1", at: [2.95, 1.9], box: [2.33, 1.13, 3.63, 2.7], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "statue", label: "serpent warrior statue with scimitar", space: "s2", at: [4.5, 1.2], box: [3.9, 0.55, 5.17, 1.9], affords: [
+          "interact"
+        ] },
+      { id: "f5", kind: "rubble", label: "toppled statue", space: "s2", at: [5.8, 0.95], box: [5.17, 0.56, 6.44, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "statue", label: "serpent warrior statue with spear", space: "s2", at: [5.85, 2.3], box: [5.2, 1.6, 6.44, 2.8], affords: [
+          "interact"
+        ] },
+      { id: "f7", kind: "statue", label: "serpent warrior statue", space: "s3", at: [6.1, 3.7], box: [5.7, 2.85, 6.4, 4.4], affords: [
+          "interact"
+        ] },
+      { id: "f8", kind: "statue", label: "serpent warrior statue with spear", space: "s1", at: [3.2, 3.9], box: [2.42, 3.45, 3.9, 4.35], affords: [
+          "interact"
+        ] },
+      { id: "f9", kind: "statue", label: "serpent warrior statue with scimitar", space: "s3", at: [4.4, 4.4], box: [3.65, 3.83, 5.25, 5.1], affords: [
+          "interact"
+        ] },
+      { id: "f10", kind: "statue", label: "serpent warrior statue with scimitar", space: "s1", at: [1.25, 3.9], box: [0.55, 3.35, 1.9, 4.6], affords: [
+          "interact"
+        ] },
+      { id: "f11", kind: "statue", label: "serpent warrior statue", space: "s4", at: [1.15, 5.5], box: [0.65, 4.8, 1.67, 6.25], affords: [
+          "interact"
+        ] },
+      { id: "f12", kind: "statue", label: "serpent warrior statue with spear", space: "s4", at: [3.15, 5.8], box: [2.75, 5.1, 3.55, 6.4], affords: [
+          "interact"
+        ] },
+      { id: "f13", kind: "statue", label: "serpent warrior statue with spear", space: "s3", at: [4.8, 6], box: [3.95, 5.6, 5.85, 6.5], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideBurialChamber: {
+    desc: "Stone burial chamber with a glyph-carved border and cracked floor, a skeleton sprawled among painted funerary urns in the west corner, doors north and south",
+    roomTypes: [
+      "crypt"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "dark",
+      "death"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chamber",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.4], [3.5, 2.2], [3.5, 3.5], [0, 3.5]],
+        anchor: [2.88, 2.18],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s2",
+        label: "east chamber",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.2], [2.65, 1.4]],
+        anchor: [4.78, 1.73],
+        spots: [[5.98, 2.48], [5.98, 0.98]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bones", label: "sprawled skeleton", space: "s1", at: [1.45, 2.45], box: [0.7, 1.67, 2.33, 3], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "other", label: "broken red funerary urn", space: "s1", at: [1.1, 2.22], box: [0.88, 2, 1.33, 2.44], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "other", label: "large red funerary urn", space: "s1", at: [1.05, 0.85], box: [0.8, 0.58, 1.3, 1.13], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "other", label: "green funerary urn", space: "s1", at: [1.56, 0.75], box: [1.37, 0.56, 1.75, 0.94], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "other", label: "orange clay pot", space: "s1", at: [0.7, 1.42], box: [0.52, 1.25, 0.88, 1.58], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "red clay pot", space: "s1", at: [0.75, 2.82], box: [0.54, 2.63, 0.96, 3], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideBedChamber: {
+    desc: "Stone chamber with a glyph-carved border and cracked floor, dominated by a great stone slab bed on a raised block platform in the east, with scattered rubble and doors north and west",
+    roomTypes: [
+      "crypt",
+      "bedroom"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "dark"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chamber",
+        outline: [[0, 0], [3.5, 0], [3.5, 1.35], [2.65, 2.15], [2.65, 3.5], [0, 3.5]],
+        anchor: [1.48, 1.43],
+        spots: [[2.73, 0.78], [0.68, 2.58]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east chamber",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 2.15], [3.5, 1.35]],
+        anchor: [3.53, 2.18],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bed", label: "stone slab bed", space: "s2", at: [5.33, 1.74], box: [4.87, 0.83, 5.8, 2.65], affords: [
+          "search", "interact"
+        ] },
+      { id: "f2", kind: "other", label: "raised stone block platform", space: "s2", at: [5.24, 1.75], box: [4.35, 0.79, 6.12, 2.71], affords: [
+          "climb"
+        ] },
+      { id: "f3", kind: "rubble", label: "loose stones", space: "s1", at: [2.2, 2.56], box: [2.1, 2.42, 2.33, 2.7], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "rubble", label: "carved stone block", space: "s1", at: [1.77, 2.77], box: [1.65, 2.65, 1.88, 2.88], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "rubble", label: "loose stones", space: "s1", at: [1.15, 3], box: [1, 2.85, 1.3, 3.12] },
+      { id: "f6", kind: "rubble", label: "loose stones", space: "s1", at: [0.75, 0.5], box: [0.6, 0.35, 0.9, 0.65] }
+    ]
+  },
+  TileSideVerdantChamber: {
+    desc: "Ancient stone chamber overrun by dense vegetation, vines and wildflowers, with mossy boulders heaped along the walls around a sunlit clearing, a vine-covered door east and a studded door south",
+    roomTypes: [
+      "garden",
+      "cave"
+    ],
+    tags: [
+      "indoor",
+      "overgrown",
+      "ancient",
+      "nature"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west overgrowth",
+        outline: [[0, 0], [3.5, 0], [3.5, 0.95], [4.4, 1.8], [4.4, 3.5], [0, 3.5]],
+        anchor: [1.58, 2.63],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east overgrowth",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 1.8], [3.5, 0.95]],
+        anchor: [6.28, 1.53],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bush", label: "dense undergrowth and vines along the north wall", space: "s1", at: [3.4, 0.55], box: [0.3, 0.25, 6.5, 0.9], affords: [
+          "hide", "search"
+        ] },
+      { id: "f2", kind: "bush", label: "thick undergrowth along the south wall", space: "s2", at: [5.5, 2.7], box: [4.5, 2.2, 6.6, 3.2], affords: [
+          "hide", "search"
+        ] },
+      { id: "f3", kind: "plant", label: "red wildflowers", space: "s1", at: [0.55, 1.1], box: [0.4, 0.95, 0.7, 1.25] },
+      { id: "f4", kind: "rock", label: "heap of mossy boulders", space: "s1", at: [1.5, 1.5], box: [1.1, 1.06, 1.94, 1.94], affords: [
+          "climb", "hide"
+        ] },
+      { id: "f5", kind: "rock", label: "boulders", space: "s1", at: [2.9, 1.75], box: [2.73, 1.52, 3.1, 1.98] },
+      { id: "f6", kind: "rock", label: "heap of boulders", space: "s1", at: [3.6, 2.1], box: [3.2, 1.6, 4.02, 2.56], affords: [
+          "hide"
+        ] },
+      { id: "f7", kind: "rock", label: "boulders", space: "s2", at: [4.9, 1.15], box: [4.48, 0.9, 5.29, 1.4] },
+      { id: "f8", kind: "rock", label: "lone boulder", space: "s2", at: [5.62, 1.7], box: [5.48, 1.6, 5.77, 1.79] },
+      { id: "f9", kind: "rock", label: "boulders", space: "s2", at: [5.2, 2.8], box: [4.83, 2.44, 5.56, 3.1] },
+      { id: "f10", kind: "rock", label: "boulders", space: "s1", at: [2.85, 2.85], box: [2.29, 2.56, 3.44, 3.17] },
+      { id: "f11", kind: "rock", label: "boulders", space: "s1", at: [0.78, 2.93], box: [0.5, 2.77, 1.06, 3.1] }
+    ]
+  },
+  TileSidePit: {
+    desc: "Narrow flagstone ledge with glyph-carved borders and doors north, west and south, dropping at a yellow-marked edge into a deep pit of tumbled boulders filling the east of the chamber",
+    roomTypes: [
+      "cave",
+      "crypt"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "dark",
+      "dangerous"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "stone floor",
+        outline: [[0, 0], [2.65, 0], [2.65, 7], [0, 7]],
+        anchor: [1.28, 1.28],
+        spots: [[1.28, 2.68], [1.28, 4.08]],
+        links: [
+          { to: "s2", via: "barrier" },
+          { to: "s3", via: "barrier" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "north pit",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [2.65, 3.5]],
+        anchor: [3.73, 2.38],
+        spots: [[3.63, 0.98], [5.88, 0.83]],
+        links: [
+          { to: "s1", via: "barrier" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "south pit",
+        outline: [[2.65, 3.5], [7, 3.5], [7, 7], [2.65, 7]],
+        anchor: [4.13, 4.98],
+        spots: [[4.93, 6.13], [5.38, 4.28]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "barrier" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "hole", label: "deep boulder-filled pit", space: "s3", at: [4.75, 3.5], box: [2.7, 0.2, 6.8, 6.8], affords: [
+          "climb"
+        ] },
+      { id: "f2", kind: "rock", label: "long stone slab", space: "s2", at: [4.9, 1.6], box: [4.35, 1.2, 5.48, 1.98], affords: [
+          "climb"
+        ] },
+      { id: "f3", kind: "rock", label: "cracked upright boulder", space: "s2", at: [6.15, 2], box: [5.94, 1.64, 6.38, 2.33] },
+      { id: "f4", kind: "rock", label: "large boulder", space: "s3", at: [6.1, 5.35], box: [5.55, 4.85, 6.7, 5.83], affords: [
+          "climb"
+        ] }
+    ]
+  },
+  TileSideTunnel: {
+    desc: "Rough-hewn rock tunnel with a gravelly floor and loose boulders along its walls, a plank door at each end",
+    roomTypes: [
+      "tunnel",
+      "cave"
+    ],
+    tags: [
+      "underground",
+      "dark",
+      "rough"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west tunnel",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.95], [4.4, 2.65], [4.4, 3.5], [0, 3.5]],
+        anchor: [1.13, 1.13],
+        spots: [[2.58, 1.93], [0.68, 2.83]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east tunnel",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 2.65], [2.65, 0.95]],
+        anchor: [4.88, 1.43],
+        spots: [[3.58, 0.78], [6.33, 1.38]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "rock", label: "cluster of boulders", space: "s1", at: [1.5, 2.45], box: [1.2, 2.12, 1.79, 2.77], affords: [
+          "hide"
+        ] },
+      { id: "f2", kind: "rock", label: "boulder", space: "s1", at: [1.97, 2.52], box: [1.83, 2.42, 2.12, 2.62] },
+      { id: "f3", kind: "rock", label: "boulders against the north wall", space: "s1", at: [2.57, 0.77], box: [2.3, 0.58, 2.83, 0.96] },
+      { id: "f4", kind: "rock", label: "boulders", space: "s1", at: [3.6, 2.92], box: [3.37, 2.7, 3.83, 3.13] },
+      { id: "f5", kind: "rock", label: "boulders", space: "s1", at: [4.15, 2.42], box: [3.98, 2.25, 4.35, 2.6] },
+      { id: "f6", kind: "rock", label: "boulders", space: "s2", at: [5.4, 2.85], box: [5.25, 2.73, 5.56, 2.98] },
+      { id: "f7", kind: "rock", label: "boulders beside the east door", space: "s2", at: [6.03, 2.18], box: [5.77, 1.96, 6.3, 2.4] },
+      { id: "f8", kind: "rock", label: "boulders against the north wall", space: "s2", at: [6.13, 0.57], box: [5.88, 0.4, 6.38, 0.73] }
+    ]
+  },
   TileSideRopeBridge: { desc: "Wooden rope bridge spanning a rocky gorge between cliff edges", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideHollowGrove: { desc: "Forest clearing with three large hollow tree trunk pools", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideCrumblingPlaza: { desc: "Overgrown circular stone plaza with crumbling mosaic pattern", roomTypes: [], tags: [], spaces: [], features: [] },
