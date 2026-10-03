@@ -195,6 +195,12 @@
   .step p{margin:0; color:var(--parchment-dim); font-size:17px}
 
   /* ---------- map ---------- */
+  .rooms{background:radial-gradient(ellipse at center, #15130f, var(--void) 70%)}
+  .rooms h3{font-family:var(--cinzel); color:var(--brass-hi); margin:0 0 8px}
+  .tally{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px}
+  .tally div{text-align:center; border:1px solid var(--eldritch-dim); padding:14px 8px; background:rgba(5,7,6,.6)}
+  .tally b{display:block; font-family:var(--cinzel); font-size:30px; color:var(--eldritch)}
+  .tally span{font-size:14px; color:var(--parchment-dim)}
   .mapsec{background:radial-gradient(ellipse at center, #111a15, var(--void) 70%)}
   .map-grid{display:grid; grid-template-columns:1fr; gap:30px}
   .map-copy{max-width:760px; margin:0 auto}
@@ -315,7 +321,7 @@
     </svg>
     <div class="kicker">For Claude Code &amp; Hermes Agent · For the Valkyrie App</div>
     <h1>Valkyrie MoM<span>SCENARIO FORGE</span></h1>
-    <p class="tag">Describe a nightmare in plain words. An AI assistant builds it as a Mansions of Madness scenario you can play: tiles laid, events wired, puzzles set, plates painted, checked against twenty wards, and packed into a <code>.valkyrie</code> file.</p>
+    <p class="tag">Describe a nightmare in plain words. An AI assistant builds it as a Mansions of Madness scenario you can play: tiles laid, events wired, puzzles set, plates painted, checked against twenty-one wards, and packed into a <code>.valkyrie</code> file.</p>
     <div class="cta">
       <a class="btn" href="#summon">Perform the Summoning</a>
       <a class="btn ghost" href="https://github.com/thijs-hakkenberg/ValkyrieMCP" target="_blank" rel="noopener">Read the Codex ↗</a>
@@ -354,7 +360,8 @@
           <li><code>place_tile_relative</code> lines up doors; <code>render_map</code> draws the real tiles</li>
           <li><code>story_graph</code> projects the whole plot as a tree</li>
           <li><code>generate_artwork</code> paints plates with a local ComfyUI</li>
-          <li><code>search_game_content</code> over an 846-entry catalog</li>
+          <li><code>search_game_content</code> over an 885-entry catalog, tiles found by what is drawn on them</li>
+          <li><code>at="Farmhouse:sideboard"</code> sets a token on the sideboard itself</li>
         </ul>
       </article>
       <article class="relic reveal">
@@ -407,11 +414,11 @@
     <div class="rule">✦</div>
     <div class="steps">
       <div class="step reveal"><h3>Speak the Premise</h3><p>“A fishing village, a missing priest, three hours before high tide.” That much is enough to begin. Invoke <code>/scenario</code> or hand it to the familiar.</p></div>
-      <div class="step reveal"><h3>Lay the House</h3><p>Tiles are chosen from the real game catalog and placed in linear, L-shaped, or hub-and-spoke layouts. Each exploration reveal is wired to the next.</p></div>
+      <div class="step reveal"><h3>Lay the House</h3><p>Tiles are chosen from the real game catalog by what is drawn on them, a fireplace, a slab, a grave, and placed in linear, L-shaped, or hub-and-spoke layouts. Tokens go on the object the story names. Each exploration reveal is wired to the next.</p></div>
       <div class="step reveal"><h3>Bind the Events</h3><p>Events, tokens, spawns, items, and puzzles are upserted one at a time. Every button, every <code>event1</code>..<code>event6</code> link, and every localization string is tracked.</p></div>
       <div class="step reveal"><h3>Paint the Plates</h3><p>With a local ComfyUI, <code>generate_artwork</code> paints the cover, an intro cutscene, handouts that hide clues, and the thing on the slab, all in one house style.</p></div>
       <div class="step reveal"><h3>Read the Thread</h3><p><code>story_graph</code> reads the plot back as one condensed tree, so you and the assistant can check that every branch leads somewhere and every ending can be reached.</p></div>
-      <div class="step reveal"><h3>Test the Wards</h3><p>Twenty validation rules walk the game as Valkyrie runs it, looking for dead ends, unwinnable scenarios, broken references, unsolvable puzzles and missing text before any player sees them.</p></div>
+      <div class="step reveal"><h3>Test the Wards</h3><p>Twenty-one validation rules walk the game as Valkyrie runs it, looking for dead ends, unwinnable scenarios, broken references, unsolvable puzzles and missing text before any player sees them.</p></div>
       <div class="step reveal"><h3>Seal the Package</h3><p><code>build_scenario</code> saves the files and writes what Valkyrie's own Create Package writes: the <code>.valkyrie</code> archive, its manifest and cover, ready to publish. The scenario is in Valkyrie's editor, ready to play tonight.</p></div>
     </div>
   </div>
@@ -421,13 +428,46 @@
 <section class="mapsec">
   <div class="wrap map-grid">
     <figure class="shot reveal">
-      <img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/map.jpg" alt="render_map output: the potter's field, lane, farmhouse and cellar tiles of Herbert West with numbered tokens" loading="lazy" width="1000" height="363">
-      <figcaption><code>render_map()</code> · Herbert West—Reanimator I: the potter's field, the lane, and the farmhouse over its cellar, drawn from Valkyrie's own tile art.</figcaption>
+      <img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/map.jpg" alt="render_map output: the potter's field, lane, farmhouse and cellar tiles of Herbert West with numbered tokens" loading="lazy" width="1400" height="676">
+      <figcaption><code>render_map()</code> · Herbert West—Reanimator I: the potter's field, the lane, and the farmhouse over its cellar, drawn from Valkyrie's own tile art. The space between the two acts is cropped.</figcaption>
     </figure>
     <div class="map-copy reveal">
       <h2><small>Cartography of the unseen</small>See the Map It Drew</h2>
-      <p>You don't need to open the editor to check the layout. The assistant renders the board with the real tile artwork, exactly as Valkyrie lays it out, with every token numbered. <code>place_tile_relative</code> joins tiles door to door and open ground to open ground, and a ward catches any token that falls off the board.</p>
+      <p>You don't need to open the editor to check the layout. The assistant renders the board with the real tile artwork, exactly as Valkyrie lays it out, with every token numbered. <code>place_tile_relative</code> joins tiles door to door and open ground to open ground, and a ward catches any token that falls off the board or straddles the line between two spaces.</p>
       <p>Every tile side, monster, and item is checked against the real game content, so nothing unknown gets into the file.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ROOMS ============ -->
+<section class="rooms">
+  <div class="wrap map-grid">
+    <div class="map-copy reveal">
+      <h2><small>Every room inventoried</small>It Knows What Is in the Room</h2>
+      <p>Every one of the game's tile sides has been charted: where its movement spaces run, which doors lead into which space, and what is painted on the floor. The assistant no longer guesses coordinates. It asks for the tile with a fireplace and a bookcase, and sets the clue on the bookcase rather than beside it.</p>
+      <div class="tally">
+        <div><b>174</b><span>tile sides</span></div>
+        <div><b>435</b><span>movement spaces</span></div>
+        <div><b>1,955</b><span>objects</span></div>
+      </div>
+    </div>
+    <figure class="shot reveal">
+      <img src="https://raw.githubusercontent.com/thijs-hakkenberg/ValkyrieMCP/main/docs/promo/img/map-spaces.jpg" alt="render_map with showSpaces: Herbert West's tiles with white space outlines, space ids s1, s2 and yellow object markers f1, f2" loading="lazy" width="1400" height="676">
+      <figcaption><code>render_map({ showSpaces: true })</code> · the same board with its spaces outlined (s1, s2, …) and its objects marked (f1, f2, …).</figcaption>
+    </figure>
+    <pre class="outline reveal"><span class="d">search_game_content({ type: "tile", has: ["fireplace", "bookcase"] })</span>
+<span class="k">→</span> <span class="c">TileSideStudy, TileSideLoungeMAD26</span>, with the space each object stands in
+
+<span class="d">upsert_token({ name: "TokenLabBench", data: { at: "TileFarmhouse:sideboard" } })</span>
+<span class="k">→</span> placed at (26.4, -2.6), <span class="c">TileFarmhouse on f7 cabinet (sideboard) in space s2</span>
+
+<span class="d">upsert_token({ name: "TokenCellarGrave", data: { at: "TileCellar:s3" } })</span>
+<span class="k">→</span> placed at (29.8, -4.8), <span class="c">TileCellar space s3 (cellar floor)</span></pre>
+    <div class="map-copy reveal">
+      <h3>Herbert West, re-furnished</h3>
+      <p>Asked to improve the placement in <i>Herbert West—Reanimator I</i>, the assistant read the story and moved each token to the thing the text describes. West mixes his solution at the sideboard, in the same room as the slab, not on a ledger in the kitchen. The window the investigators escape through is in the laboratory itself. The grave in the cellar lies open on the bare floor rather than by the coal furnace, and the sexton's satchel waits among the rakes.</p>
+      <p>It weighed the tiles too. A yard with headstones and a real laboratory both matched the search, but Lovecraft's potter's field has only numbered pine stakes, and West's operating room is improvised in a gasless farmhouse. The overgrown tool-shed yard and the dining table stayed, and the scenario still needs only the base game.</p>
     </div>
   </div>
 </section>
@@ -499,9 +539,9 @@
 <!-- ============ WARDS ============ -->
 <section class="wards">
   <div class="wrap">
-    <h2 class="reveal"><small>Validation rules</small>The Twenty Wards</h2>
+    <h2 class="reveal"><small>Validation rules</small>The Twenty-One Wards</h2>
     <div class="rule">✦</div>
-    <p class="lede reveal" style="margin-bottom:38px">They follow the game the way Valkyrie runs it, and were tested against community-authored scenarios. A scenario that passes all twenty loads and plays as intended.</p>
+    <p class="lede reveal" style="margin-bottom:38px">They follow the game the way Valkyrie runs it, and were tested against community-authored scenarios. A scenario that passes all twenty-one loads and plays as intended.</p>
     <div class="ward-grid">
       <div class="ward reveal"><b>I</b><span>Required Fields<em>Tiles have sides; spawns have monsters.</em></span></div>
       <div class="ward reveal"><b>II</b><span>Cross-References<em>Every name referenced actually exists.</em></span></div>
@@ -513,7 +553,7 @@
       <div class="ward reveal"><b>VIII</b><span>Explore Tokens<em>Each one leads to a reveal.</em></span></div>
       <div class="ward reveal"><b>IX</b><span>Investigator Token<em>Placed at the start, removed after.</em></span></div>
       <div class="ward reveal"><b>X</b><span>Tile Connectivity<em>The house is one house.</em></span></div>
-      <div class="ward reveal"><b>XI</b><span>Token Placement<em>No token falls off the board.</em></span></div>
+      <div class="ward reveal"><b>XI</b><span>Token Placement<em>No token falls off the board, or between two spaces.</em></span></div>
       <div class="ward reveal"><b>XII</b><span>Event Flow<em>Buttons and links agree; silent events behave.</em></span></div>
       <div class="ward reveal"><b>XIII</b><span>Token Wiring<em>Clicking a token does something.</em></span></div>
       <div class="ward reveal"><b>XIV</b><span>Field Schema<em>No field Valkyrie would ignore.</em></span></div>
@@ -523,6 +563,7 @@
       <div class="ward reveal"><b>XVIII</b><span>Game Flow<em>The game can be won, and lost.</em></span></div>
       <div class="ward reveal"><b>XIX</b><span>Puzzles<em>Every lock can be opened.</em></span></div>
       <div class="ward reveal"><b>XX</b><span>Package Name<em>The package can be published.</em></span></div>
+      <div class="ward reveal"><b>XXI</b><span>UI Lifetime<em>Nothing left on screen stalls the next phase.</em></span></div>
     </div>
   </div>
 </section>
