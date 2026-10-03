@@ -10250,17 +10250,836 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideStudio: { desc: "Dark artist studio with ghostly canvas, paint supplies, and columns", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideSewer1: { desc: "Dark stone sewer corridor with debris and mechanical equipment", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideLibraryArchives: { desc: "Wooden archive room with bookshelves, scattered papers and red chairs", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSidePrintingPress: { desc: "Industrial printing press room with two large presses and columns", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideExhibit2: { desc: "Green checkered museum exhibit hall with display case in center", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideStreetCorner: { desc: "Cobblestone street corner with brick wall and lamppost", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideResearchLibrary: { desc: "Parquet-floored library with tall bookshelves and large globe", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideSewer2: { desc: "Stone sewer tunnel with scattered crates and dark water pools", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideChapelMAD25: { desc: "Chapel interior with pews, stained glass light and checkered floor", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideSpeakeasy: { desc: "Dimly lit speakeasy bar with wooden floors and circular stage", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSidePortraitHall: { desc: "Green tiled hallway with portraits, luggage and display case", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideStudio: {
+    desc: "Paint-splattered artist's studio with a shelf of paint pots, a sheet-covered round stand in the middle, two windows on the south wall, and a side storeroom with crates of brushes, a round stone slab and plaster casts on the wall",
+    roomTypes: [
+      "workshop",
+      "storage"
+    ],
+    tags: [
+      "indoor",
+      "dirty",
+      "art"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "studio north",
+        outline: [[0, 0], [4.3, 0], [4.3, 3.5], [3.4, 3.45], [2.65, 2.65], [0, 2.65]],
+        anchor: [2.13, 1.33],
+        spots: [[3.43, 1.88]],
+        links: [
+          { to: "s2", via: "door" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "storeroom",
+        outline: [[4.3, 0], [7, 0], [7, 3.65], [4.3, 3.65]],
+        anchor: [5.28, 0.98],
+        spots: [[5.83, 2.28]],
+        links: [
+          { to: "s1", via: "door" }
+        ],
+        openings: [
+          { side: "N", index: 1 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "studio south",
+        outline: [[0, 2.65], [2.65, 2.65], [3.4, 3.45], [3.55, 3.5], [3.5, 7], [0, 7]],
+        anchor: [1.33, 5.18],
+        spots: [[0.88, 3.68], [2.68, 5.58]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "studio east",
+        outline: [[3.55, 3.5], [4.3, 3.5], [4.3, 3.65], [7, 3.65], [7, 7], [3.5, 7]],
+        anchor: [4.73, 5.28],
+        spots: [[6.08, 5.68]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "shelf", label: "shelf of paint pots", space: "s1", at: [0.55, 1.85], box: [0.3, 0.8, 0.85, 2.9], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "table", label: "round stand under a drop cloth", space: "s3", at: [2.55, 3.45], box: [1.7, 2.65, 3.4, 4.3], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "window", space: "s3", at: [2, 6.6], box: [1.15, 6.45, 2.75, 6.75] },
+      { id: "f4", kind: "window", space: "s4", at: [5.05, 6.6], box: [4.25, 6.45, 5.85, 6.75] },
+      { id: "f5", kind: "papers", label: "sketches pinned to the wall", space: "s1", at: [3.2, 0.4], box: [2.6, 0.3, 3.8, 0.55] },
+      { id: "f6", kind: "bench", label: "long wooden bench", space: "s4", at: [5.6, 3.95], box: [4.4, 3.75, 6.75, 4.1], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "other", label: "round stone slab with spindle", space: "s2", at: [4.85, 3.1], box: [4.45, 2.65, 5.3, 3.5], affords: [
+          "interact"
+        ] },
+      { id: "f8", kind: "crate", label: "crate of paintbrushes", space: "s2", at: [5.65, 3.2], box: [5.4, 2.9, 5.85, 3.55], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "crate", label: "crate of paintbrushes", space: "s2", at: [6.2, 3.1], box: [5.9, 2.8, 6.5, 3.45], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "other", label: "plaster casts on a wall rack", space: "s2", at: [6.5, 1.25], box: [6.25, 0.6, 6.75, 1.9], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideSewer1: {
+    desc: "Blood-stained brick sewer tunnel piled with crates, barrels and sacks along the walls, an overturned barrel spilling rags, and a red iron door to the west",
+    roomTypes: [
+      "tunnel",
+      "storage"
+    ],
+    tags: [
+      "underground",
+      "dirty",
+      "dark",
+      "bloody"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "sewer west",
+        outline: [[0, 0], [4.35, 0], [4.35, 0.95], [2.6, 2.7], [2.6, 3.5], [0, 3.5]],
+        anchor: [2.03, 1.53],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "sewer east",
+        outline: [[4.35, 0], [7, 0], [7, 3.5], [2.6, 3.5], [2.6, 2.7], [4.35, 0.95]],
+        anchor: [4.48, 2.18],
+        spots: [[5.98, 2.38]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "barrel", label: "barrel under an open crate", space: "s1", at: [0.75, 0.6], box: [0.45, 0.3, 1.25, 1], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "barrel", label: "metal bucket", space: "s1", at: [1, 1.05], box: [0.7, 0.8, 1.3, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "crate", label: "stacked crates and a sack", space: "s1", at: [1.1, 2.75], box: [0.6, 2.05, 1.6, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "barrel", label: "overturned barrel", space: "s1", at: [3, 0.65], box: [2.55, 0.3, 3.35, 1.05], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "rubble", label: "rags and debris", space: "s1", at: [3.2, 1.1], box: [2.95, 0.8, 3.6, 1.4] },
+      { id: "f6", kind: "crate", label: "broken crate with bottles", space: "s2", at: [3.5, 2.95], box: [3.1, 2.75, 3.85, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "crate", label: "open crate with bottle", space: "s2", at: [4.85, 0.7], box: [4.6, 0.45, 5.1, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "barrel", label: "barrel with a life ring", space: "s2", at: [5.45, 0.7], box: [5.2, 0.4, 5.75, 1.05], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "barrel", space: "s2", at: [5.05, 1.1], box: [4.85, 0.9, 5.25, 1.35], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "barrel", label: "barrel of bottles", space: "s2", at: [5.45, 1.45], box: [5.2, 1.2, 5.7, 1.7], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "crate", label: "large and small crates", space: "s2", at: [5.95, 0.9], box: [5.45, 0.45, 6.55, 1.4], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "sack", space: "s2", at: [6.45, 1.05], box: [6.3, 0.85, 6.6, 1.25], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideLibraryArchives: {
+    desc: "Cluttered wooden-floored archive with bookcases along the walls, long reading tables, a filing cabinet, desks strewn with papers and books, and two red armchairs",
+    roomTypes: [
+      "library",
+      "study"
+    ],
+    tags: [
+      "indoor",
+      "cluttered",
+      "books"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "archives west",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.8], [3.5, 2.65], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.58, 2.73],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "archives east",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.65], [2.65, 1.8]],
+        anchor: [4.53, 2.43],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bookcase", space: "s1", at: [0.45, 0.7], box: [0.2, 0.25, 0.75, 1.15], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "chair", label: "chair with an open book", space: "s1", at: [0.95, 0.65], box: [0.75, 0.45, 1.15, 0.95] },
+      { id: "f3", kind: "table", label: "small round table with newspaper", space: "s1", at: [1.2, 1.25], box: [1, 1.05, 1.45, 1.45], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "shelf", label: "low book shelf", space: "s1", at: [1.8, 0.95], box: [1.65, 0.3, 1.95, 1.6], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "desk", label: "L-shaped desk with papers", space: "s1", at: [2.1, 1.3], box: [1.55, 0.25, 2.45, 2], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "cabinet", label: "filing cabinets", space: "s2", at: [2.75, 0.4], box: [2.45, 0.25, 3.05, 0.6], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "table", label: "long reading tables", space: "s2", at: [3.5, 1.1], box: [3.1, 0.25, 3.9, 1.95], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "bookcase", space: "s1", at: [0.45, 2.85], box: [0.2, 2.45, 0.85, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "papers", label: "rolled scrolls", space: "s1", at: [0.85, 3.05], box: [0.65, 2.9, 1.05, 3.2] },
+      { id: "f10", kind: "armchair", label: "red armchair", space: "s1", at: [2.85, 2.75], box: [2.55, 2.45, 3.15, 3.05] },
+      { id: "f11", kind: "desk", label: "green-topped desk", space: "s2", at: [3.55, 2.85], box: [3.1, 2.55, 4, 3.15], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "painting", label: "framed picture on the floor", space: "s2", at: [4.15, 3.15], box: [3.85, 3.05, 4.45, 3.25] },
+      { id: "f13", kind: "bookcase", space: "s2", at: [4.6, 1], box: [4.45, 0.25, 4.7, 1.75], affords: [
+          "search"
+        ] },
+      { id: "f14", kind: "bookcase", label: "long shelf on the north wall", space: "s2", at: [5.6, 0.45], box: [4.7, 0.25, 6.6, 0.75], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "bookcase", label: "tall bookcase", space: "s2", at: [6.2, 2.05], box: [6, 0.8, 6.4, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f16", kind: "cabinet", label: "tall dark cabinet", space: "s2", at: [6.6, 2.05], box: [6.4, 0.8, 6.8, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f17", kind: "armchair", label: "red armchair", space: "s2", at: [5.7, 2.25], box: [5.3, 1.95, 6.05, 2.65] },
+      { id: "f18", kind: "papers", label: "scattered papers", space: "s2", at: [5.7, 1.4], box: [5.5, 0.95, 5.95, 1.8], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSidePrintingPress: {
+    desc: "Grimy print shop with two large printing presses, a long type case of metal letters, a crate of type, barrels and buckets, and crumpled papers strewn across the plank floor",
+    roomTypes: [
+      "workshop",
+      "shop"
+    ],
+    tags: [
+      "indoor",
+      "industrial",
+      "dirty"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "press room west",
+        outline: [[0, 0], [3.5, 0], [3.5, 1.8], [4.45, 2.8], [4.55, 2.8], [5.35, 3.5], [0, 3.5]],
+        anchor: [0.78, 1.73],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "press room east",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [5.35, 3.5], [4.55, 2.8], [4.45, 2.8], [3.5, 1.8]],
+        anchor: [6.43, 2.13],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "machinery", label: "printing press", space: "s1", at: [2.45, 1.3], box: [1.5, 0.5, 3.4, 2.1], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "machinery", label: "printing press", space: "s2", at: [4.95, 1.3], box: [3.9, 0.5, 5.95, 2.1], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "barrel", label: "jug in a wooden barrel", space: "s2", at: [3.6, 0.55], box: [3.4, 0.35, 3.8, 0.8], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "sack", space: "s1", at: [0.95, 0.85], box: [0.8, 0.6, 1.15, 1.05], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "barrel", label: "tipped barrel", space: "s1", at: [0.9, 2.95], box: [0.6, 2.65, 1.2, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "barrel", label: "bucket of scrap", space: "s1", at: [2.65, 2.9], box: [2.45, 2.7, 2.85, 3.1], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "workbench", label: "type case with metal letters", space: "s1", at: [4, 2.95], box: [3, 2.65, 5.1, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "crate", label: "crate of type", space: "s1", at: [4.5, 2.9], box: [4.2, 2.6, 4.75, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "barrel", label: "bucket", space: "s2", at: [5.35, 2.9], box: [5.15, 2.7, 5.55, 3.1], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "barrel", space: "s2", at: [6.05, 2.9], box: [5.85, 2.65, 6.3, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "other", label: "wagon wheel", space: "s2", at: [6.15, 0.65], box: [5.9, 0.4, 6.4, 0.95] },
+      { id: "f12", kind: "crate", label: "green crate", space: "s2", at: [6, 1.05], box: [5.7, 0.75, 6.35, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "papers", label: "crumpled papers", space: "s1", at: [2.2, 2.6], box: [1.95, 2.4, 2.45, 2.8] }
+    ]
+  },
+  TileSideExhibit2: {
+    desc: "Museum exhibit hall with a green and cream checkered floor, a central display table of copper apparatus, a glass display case, a cabinet of electrical equipment, a side table of chemical glassware, and stone columns in the east corners",
+    roomTypes: [
+      "gallery"
+    ],
+    tags: [
+      "indoor",
+      "museum",
+      "scientific"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "exhibit hall west",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.8], [3.5, 2.65], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.08, 2.38],
+        spots: [[2.48, 2.73], [0.73, 0.93]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "exhibit hall east",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.65], [4.4, 1.8]],
+        anchor: [4.88, 2.38],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "table", label: "display table with copper apparatus", space: "s1", at: [2.6, 1.5], box: [1.7, 1.05, 3.55, 2], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "cabinet", label: "glass display case", space: "s1", at: [3.7, 0.5], box: [3.3, 0.25, 4.1, 0.7], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "machinery", label: "cabinet with electrical apparatus", space: "s2", at: [5.4, 0.6], box: [4.85, 0.35, 5.9, 0.85], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "lab_equipment", label: "side table of glassware", space: "s2", at: [6.25, 1.85], box: [5.9, 1.3, 6.55, 2.35], affords: [
+          "search", "interact"
+        ] },
+      { id: "f5", kind: "pillar", space: "s2", at: [6.5, 0.5], box: [6.2, 0.25, 6.8, 0.75] },
+      { id: "f6", kind: "pillar", space: "s2", at: [6.5, 3], box: [6.2, 2.75, 6.8, 3.25] },
+      { id: "f7", kind: "painting", label: "framed chart", space: "s2", at: [6.6, 1.15], box: [6.5, 0.95, 6.75, 1.35] },
+      { id: "f8", kind: "painting", label: "framed chart", space: "s2", at: [6.6, 2.7], box: [6.5, 2.5, 6.75, 2.9] },
+      { id: "f9", kind: "painting", label: "framed pictures on the wall", space: "s1", at: [1.5, 0.3], box: [0.85, 0.25, 2.3, 0.4] }
+    ]
+  },
+  TileSideStreetCorner: {
+    desc: "Cobblestone street corner outside a brick shopfront with a lit bay window and shop door, two glowing streetlamps and a storm drain grate",
+    roomTypes: [
+      "street"
+    ],
+    tags: [
+      "outdoor",
+      "urban",
+      "night"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "street west",
+        outline: [[0, 0], [4.45, 0], [4.4, 0.9], [4.1, 1.25], [3.45, 1.6], [2.9, 2.05], [2.7, 2.4], [2.65, 3.5], [0, 3.5]],
+        anchor: [1.58, 1.58],
+        spots: [[0.78, 2.73]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "street east",
+        outline: [[4.45, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 2.7], [2.8, 2.2], [3.1, 1.85], [3.9, 1.4], [4.3, 1.05], [4.4, 0.9]],
+        anchor: [5.43, 1.28],
+        spots: [[4.33, 2.23], [6.33, 2.38]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 1 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "window", label: "lit bay window", space: "s1", at: [3.45, 0.7], box: [3.1, 0.3, 4, 1.1] },
+      { id: "f2", kind: "streetlamp", space: "s1", at: [4.25, 0.95], box: [4.1, 0.75, 4.4, 1.1], affords: [
+          "light"
+        ] },
+      { id: "f3", kind: "streetlamp", space: "s1", at: [2.25, 2.85], box: [2.1, 2.65, 2.4, 3], affords: [
+          "light"
+        ] },
+      { id: "f4", kind: "well", label: "storm drain grate", space: "s2", at: [5.45, 2.68], box: [5.1, 2.55, 5.85, 2.8], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "window", label: "shop window", space: "s2", at: [6.15, 0.3], box: [5.8, 0.25, 6.5, 0.4] }
+    ]
+  },
+  TileSideResearchLibrary: {
+    desc: "Parquet-floored research library with rows of freestanding bookcases and wall shelves, a planter of sunflowers, and a reading nook with a round table, desk lamp, two chairs and a framed portrait",
+    roomTypes: [
+      "library",
+      "study"
+    ],
+    tags: [
+      "indoor",
+      "wealthy",
+      "books"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "stacks west",
+        outline: [[0, 0], [3.5, 0], [3.5, 1.8], [2.6, 2.65], [2.6, 3.5], [0, 3.5]],
+        anchor: [1.73, 0.93],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "reading area east",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [2.6, 3.5], [2.6, 2.65], [3.5, 1.8]],
+        anchor: [4.63, 2.48],
+        spots: [[4.98, 0.73]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 1 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bookcase", space: "s1", at: [0.5, 0.65], box: [0.25, 0.25, 0.8, 1], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "lamp", label: "wall lamp", space: "s1", at: [0.7, 0.45], box: [0.6, 0.3, 0.8, 0.55], affords: [
+          "light"
+        ] },
+      { id: "f3", kind: "papers", label: "notes pinned to the wall", space: "s1", at: [0.65, 1.25], box: [0.5, 1, 0.8, 1.5], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "bookcase", space: "s1", at: [0.5, 2], box: [0.25, 1.5, 0.8, 2.5], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "bookcase", space: "s1", at: [0.55, 2.9], box: [0.25, 2.5, 0.85, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "bookcase", label: "freestanding bookcase", space: "s1", at: [1.25, 2.3], box: [0.95, 1.55, 1.5, 3.1], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "bookcase", label: "freestanding bookcase", space: "s1", at: [2.25, 2.35], box: [2, 1.6, 2.65, 3.15], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "bookcase", label: "north wall shelves", space: "s1", at: [2.95, 0.55], box: [2.55, 0.4, 3.25, 0.7], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "bookcase", label: "shelves in an alcove", space: "s2", at: [4, 1], box: [3.55, 0.45, 4.3, 1.95], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "plant", label: "barrel planter of sunflowers", space: "s2", at: [3.25, 2.95], box: [3, 2.7, 3.5, 3.2] },
+      { id: "f11", kind: "painting", label: "framed picture on the floor", space: "s2", at: [4.05, 3.15], box: [3.8, 3.05, 4.3, 3.25] },
+      { id: "f12", kind: "table", label: "round reading table", space: "s2", at: [6.05, 1.5], box: [5.6, 1.05, 6.5, 1.95], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "lamp", label: "desk lamp", space: "s2", at: [6.2, 1.55], box: [6.05, 1.35, 6.4, 1.75], affords: [
+          "light"
+        ] },
+      { id: "f14", kind: "chair", space: "s2", at: [5.85, 0.75], box: [5.65, 0.4, 6.1, 1] },
+      { id: "f15", kind: "chair", space: "s2", at: [5.8, 2.35], box: [5.5, 2.05, 6.1, 2.65] },
+      { id: "f16", kind: "painting", label: "framed portrait", space: "s2", at: [6.6, 0.9], box: [6.45, 0.6, 6.75, 1.2] },
+      { id: "f17", kind: "bookcase", space: "s2", at: [6.4, 2.6], box: [6.15, 2.2, 6.75, 3.05], affords: [
+          "search"
+        ] },
+      { id: "f18", kind: "shelf", label: "low open drawer of books", space: "s2", at: [6.05, 3.1], box: [5.7, 2.95, 6.4, 3.3], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideSewer2: {
+    desc: "Dark brick sewer tunnel littered with broken pipes, a smashed crate, an open crate, a barrel of sticks, a bag of tools on a wooden pallet, a wall lantern and a pipe valve",
+    roomTypes: [
+      "tunnel"
+    ],
+    tags: [
+      "underground",
+      "dark",
+      "dirty",
+      "industrial"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "sewer west",
+        outline: [[0, 0], [3.5, 0], [3.5, 0.95], [2.65, 1.75], [2.65, 3.5], [0, 3.5]],
+        anchor: [0.98, 1.48],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "sewer east",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [2.65, 3.5], [2.65, 1.75], [3.5, 0.95]],
+        anchor: [5.58, 1.13],
+        spots: [[3.78, 1.88]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "lamp", label: "wall lantern", space: "s1", at: [3.35, 0.55], box: [3.2, 0.35, 3.45, 0.7], affords: [
+          "light"
+        ] },
+      { id: "f2", kind: "crate", label: "smashed crate with a bottle", space: "s1", at: [2.75, 0.95], box: [2.2, 0.6, 3.25, 1.4], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "rubble", label: "broken pipes", space: "s1", at: [2, 0.9], box: [1.65, 0.5, 2.4, 1.25] },
+      { id: "f4", kind: "rubble", label: "pile of iron pipes", space: "s1", at: [0.85, 2.8], box: [0.4, 2.45, 1.3, 3.1] },
+      { id: "f5", kind: "crate", label: "open crate", space: "s1", at: [1.4, 2.7], box: [1.05, 2.4, 1.75, 3], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "barrel", label: "tipped barrel of sticks", space: "s2", at: [3.15, 2.95], box: [2.9, 2.7, 3.4, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "crate", label: "wooden pallet", space: "s2", at: [4.25, 0.55], box: [3.95, 0.25, 4.6, 0.85] },
+      { id: "f8", kind: "sack", label: "bag of tools", space: "s2", at: [4.25, 0.95], box: [4.05, 0.7, 4.5, 1.15], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "rubble", label: "pile of iron pipes", space: "s2", at: [5.25, 2.75], box: [4.5, 2.2, 6, 3.1] },
+      { id: "f10", kind: "machinery", label: "pipe valve wheel", space: "s2", at: [6.05, 2.95], box: [5.85, 2.75, 6.3, 3.1], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideChapelMAD25: {
+    desc: "Gloomy tiled chapel with two rows of wooden pews, a round stained-glass window casting coloured light over a lectern and an octagonal stone font, red banners and portraits on the walls, and large clay pots in the corner",
+    roomTypes: [
+      "chapel"
+    ],
+    tags: [
+      "indoor",
+      "religious",
+      "dark"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "chapel west",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.55], [4.1, 1.9], [4.4, 2.05], [4.4, 3.5], [0, 3.5]],
+        anchor: [1.78, 2.28],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "chapel east",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 2.05], [4.1, 1.9], [2.65, 1.55]],
+        anchor: [5.48, 1.38],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "window", label: "round stained-glass window", space: "s1", at: [0.4, 1.75], box: [0.25, 1.4, 0.6, 2.05] },
+      { id: "f2", kind: "other", label: "octagonal stone font", space: "s1", at: [1.35, 0.7], box: [1.05, 0.35, 1.75, 1.05], affords: [
+          "interact", "search"
+        ] },
+      { id: "f3", kind: "pulpit", label: "wooden lectern", space: "s1", at: [1.2, 1.65], box: [1, 1.3, 1.4, 1.95], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "barrel", label: "small keg", space: "s1", at: [1.05, 2.75], box: [0.85, 2.55, 1.25, 2.95], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "painting", label: "portrait", space: "s1", at: [0.45, 0.6], box: [0.3, 0.45, 0.6, 0.8] },
+      { id: "f6", kind: "painting", label: "portrait", space: "s1", at: [0.45, 2.95], box: [0.3, 2.75, 0.6, 3.15] },
+      { id: "f7", kind: "pew", space: "s1", at: [2.12, 1.08], box: [1.9, 0.55, 2.35, 1.6] },
+      { id: "f8", kind: "pew", space: "s2", at: [2.7, 1.1], box: [2.45, 0.6, 2.95, 1.6] },
+      { id: "f9", kind: "pew", space: "s2", at: [3.22, 1.15], box: [3.05, 0.65, 3.4, 1.65] },
+      { id: "f10", kind: "pew", label: "pew with a top hat", space: "s2", at: [3.8, 1.02], box: [3.6, 0.5, 4, 1.55] },
+      { id: "f11", kind: "pew", space: "s2", at: [4.35, 1.02], box: [4.15, 0.5, 4.55, 1.55] },
+      { id: "f12", kind: "pew", label: "pew with a hat", space: "s1", at: [2.72, 2.45], box: [2.5, 1.95, 2.95, 2.95] },
+      { id: "f13", kind: "pew", space: "s1", at: [3.25, 2.5], box: [3.05, 2, 3.45, 3] },
+      { id: "f14", kind: "pew", space: "s1", at: [3.8, 2.48], box: [3.6, 2, 4, 2.95] },
+      { id: "f15", kind: "pew", space: "s1", at: [4.37, 2.5], box: [4.15, 2, 4.6, 3] },
+      { id: "f16", kind: "pew", space: "s2", at: [4.9, 2.45], box: [4.7, 1.95, 5.1, 2.95] },
+      { id: "f17", kind: "barrel", label: "large clay pots", space: "s2", at: [5.65, 2.85], box: [5.3, 2.65, 6, 3.1], affords: [
+          "search"
+        ] },
+      { id: "f18", kind: "sack", space: "s2", at: [6.4, 0.55], box: [6, 0.3, 6.65, 1], affords: [
+          "search"
+        ] },
+      { id: "f19", kind: "lamp", label: "wall lamp", space: "s2", at: [6.6, 2.8], box: [6.5, 2.6, 6.75, 3], affords: [
+          "light"
+        ] }
+    ]
+  },
+  TileSideSpeakeasy: {
+    desc: "Dim wood-panelled speakeasy with a long bar counter of bottles and fruit, two bar stools, wooden booths under hanging lamps, a round table with a dropped bottle, a card table with scattered cards and barrels in the corners",
+    roomTypes: [
+      "lounge",
+      "dining"
+    ],
+    tags: [
+      "indoor",
+      "shabby",
+      "dark",
+      "crime"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "bar",
+        outline: [[0, 0], [3.5, 0], [3.5, 1.8], [4.4, 2.65], [4.4, 3.5], [0, 3.5]],
+        anchor: [1.78, 2.53],
+        spots: [[0.63, 1.58]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "booths and tables",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 2.65], [3.5, 1.8]],
+        anchor: [4.08, 1.78],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "counter", label: "bar counter with bottles and fruit", space: "s1", at: [2.1, 1.05], box: [0.9, 0.85, 3.25, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "crate", label: "crate of bottles", space: "s1", at: [3.15, 0.6], box: [2.9, 0.3, 3.35, 0.85], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "other", label: "ornate kettle", space: "s1", at: [0.7, 0.65], box: [0.5, 0.45, 0.85, 0.85], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "lamp", label: "wall lamp", space: "s1", at: [1, 0.45], box: [0.9, 0.3, 1.1, 0.6], affords: [
+          "light"
+        ] },
+      { id: "f5", kind: "chair", label: "bar stool", space: "s1", at: [1.6, 1.65], box: [1.45, 1.5, 1.75, 1.8] },
+      { id: "f6", kind: "chair", label: "bar stool", space: "s1", at: [2.4, 1.65], box: [2.25, 1.5, 2.55, 1.8] },
+      { id: "f7", kind: "barrel", label: "broken barrel", space: "s1", at: [0.85, 2.95], box: [0.55, 2.65, 1.15, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "painting", label: "small framed picture", space: "s1", at: [0.45, 2.8], box: [0.35, 2.65, 0.55, 2.95] },
+      { id: "f9", kind: "table", label: "booth table", space: "s2", at: [4.05, 0.85], box: [3.75, 0.35, 4.35, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "bench", label: "booth bench", space: "s1", at: [3.45, 0.8], box: [3.2, 0.3, 3.75, 1.35] },
+      { id: "f11", kind: "bench", label: "booth bench", space: "s2", at: [4.7, 0.8], box: [4.4, 0.3, 5, 1.35] },
+      { id: "f12", kind: "table", label: "booth table", space: "s2", at: [5.7, 0.85], box: [5.4, 0.35, 5.95, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "bench", label: "booth bench", space: "s2", at: [5.2, 0.8], box: [5, 0.3, 5.4, 1.35] },
+      { id: "f14", kind: "bench", label: "booth bench", space: "s2", at: [6.15, 0.8], box: [5.95, 0.3, 6.35, 1.35] },
+      { id: "f15", kind: "lamp", label: "hanging lamp", space: "s2", at: [3.95, 0.5], box: [3.8, 0.35, 4.1, 0.65], affords: [
+          "light"
+        ] },
+      { id: "f16", kind: "lamp", label: "hanging lamp", space: "s2", at: [5.75, 0.5], box: [5.6, 0.35, 5.9, 0.65], affords: [
+          "light"
+        ] },
+      { id: "f17", kind: "table", label: "booth table", space: "s1", at: [3.3, 2.75], box: [3.05, 2.3, 3.6, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f18", kind: "bench", label: "booth bench", space: "s1", at: [2.75, 2.75], box: [2.55, 2.25, 3, 3.25] },
+      { id: "f19", kind: "bench", label: "booth bench", space: "s1", at: [3.85, 2.75], box: [3.6, 2.25, 4.15, 3.25] },
+      { id: "f20", kind: "lamp", label: "hanging lamp", space: "s1", at: [3.25, 3], box: [3.1, 2.85, 3.4, 3.15], affords: [
+          "light"
+        ] },
+      { id: "f21", kind: "lamp", label: "hanging lamp", space: "s2", at: [5.75, 3], box: [5.6, 2.85, 5.9, 3.15], affords: [
+          "light"
+        ] },
+      { id: "f22", kind: "barrel", label: "barrels", space: "s2", at: [6.45, 0.8], box: [6.2, 0.35, 6.7, 1.25], affords: [
+          "search"
+        ] },
+      { id: "f23", kind: "table", label: "round table with a dropped bottle", space: "s2", at: [4.95, 2.65], box: [4.65, 2.3, 5.3, 3], affords: [
+          "search"
+        ] },
+      { id: "f24", kind: "chair", space: "s2", at: [4.75, 2.1], box: [4.6, 1.85, 4.95, 2.25] },
+      { id: "f25", kind: "chair", space: "s2", at: [5.15, 3.1], box: [4.95, 2.9, 5.45, 3.25] },
+      { id: "f26", kind: "table", label: "card table", space: "s2", at: [5.95, 2.25], box: [5.65, 1.95, 6.25, 2.55], affords: [
+          "search", "interact"
+        ] },
+      { id: "f27", kind: "chair", space: "s2", at: [6.25, 1.9], box: [6.05, 1.65, 6.6, 2.1] },
+      { id: "f28", kind: "chair", space: "s2", at: [6.05, 2.75], box: [5.8, 2.55, 6.5, 2.95] }
+    ]
+  },
+  TileSidePortraitHall: {
+    desc: "Gallery hall with a green and cream checkered floor, gilt-framed portraits and paintings on every wall, two glass display cases of books and scrolls, a stone bust on the north wall and a marble plinth with a bust in the west half",
+    roomTypes: [
+      "gallery",
+      "hallway"
+    ],
+    tags: [
+      "indoor",
+      "wealthy",
+      "museum"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "portrait hall west",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.95], [3.5, 1.75], [3.5, 3.5], [0, 3.5]],
+        anchor: [0.98, 1.48],
+        spots: [[1.73, 2.68]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "portrait hall east",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 1.75], [2.65, 0.95]],
+        anchor: [4.83, 2.08],
+        spots: [[6.13, 1.48], [5.98, 2.88]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "painting", label: "gilt-framed portrait", space: "s1", at: [0.4, 0.85], box: [0.25, 0.6, 0.55, 1.05] },
+      { id: "f2", kind: "painting", label: "gilt-framed portrait", space: "s1", at: [0.4, 2.8], box: [0.25, 2.55, 0.55, 3.05] },
+      { id: "f3", kind: "painting", label: "row of framed paintings", space: "s1", at: [1.55, 0.3], box: [0.6, 0.25, 2.55, 0.4] },
+      { id: "f4", kind: "painting", label: "framed painting", space: "s1", at: [0.95, 3.22], box: [0.6, 3.15, 1.3, 3.3] },
+      { id: "f5", kind: "painting", label: "framed painting", space: "s1", at: [3, 3.22], box: [2.7, 3.15, 3.35, 3.3] },
+      { id: "f6", kind: "painting", label: "framed portraits", space: "s2", at: [5.25, 0.3], box: [4.25, 0.25, 6.4, 0.4] },
+      { id: "f7", kind: "cabinet", label: "glass display case with a book", space: "s2", at: [3.3, 0.55], box: [2.85, 0.25, 3.75, 0.8], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "statue", label: "stone bust", space: "s2", at: [4.05, 0.55], box: [3.85, 0.4, 4.25, 0.7], affords: [
+          "interact"
+        ] },
+      { id: "f9", kind: "cabinet", label: "glass display case with scrolls and a book", space: "s2", at: [5.4, 0.55], box: [4.85, 0.25, 5.95, 0.85], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "statue", label: "bust on a marble plinth", space: "s1", at: [2.15, 1.75], box: [1.85, 1.35, 2.5, 2.1], affords: [
+          "interact"
+        ] }
+    ]
+  },
   TileSideMagicShop: { desc: "Cluttered magic shop with shelves, rug and fortune-telling chair", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideOfficeMAD25: { desc: "Dark wood office with large oval rug and desk", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideYard2MAD25: { desc: "Overgrown yard with debris, trees, and winding path", roomTypes: [], tags: [], spaces: [], features: [] },
