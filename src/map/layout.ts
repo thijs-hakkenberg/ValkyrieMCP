@@ -196,10 +196,13 @@ export function overlapArea(a: Rect, b: Rect): number {
   return w > 0 && h > 0 ? w * h : 0;
 }
 
-/** The tile whose footprint contains (x, y), allowing `tolerance` outside the edge (wall tokens sit on borders) */
+/**
+ * The tile whose footprint contains (x, y), allowing `tolerance` outside the edge (wall tokens sit on borders).
+ * A tile that really contains the point wins over a neighbour that only reaches it through the tolerance.
+ */
 export function tileAt(tiles: PlacedTile[], x: number, y: number, tolerance = 0): PlacedTile | undefined {
-  return tiles.find(t => x >= t.rect.minX - tolerance && x <= t.rect.maxX + tolerance
-    && y >= t.rect.minY - tolerance && y <= t.rect.maxY + tolerance);
+  const within = (t: PlacedTile, d: number) => x >= t.rect.minX - d && x <= t.rect.maxX + d && y >= t.rect.minY - d && y <= t.rect.maxY + d;
+  return tiles.find(t => within(t, 0)) ?? (tolerance > 0 ? tiles.find(t => within(t, tolerance)) : undefined);
 }
 
 export interface PlacementCandidate {

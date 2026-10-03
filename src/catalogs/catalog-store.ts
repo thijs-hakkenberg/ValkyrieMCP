@@ -35,6 +35,12 @@ export const PACK_ID_MAP: Record<string, string> = {
 };
 
 /** Convert a catalog pack ID (lowercase) to Valkyrie's case-sensitive pack ID */
+/** `text` contains `term` as whole words (a plural -s/-es counts too), ignoring case */
+function hasWord(text: string, term: string): boolean {
+  const escaped = term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+  return new RegExp(`\\b${escaped}(?:s|es)?\\b`, 'i').test(text);
+}
+
 export function getValkyriePackId(catalogPack: string): string {
   return PACK_ID_MAP[catalogPack] ?? catalogPack;
 }
@@ -99,11 +105,12 @@ export class CatalogStore {
       if (entry.id.toLowerCase().includes(q)) return true;
       if (entry.name.toLowerCase().includes(q)) return true;
       if (entry.traits.some(t => t.toLowerCase().includes(q))) return true;
-      if (typeof entry.desc === 'string' && entry.desc.toLowerCase().includes(q)) return true;
-      if (entry.type === 'tile' && this.tileObjectMatches(entry.id, query).length > 0) return true;
-      const content = entry.type === 'tile' ? TILE_CONTENT[entry.id] : undefined;
-      if (content && [...content.roomTypes, ...content.tags].some(t => t.includes(q))) return true;
-      return false;
+      if (entry.type !== 'tile') return typeof entry.desc === 'string' && entry.desc.toLowerCase().includes(q);
+      // Tiles match on whole words, so "grave" doesn't find gravel and "table" doesn't find a timetable
+      if (typeof entry.desc === 'string' && hasWord(entry.desc, q)) return true;
+      if (this.tileObjectMatches(entry.id, query).length > 0) return true;
+      const content = TILE_CONTENT[entry.id];
+      return !!content && [...content.roomTypes, ...content.tags].some(t => hasWord(t, q));
     });
   }
 
@@ -117,7 +124,7 @@ export class CatalogStore {
     if (!isAnnotated(content) || !q) return [];
     const kinds = new Set<string>(kindsForTerm(q));
     return content.features
-      .filter(f => kinds.has(f.kind) || (f.label?.toLowerCase().includes(q) ?? false))
+      .filter(f => kinds.has(f.kind) || (!!f.label && hasWord(f.label, q)))
       .map(f => `${featureName(f)} in ${f.space} ${content.spaces.find(s => s.id === f.space)?.label ?? ''}`.trim());
   }
 
@@ -133,7 +140,7 @@ export class CatalogStore {
       const ok = wanted.every(term => {
         const found = this.tileObjectMatches(entry.id, term);
         if (found.length === 0 && !isAnnotated(TILE_CONTENT[entry.id]) && typeof entry.desc === 'string'
-          && entry.desc.toLowerCase().includes(term)) found.push('(mentioned in the description; not annotated yet)');
+          && hasWord(entry.desc, term)) found.push('(mentioned in the description; not annotated yet)');
         matchedObjects[term] = found;
         return found.length > 0;
       });

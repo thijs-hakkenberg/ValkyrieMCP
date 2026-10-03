@@ -137,4 +137,13 @@ describe('searching tiles by content', () => {
     expect(searchGameContent('', 'tile', ['tub']).map(e => e.id)).toContain('TileSideBathroom');
     expect(searchGameContent('lobby', 'tile', ['tub'])).toEqual([]);
   });
+
+  it('matches whole words, not parts of them', () => {
+    const store = new CatalogStore();
+    const graves = store.search('grave', 'tile').map(e => e.id);
+    expect(graves).toContain('TileSideYard1MAD25');
+    expect(graves).not.toContain('TileSideTunnel');
+    expect(store.tileObjectMatches('TileSideStation', 'table')).toEqual([]);
+    expect(store.search('bookcases', 'tile').length).toBeGreaterThan(0);
+  });
 });
