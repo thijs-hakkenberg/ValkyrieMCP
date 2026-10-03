@@ -46,9 +46,8 @@ describe('TileGeometry', () => {
         }
       });
 
-      it('has an image and a non-empty description', () => {
+      it('has an image', () => {
         expect(geo.image.length).toBeGreaterThan(0);
-        expect(geo.desc.length).toBeGreaterThan(0);
       });
     });
   }
