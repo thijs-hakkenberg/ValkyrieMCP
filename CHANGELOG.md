@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.0] - 2026-10-03
+
+### Added
+
+- **Tile contents.** All 174 tile sides record their movement spaces (outline, links to neighbouring spaces through lines, barriers, walls and doors, token spots, and which frame openings lead in) and the objects drawn on them (bookcases, fireplaces, altars, stairs, ...), in local tile coordinates.
+- `search_game_content` matches tiles on what is drawn on them: object kinds and synonyms ("bookshelf", "stove", "stairs"), room types and mood tags. `has=["fireplace","piano"]` finds tiles showing all of the listed objects.
+- `upsert_token` and `upsert_mplace` take `at` instead of coordinates: `at="Study"` (a free spot in the tile's largest space), `at="Study:s2"` (a free spot in space s2), `at="Study:desk"` (on the first desk) or `at="Study:f3"` (on object f3). Spots already taken by tokens or monster placements are skipped.
+- `get_map_ascii` lists each placed tile's spaces and objects with their ids. `render_map` with `showSpaces=true` outlines the spaces and marks the objects.
+- Validation warns about a token that sits on the line between two spaces, where players can't tell which space it is in.
+- Annotation tooling for maintainers: `scripts/tile-annotation.ts` (coordinate sheets, a builder that turns traced lines into spaces, checks and overlays), `scripts/merge-tile-annotations.ts`, and `docs/tile-annotation-guide.md`.
+
 ## [2.3.3] - 2026-09-27
 
 ### Added
