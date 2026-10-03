@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ScenarioModel } from '../../src/model/scenario-model.js';
-import { layoutTiles, localToWorld, worldToLocal } from '../../src/map/layout.js';
+import { layoutTiles, localToWorld, tileAt, worldToLocal } from '../../src/map/layout.js';
 import { TILE_GEOMETRY } from '../../src/catalogs/data/tile-geometry.js';
 
 describe('local tile coordinates', () => {
@@ -28,4 +28,17 @@ describe('local tile coordinates', () => {
       expect(worldToLocal(tile, ...localToWorld(tile, [1.25, 2.5]))).toEqual([1.25, 2.5]);
     });
   }
+});
+
+describe('tileAt', () => {
+  it('prefers the tile that contains the point over a neighbour within tolerance', () => {
+    const model = new ScenarioModel();
+    model.upsert('TileWest', { xposition: '20', yposition: '0', side: 'TileSideDiningRoom' });
+    model.upsert('TileEast', { xposition: '27', yposition: '0', side: 'TileSideBasement' });
+    const tiles = layoutTiles(model);
+    expect(tileAt(tiles, 27.55, -3.1, 0.6)?.name).toBe('TileEast');
+    expect(tileAt(tiles, 26.5, -3.1, 0.6)?.name).toBe('TileWest');
+    expect(tileAt(tiles, 34.3, -3.1, 0.6)?.name).toBe('TileEast');
+    expect(tileAt(tiles, 34.3, -3.1)).toBeUndefined();
+  });
 });
