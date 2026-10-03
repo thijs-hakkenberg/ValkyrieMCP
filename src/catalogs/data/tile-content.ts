@@ -8450,16 +8450,758 @@ export const TILE_CONTENT: Record<string, TileContent> = {
       { id: "f11", kind: "plant", label: "hanging vines", space: "s4", at: [0.6, 6], box: [0.3, 5.5, 1, 6.6] }
     ]
   },
-  TileSideHallChamber1: { desc: "Temple hall with scattered rubble and green idol statue", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideHallChamber2: { desc: "Cracked stone chamber with bookshelf alcove on east side", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideStorageChamber: { desc: "Temple storage room with shelves, crates, and cracked floor", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSidePoolChamber: { desc: "Flooded cave chamber with large turquoise pool and island", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideMosaicChamber: { desc: "Ornate chamber with vivid stained-glass mosaic floor pattern", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRavine: { desc: "Outdoor rocky ravine with fallen branches and mossy ground", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideAntechamber: { desc: "Stone antechamber with cracked floor and scattered red debris", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideCrackedChamber: { desc: "Large crumbling temple chamber with deep central crack and rubble", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideRuinedChamber: { desc: "Collapsed temple room half-filled with boulder rubble", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideDiner: { desc: "Checkered-floor diner with counter, kitchen area, and booth seating", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideHallChamber1: {
+    desc: "Long stone temple hall with carved glyph friezes, crowded with clay pots and urns along the walls and the toppled fragments of a broken stone statue in the middle",
+    roomTypes: [
+      "hallway",
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "ruined",
+      "temple"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chamber",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.95], [4.35, 2.6], [4.4, 3.5], [0, 3.5]],
+        anchor: [2.13, 1.53],
+        spots: [[0.63, 1.88]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east chamber",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.35, 2.6], [2.65, 0.95]],
+        anchor: [5.68, 2.23],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "E", index: 1 },
+          { side: "E", index: 2 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "statue", label: "broken stone statue head", space: "s2", at: [3.7, 0.95], box: [3.4, 0.7, 4, 1.25], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "statue", label: "broken stone statue fragment", space: "s2", at: [4.35, 1.05], box: [4.1, 0.7, 4.75, 1.3], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "statue", label: "toppled stone statue torso", space: "s2", at: [4.1, 1.75], box: [3.8, 1.35, 4.45, 2], affords: [
+          "interact", "search"
+        ] },
+      { id: "f4", kind: "other", label: "large red urn", space: "s2", at: [4.8, 1.45], box: [4.55, 1.2, 5, 1.7], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "other", label: "golden patterned vase", space: "s2", at: [5.8, 0.75], box: [5.5, 0.4, 6.1, 1], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "clay pots and jars", space: "s1", at: [0.8, 0.9], box: [0.45, 0.3, 1.4, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "other", label: "clay pots and jars", space: "s1", at: [0.9, 2.9], box: [0.55, 2.5, 1.3, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "other", label: "large striped amphora", space: "s1", at: [1.65, 2.95], box: [1.4, 2.65, 1.9, 3.25], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "other", label: "broken red pot", space: "s1", at: [2.65, 2.25], box: [2.5, 2.1, 2.85, 2.4], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "other", label: "patterned red pots", space: "s1", at: [3.9, 3], box: [3.45, 2.7, 4.35, 3.2], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideHallChamber2: {
+    desc: "Bare cracked flagstone hall opening west into a short brick-walled passage with a carved glyph border, ending at a wooden door to the east",
+    roomTypes: [
+      "hallway"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "empty"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "open hall",
+        outline: [[0, 0], [3.5, 0], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.73, 1.73],
+        spots: [[0.73, 0.73], [2.73, 0.73]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "corridor end",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [3.5, 3.5]],
+        anchor: [5.23, 1.73],
+        spots: [[6.23, 2.73], [4.23, 0.73]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: []
+  },
+  TileSideStorageChamber: {
+    desc: "Stone storage chamber with carved glyph borders, lined with carved stone chests and boxes and a few clay pots, with wooden doors north and east",
+    roomTypes: [
+      "storage"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "dusty"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west storeroom",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.95], [4.35, 2.6], [4.4, 3.5], [0, 3.5]],
+        anchor: [2.13, 1.38],
+        spots: [[0.83, 2.38]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s2",
+        label: "east storeroom",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.35, 2.6], [2.65, 0.95]],
+        anchor: [5.13, 1.68],
+        spots: [[3.73, 1.28]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "chest", label: "carved stone chest", space: "s1", at: [1.15, 0.5], box: [0.5, 0.27, 1.8, 0.75], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "chest", label: "carved stone chest", space: "s2", at: [3.45, 0.45], box: [3.05, 0.28, 3.9, 0.65], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "chest", label: "carved stone chest", space: "s2", at: [6, 0.45], box: [5.65, 0.28, 6.4, 0.6], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "chest", label: "carved stone chest", space: "s1", at: [1.8, 2.7], box: [1.58, 2.2, 2.03, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "chest", label: "carved stone chest", space: "s1", at: [2.95, 2.95], box: [2.55, 2.68, 3.35, 3.22], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "chest", label: "carved stone block", space: "s2", at: [6.2, 2.9], box: [6.03, 2.62, 6.4, 3.2], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "other", label: "blue clay pot", space: "s1", at: [0.7, 0.95], box: [0.53, 0.78, 0.88, 1.12], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "other", label: "red clay pot", space: "s1", at: [0.7, 1.4], box: [0.5, 1.2, 0.9, 1.58], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "other", label: "broken yellow pot", space: "s1", at: [0.85, 0.42] },
+      { id: "f10", kind: "other", label: "broken orange pots", space: "s1", at: [1.75, 2.8] },
+      { id: "f11", kind: "other", label: "green urn", space: "s2", at: [6.65, 3.05], box: [6.45, 2.85, 6.8, 3.25], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSidePoolChamber: {
+    desc: "Rocky cave chamber around a large shallow green pool littered with skeletons, bones and sunken planks, with a gravel island reaching in from the south and wooden doorways north, east and south",
+    roomTypes: [
+      "cave"
+    ],
+    tags: [
+      "underground",
+      "water",
+      "dark",
+      "bones"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "northwest bank",
+        outline: [[0, 0], [2.65, 0], [2.6, 2.6], [0, 2.65]],
+        anchor: [1.28, 1.28],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s2",
+        label: "north pool",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.55], [3.45, 3.4], [3.35, 3.4], [2.6, 2.65]],
+        anchor: [5.73, 1.23],
+        spots: [[4.18, 0.93], [6.13, 2.58]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "southwest pool",
+        outline: [[2.5, 2.6], [2.6, 2.6], [3.55, 3.55], [3.5, 7], [0, 7], [0, 2.65]],
+        anchor: [1.33, 5.68],
+        spots: [[1.23, 3.88], [2.68, 6.08]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s4",
+        label: "south island",
+        outline: [[3.7, 3.5], [7, 3.5], [7, 7], [3.5, 7], [3.5, 3.6]],
+        anchor: [6.28, 6.23],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "water", label: "shallow green pool", space: "s3", at: [3, 3.5] },
+      { id: "f2", kind: "bones", label: "skeleton in water", space: "s2", at: [3.75, 1.75], box: [3.6, 1.55, 3.95, 2], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "bones", label: "fish skeleton", space: "s2", at: [4.55, 1.8], box: [4.4, 1.65, 4.7, 1.95] },
+      { id: "f4", kind: "bones", label: "skull and bones", space: "s2", at: [2.65, 2.2], box: [2.5, 1.95, 2.85, 2.45], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "bones", label: "scattered bones", space: "s3", at: [2.4, 3.45], box: [2.25, 3.25, 2.6, 3.65] },
+      { id: "f6", kind: "rubble", label: "sunken planks and skeleton", space: "s3", at: [2.3, 4.7], box: [1.9, 4.35, 2.75, 5], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "bones", label: "skull", space: "s4", at: [4.1, 3.85], box: [3.95, 3.72, 4.25, 4] },
+      { id: "f8", kind: "rubble", label: "broken pottery in water", space: "s3", at: [3.3, 4], box: [3.1, 3.8, 3.6, 4.2], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "rock", label: "rocks in water", space: "s2", at: [5, 2.2], box: [4.65, 1.95, 5.3, 2.5] },
+      { id: "f10", kind: "other", label: "gravel island", space: "s4", at: [5, 4.7], box: [4.15, 3.75, 5.95, 5.9] }
+    ]
+  },
+  TileSideMosaicChamber: {
+    desc: "Brick-walled chamber whose floor is a large coloured stone mosaic of a branching tree flanked by coiled serpents, with wooden doors north, west and east",
+    roomTypes: [
+      "other",
+      "chapel"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "decorated"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west half",
+        outline: [[0, 0], [3.5, 0], [3.5, 7], [0, 7]],
+        anchor: [0.83, 0.83],
+        spots: [[0.83, 3.48], [2.78, 0.73]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east half",
+        outline: [[3.5, 0], [7, 0], [7, 7], [3.5, 7]],
+        anchor: [6.18, 0.83],
+        spots: [[6.18, 3.48], [4.23, 0.73]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "other", label: "mosaic of a branching tree", space: "s2", at: [3.5, 3.5], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "other", label: "mosaic serpent", space: "s2", at: [5, 2], box: [4.3, 1.3, 5.9, 3], affords: [
+          "interact"
+        ] },
+      { id: "f3", kind: "other", label: "mosaic serpent", space: "s1", at: [1.8, 2.3], box: [1.1, 1.3, 2.7, 3], affords: [
+          "interact"
+        ] },
+      { id: "f4", kind: "other", label: "mosaic serpent", space: "s1", at: [2, 4.9], box: [1.1, 4, 2.9, 5.9], affords: [
+          "interact"
+        ] },
+      { id: "f5", kind: "other", label: "mosaic serpent", space: "s2", at: [5.2, 5], box: [4.4, 4.1, 6, 5.9], affords: [
+          "interact"
+        ] }
+    ]
+  },
+  TileSideRavine: {
+    desc: "Jungle floor split by a dark ravine running north to south, bridged by a fallen moss-covered tree trunk, with scattered boulders to the west and a hollow tree stump to the east",
+    roomTypes: [
+      "wilderness"
+    ],
+    tags: [
+      "outdoor",
+      "jungle",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west jungle",
+        outline: [[0, 0], [2.65, 0], [2.55, 1.65], [2.65, 3.5], [0, 3.5]],
+        anchor: [1.78, 2.73],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "ravine",
+        outline: [[2.65, 0], [4.4, 0], [4.5, 1.1], [4.4, 3.5], [2.65, 3.5], [2.55, 2.6]],
+        anchor: [3.18, 0.53],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "east jungle",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.5, 2.3]],
+        anchor: [6.13, 2.13],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "hole", label: "deep ravine", space: "s2", at: [3.5, 2.9], box: [2.65, 0, 4.4, 3.5] },
+      { id: "f2", kind: "tree", label: "fallen mossy tree trunk bridging the ravine", space: "s2", at: [3.6, 1.8], box: [2.2, 1, 5, 2.5], affords: [
+          "climb"
+        ] },
+      { id: "f3", kind: "tree", label: "hollow tree stump", space: "s3", at: [6.2, 0.75], box: [5.6, 0.1, 6.85, 1.3], affords: [
+          "search", "hide"
+        ] },
+      { id: "f4", kind: "rock", label: "boulders", space: "s1", at: [1, 1.6], box: [0.5, 0.4, 1.6, 2.3], affords: [
+          "hide"
+        ] },
+      { id: "f5", kind: "rock", label: "rocks", space: "s3", at: [5.45, 2.75], box: [5.2, 2.5, 5.7, 2.95] },
+      { id: "f6", kind: "rock", label: "rocks", space: "s1", at: [1.05, 2.95], box: [0.8, 2.8, 1.25, 3.1] }
+    ]
+  },
+  TileSideAntechamber: {
+    desc: "Stone temple antechamber with carved glyph borders, scattered with red-painted jaguar statues, some broken, a toppled carved red stand and a green urn, with wooden doors west and south",
+    roomTypes: [
+      "foyer",
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "ruined"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west antechamber",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.3], [3.5, 2.2], [3.5, 3.5], [0, 3.5]],
+        anchor: [0.98, 1.73],
+        spots: [[3.43, 1.53], [2.83, 2.83]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east antechamber",
+        outline: [[4.4, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.2], [4.4, 1.3]],
+        anchor: [4.98, 2.13],
+        spots: [[6.38, 1.68]],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "statue", label: "red jaguar statue", space: "s1", at: [2.4, 0.95], box: [1.95, 0.55, 3, 1.3], affords: [
+          "interact"
+        ] },
+      { id: "f2", kind: "statue", label: "broken jaguar statue head", space: "s1", at: [1.3, 0.75], box: [1.15, 0.5, 1.6, 1] },
+      { id: "f3", kind: "statue", label: "broken red jaguar statue", space: "s1", at: [2.3, 2.3], box: [2.05, 2.05, 2.55, 2.55] },
+      { id: "f4", kind: "statue", label: "broken red jaguar statue", space: "s1", at: [1.6, 2.65], box: [1.25, 2.35, 1.9, 2.85] },
+      { id: "f5", kind: "other", label: "toppled carved red stand", space: "s2", at: [5.8, 0.95], box: [5.45, 0.55, 6.2, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "other", label: "green glazed urn", space: "s2", at: [6.15, 2.85], box: [5.95, 2.55, 6.35, 3.1], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideCrackedChamber: {
+    desc: "Brick-walled temple chamber with glyph-carved floor bands, split by a wide crack in the floor and strewn with boulders and the broken pieces of carved stone statues, with doors north, east and south",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "ruined"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "northwest chamber",
+        outline: [[0, 0], [3.5, 0], [3.5, 2.55], [3.4, 2.65], [0, 2.65]],
+        anchor: [0.68, 0.68],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "northeast chamber",
+        outline: [[3.5, 0], [7, 0], [7, 3.5], [4.4, 3.55], [4.35, 3.4], [3.95, 3.15], [3.45, 2.65]],
+        anchor: [4.28, 0.78],
+        spots: [[6.33, 2.83]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "southwest chamber",
+        outline: [[3.4, 2.6], [4.45, 3.55], [4.4, 7], [0, 7], [0, 2.65]],
+        anchor: [3.03, 3.93],
+        spots: [[3.58, 5.23], [0.68, 3.33]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "southeast chamber",
+        outline: [[4.55, 3.5], [7, 3.5], [7, 7], [4.4, 7], [4.4, 3.65]],
+        anchor: [5.13, 4.23],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "hole", label: "wide crack in the floor", space: "s3", at: [2.2, 2.7], box: [0.6, 2.4, 3.9, 3] },
+      { id: "f2", kind: "statue", label: "toppled carved stone statue", space: "s2", at: [5.15, 1.95], box: [4.65, 1.25, 5.8, 2.75], affords: [
+          "interact", "search"
+        ] },
+      { id: "f3", kind: "statue", label: "broken statue fragment", space: "s1", at: [1.4, 1.35], box: [1.1, 0.9, 1.65, 1.75] },
+      { id: "f4", kind: "statue", label: "broken statue fragment", space: "s1", at: [2.6, 1.25], box: [2.3, 0.85, 2.85, 1.55] },
+      { id: "f5", kind: "statue", label: "carved stone statue head", space: "s1", at: [2.6, 2.05], box: [2.3, 1.7, 2.95, 2.35], affords: [
+          "interact"
+        ] },
+      { id: "f6", kind: "statue", label: "broken statue fragment", space: "s3", at: [1.5, 3.95], box: [1.15, 3.5, 1.8, 4.35] },
+      { id: "f7", kind: "statue", label: "broken statue fragment", space: "s3", at: [1.65, 5.4], box: [1.25, 4.9, 2, 5.8] },
+      { id: "f8", kind: "statue", label: "broken statue fragment", space: "s3", at: [2.75, 5.7], box: [2.35, 5.45, 3.05, 6.1] },
+      { id: "f9", kind: "rubble", label: "broken stone blocks", space: "s4", at: [6, 5], box: [5.6, 4.4, 6.3, 5.6], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "rubble", label: "pile of stone blocks", space: "s3", at: [1, 6], box: [0.55, 5.55, 1.4, 6.5], affords: [
+          "hide"
+        ] },
+      { id: "f11", kind: "rock", label: "boulders", space: "s2", at: [5.9, 0.95], box: [5.5, 0.6, 6.3, 1.25] },
+      { id: "f12", kind: "rock", label: "boulder", space: "s2", at: [3.95, 1.7], box: [3.65, 1.45, 4.25, 2] },
+      { id: "f13", kind: "rock", label: "boulders", space: "s4", at: [5.7, 6], box: [5, 5.6, 6.4, 6.4], affords: [
+          "hide"
+        ] },
+      { id: "f14", kind: "rock", label: "boulders", space: "s3", at: [0.9, 4.8], box: [0.6, 4.4, 1.3, 5.6] }
+    ]
+  },
+  TileSideRuinedChamber: {
+    desc: "Dead-end stone temple chamber with carved glyph borders whose eastern half is buried under a collapsed mound of rubble, with a skeleton lying half-buried in the debris and a wooden door to the west",
+    roomTypes: [
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "ancient",
+      "temple",
+      "ruined",
+      "collapsed"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west chamber",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.8], [3.5, 2.65], [3.5, 3.5], [0, 3.5]],
+        anchor: [1.38, 1.93],
+        spots: [[2.53, 2.73], [0.68, 0.68]],
+        links: [
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "collapsed east chamber",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [3.5, 3.5], [3.5, 2.65], [2.65, 1.8]],
+        anchor: [3.98, 2.63],
+        links: [
+          { to: "s1", via: "line" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "rubble", label: "collapsed ceiling rubble", space: "s2", at: [4.8, 1.3], box: [2.75, 0.55, 6.35, 2.2], affords: [
+          "search", "climb"
+        ] },
+      { id: "f2", kind: "rubble", label: "collapsed ceiling rubble", space: "s2", at: [5.4, 2.65], box: [4.4, 2.2, 6.35, 3.1], affords: [
+          "search", "climb"
+        ] },
+      { id: "f3", kind: "bones", label: "skeleton half-buried in rubble", space: "s2", at: [4.3, 1.95], box: [4.05, 1.75, 4.5, 2.2], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideDiner: {
+    desc: "Checkered-floor diner with red leather booths along the walls, a long counter with stools, cash register and pie case, and a cluttered tiled kitchen behind a wall with a pass-through, stove, crates and barrels",
+    roomTypes: [
+      "dining",
+      "kitchen"
+    ],
+    tags: [
+      "indoor",
+      "urban",
+      "shabby"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "booths and stools",
+        outline: [[0, 0], [6.15, 0], [6.15, 2.6], [0, 2.65]],
+        anchor: [0.73, 1.88],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east dining room",
+        outline: [[6.15, 0], [10.5, 0], [10.5, 7], [7.05, 7], [7.05, 3.5], [6.95, 3.5], [6.25, 2.75], [6.1, 2.7]],
+        anchor: [8.83, 5.38],
+        spots: [[7.93, 2.58], [8.08, 3.98]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "behind the counter",
+        outline: [[0, 2.65], [6.1, 2.65], [6.95, 3.5], [7.05, 3.5], [7.05, 4.35], [0, 4.35]],
+        anchor: [0.43, 3.93],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "barrier" }
+        ],
+        openings: []
+      },
+      {
+        id: "s4",
+        label: "kitchen",
+        outline: [[0, 4.35], [7.05, 4.35], [7.05, 7], [0, 7]],
+        anchor: [2.83, 5.08],
+        spots: [[5.38, 5.08]],
+        links: [
+          { to: "s3", via: "barrier" }
+        ],
+        openings: [
+          { side: "W", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "table", label: "booth table", space: "s1", at: [1.95, 0.8], box: [1.7, 0.4, 2.3, 1.33], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "table", label: "booth table", space: "s1", at: [3.6, 0.8], box: [3.35, 0.4, 3.9, 1.33], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "table", label: "booth table", space: "s1", at: [5.5, 0.8], box: [5.2, 0.4, 5.85, 1.33], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "table", label: "booth table", space: "s2", at: [7.1, 0.8], box: [6.8, 0.4, 7.45, 1.33], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "bench", label: "red leather booth seats", space: "s1", at: [3.6, 1], box: [1.15, 0.33, 6, 1.53] },
+      { id: "f6", kind: "bench", label: "red leather booth seats", space: "s2", at: [7.1, 1], box: [6.2, 0.33, 8, 1.53] },
+      { id: "f7", kind: "table", label: "booth table", space: "s2", at: [9.65, 1.87], box: [9.1, 1.47, 10.2, 2.13], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "table", label: "booth table", space: "s2", at: [9.65, 3.6], box: [9.1, 3.27, 10.2, 3.93], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "bench", label: "red leather booth seats", space: "s2", at: [9.65, 2.73], box: [9, 0.93, 10.3, 4.47] },
+      { id: "f10", kind: "chair", label: "row of counter stools", space: "s1", at: [3.4, 2.33], box: [1.55, 2.07, 5.3, 2.6] },
+      { id: "f11", kind: "chair", label: "counter stool", space: "s2", at: [6.65, 2.33], box: [6.45, 2.07, 6.85, 2.6] },
+      { id: "f12", kind: "counter", label: "diner counter", space: "s3", at: [3.5, 3.07], box: [0.3, 2.67, 7, 3.53], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "other", label: "cash register", space: "s3", at: [1.1, 3], box: [0.8, 2.73, 1.35, 3.27], affords: [
+          "search", "interact"
+        ] },
+      { id: "f14", kind: "cabinet", label: "pie display case", space: "s3", at: [2.1, 3], box: [1.65, 2.73, 2.6, 3.4], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "other", label: "telephone", space: "s3", at: [0.45, 3.13], affords: [
+          "interact"
+        ] },
+      { id: "f16", kind: "plant", label: "vase of yellow flowers", space: "s3", at: [4.6, 3.07], box: [4.45, 2.8, 4.8, 3.4] },
+      { id: "f17", kind: "barrel", label: "wooden barrel", space: "s1", at: [0.75, 0.8], box: [0.45, 0.47, 1.1, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f18", kind: "painting", label: "poster", space: "s3", at: [0.38, 3.87] },
+      { id: "f19", kind: "painting", label: "framed picture", space: "s2", at: [9.65, 0.47], box: [9.35, 0.33, 9.95, 0.6] },
+      { id: "f20", kind: "papers", label: "newspaper on booth seat", space: "s2", at: [9.4, 4.33], box: [9.2, 4.13, 9.65, 4.53], affords: [
+          "search"
+        ] },
+      { id: "f21", kind: "furnace", label: "cooking range", space: "s4", at: [4, 4.8], box: [3.5, 4.6, 4.75, 5.07], affords: [
+          "interact"
+        ] },
+      { id: "f22", kind: "crate", label: "overturned crate of greens", space: "s4", at: [1.6, 4.87], box: [1.05, 4.53, 2.15, 5.2], affords: [
+          "search"
+        ] },
+      { id: "f23", kind: "crate", label: "crate of carrots", space: "s4", at: [0.95, 6.2], box: [0.55, 5.87, 1.25, 6.6], affords: [
+          "search"
+        ] },
+      { id: "f24", kind: "crate", label: "crates of bottles and glasses", space: "s4", at: [2.6, 6.13], box: [1.55, 5.73, 3.85, 6.6], affords: [
+          "search"
+        ] },
+      { id: "f25", kind: "other", label: "large cooking pot", space: "s4", at: [4.5, 6.2], box: [4.25, 5.93, 4.75, 6.53], affords: [
+          "search"
+        ] },
+      { id: "f26", kind: "machinery", label: "kitchen machine", space: "s4", at: [5.45, 6.2], box: [4.95, 5.8, 6, 6.73], affords: [
+          "interact"
+        ] },
+      { id: "f27", kind: "barrel", label: "barrels and basket of berries", space: "s4", at: [6.4, 6.33], box: [5.95, 5.93, 6.9, 6.73], affords: [
+          "search"
+        ] },
+      { id: "f28", kind: "cabinet", label: "icebox", space: "s4", at: [6.5, 5.07], box: [6.3, 4.6, 7, 5.4], affords: [
+          "search"
+        ] },
+      { id: "f29", kind: "crate", label: "crate of carrots and knives", space: "s4", at: [6.6, 5.73], box: [6.35, 5.4, 6.95, 6], affords: [
+          "search"
+        ] },
+      { id: "f30", kind: "cabinet", label: "tall dark wooden cabinet", space: "s2", at: [7.45, 5.2], box: [7.2, 4.47, 7.7, 5.93], affords: [
+          "search"
+        ] },
+      { id: "f31", kind: "other", label: "small blue cabinet", space: "s2", at: [7.6, 6.47], box: [7.35, 6.2, 7.85, 6.73], affords: [
+          "search"
+        ] },
+      { id: "f32", kind: "other", label: "red jukebox", space: "s2", at: [9.85, 6.4], box: [9.4, 6.07, 10.3, 6.73], affords: [
+          "interact"
+        ] }
+    ]
+  },
   TileSideExhibitEntrance: { desc: "Green-tiled museum entrance hall with large whale skeleton mural", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideYard1MAD25: { desc: "Grassy yard with stone paths, benches, and scattered hedges", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideMainExhibit: { desc: "Museum exhibit room with central dinosaur skeleton display case", roomTypes: [], tags: [], spaces: [], features: [] },

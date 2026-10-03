@@ -57,10 +57,11 @@ function drawSheet(id: string, geo: TileGeometry, opts: SheetOptions = {}): { ca
   const style = opts.style ?? 'grid';
   const w = Math.round((rx1 - rx0) * unit), h = Math.round((ry1 - ry0) * unit);
   const canvas = new Canvas(w + 2 * MARGIN, h + 2 * MARGIN, [245, 245, 245, 255]);
-  // Crop the artwork to the region, then scale it
-  const apu = art.width / geo.width;
-  const cx0 = Math.round(rx0 * apu), cy0 = Math.round(ry0 * apu);
-  const cw = Math.round((rx1 - rx0) * apu), ch = Math.round((ry1 - ry0) * apu);
+  // Crop the artwork to the region, then scale it. Pixels per unit can differ by axis: a tile with an
+  // `aspect` override is stretched to its size in game (the Diner's 2:1 art fills a 10.5 x 7 tile)
+  const apuX = art.width / geo.width, apuY = art.height / geo.height;
+  const cx0 = Math.round(rx0 * apuX), cy0 = Math.round(ry0 * apuY);
+  const cw = Math.min(Math.round((rx1 - rx0) * apuX), art.width - cx0), ch = Math.min(Math.round((ry1 - ry0) * apuY), art.height - cy0);
   const crop = new Uint8Array(cw * ch * 4);
   for (let y = 0; y < ch; y++) crop.set(art.data.subarray(((cy0 + y) * art.width + cx0) * 4, ((cy0 + y) * art.width + cx0 + cw) * 4), y * cw * 4);
   canvas.blit(resize({ width: cw, height: ch, data: crop }, w, h), MARGIN, MARGIN);
