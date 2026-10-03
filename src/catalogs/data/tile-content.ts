@@ -9202,16 +9202,1054 @@ export const TILE_CONTENT: Record<string, TileContent> = {
         ] }
     ]
   },
-  TileSideExhibitEntrance: { desc: "Green-tiled museum entrance hall with large whale skeleton mural", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideYard1MAD25: { desc: "Grassy yard with stone paths, benches, and scattered hedges", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideMainExhibit: { desc: "Museum exhibit room with central dinosaur skeleton display case", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideLab: { desc: "Dark tiled laboratory with shelves, equipment, and overhead lighting", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideBandstand: { desc: "Outdoor octagonal wooden bandstand surrounded by grass and bushes", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideLobbyMAD25: { desc: "Herringbone-floored lobby with fireplace, paintings, and ornate rug", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideExhibit3: { desc: "Cluttered museum storage room with diamond-pattern floor and artifacts", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideClassroom1: { desc: "Wooden lecture hall with tiered bench seating and podium", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideLibraryMAD25: { desc: "Warm library with central reading area, bookshelves, and herringbone floor", roomTypes: [], tags: [], spaces: [], features: [] },
-  TileSideGeneralShop: { desc: "Cluttered general store with shelves, merchandise, and dark wood floors", roomTypes: [], tags: [], spaces: [], features: [] },
+  TileSideExhibitEntrance: {
+    desc: "Museum entrance hall with a checkered floor, a U-shaped marble counter with papers and a plant, and a large dinosaur skeleton on a roped-off wooden platform",
+    roomTypes: [
+      "gallery",
+      "foyer"
+    ],
+    tags: [
+      "indoor",
+      "museum",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west hall",
+        outline: [[0, 0], [2.65, 0], [2.65, 1.8], [3.1, 2.15], [3.1, 4.85], [2.65, 5.25], [2.65, 7], [0, 7]],
+        anchor: [1.43, 4.98],
+        spots: [[1.38, 1.88], [1.08, 3.28]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 },
+          { side: "W", index: 1 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "north exhibit",
+        outline: [[2.65, 0], [7.85, 0], [7.85, 1.8], [7.4, 2.15], [7.4, 3.5], [3.1, 3.5], [3.1, 2.15], [2.65, 1.8]],
+        anchor: [6.98, 0.88],
+        spots: [[3.48, 0.83]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "east hall",
+        outline: [[7.85, 0], [10.5, 0], [10.5, 7], [7.85, 7], [7.85, 5.25], [7.4, 4.9], [7.4, 2.15], [7.85, 1.8]],
+        anchor: [9.18, 1.33],
+        spots: [[9.18, 5.58], [9.83, 2.58]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "E", index: 1 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "south entrance",
+        outline: [[3.1, 3.5], [7.4, 3.5], [7.4, 4.9], [7.85, 5.25], [7.85, 7], [2.65, 7], [2.65, 5.25], [3.1, 4.85]],
+        anchor: [4.03, 5.63],
+        spots: [[5.43, 5.63], [6.83, 5.33]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bones", label: "dinosaur skeleton on wooden platform", space: "s2", at: [5.2, 3.4], box: [2.1, 2.6, 9.3, 4.3], affords: [
+          "search", "interact"
+        ] },
+      { id: "f2", kind: "fence", label: "red rope barrier", space: "s2", at: [5.2, 3.4], box: [3, 2.45, 7.35, 4.3] },
+      { id: "f3", kind: "counter", label: "U-shaped marble counter", space: "s2", at: [5.2, 1.3], box: [4.3, 0.45, 6.15, 1.75], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "papers", label: "pamphlets on counter", space: "s2", at: [5.6, 1.45], box: [4.9, 1.2, 6, 1.65], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "plant", space: "s2", at: [4.6, 1.15] },
+      { id: "f6", kind: "pillar", space: "s1", at: [0.7, 6.55] },
+      { id: "f7", kind: "pillar", space: "s3", at: [9.95, 6.55] }
+    ]
+  },
+  TileSideYard1MAD25: {
+    desc: "Overgrown grassy yard crossed by worn paths and stepping stones, with three stone slabs and several hedges",
+    roomTypes: [
+      "yard",
+      "graveyard"
+    ],
+    tags: [
+      "outdoor",
+      "overgrown"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west lawn",
+        outline: [[0, 0], [2.65, 0], [2.5, 2.75], [2.65, 3.55], [2.75, 3.65], [2.4, 3.8], [1.95, 3.8], [1.05, 3.6], [0, 3.5]],
+        anchor: [0.68, 0.68],
+        spots: [[0.68, 2.08]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "north lawn",
+        outline: [[2.65, 0], [7, 0], [7, 4.35], [6, 4.35], [4.95, 4.2], [4.35, 4.45], [3.8, 4], [3.2, 3.7], [2.7, 3.6], [2.5, 2.75]],
+        anchor: [3.48, 2.03],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "south lawn",
+        outline: [[0, 3.5], [1.05, 3.6], [1.95, 3.8], [2.4, 3.8], [2.9, 3.6], [4.1, 4.2], [4.4, 4.45], [4.35, 4.6], [4.45, 4.65], [4.4, 5.4], [4.5, 6.05], [4.4, 7], [0, 7]],
+        anchor: [2.98, 4.88],
+        spots: [[0.98, 4.58], [3.73, 6.08]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "southeast lawn",
+        outline: [[4.95, 4.2], [6, 4.35], [7, 4.35], [7, 7], [4.4, 7], [4.5, 6], [4.4, 5.4], [4.45, 4.65], [4.35, 4.5], [4.6, 4.3]],
+        anchor: [5.73, 5.58],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "gravestone", label: "stone slab", space: "s2", at: [3.95, 0.95], box: [3.75, 0.45, 4.15, 1.4], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "gravestone", label: "stone slab", space: "s2", at: [3.95, 3.1], box: [3.75, 2.65, 4.15, 3.55], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "gravestone", label: "stone slab", space: "s3", at: [1.7, 5.4], box: [1.3, 5.2, 2.15, 5.6], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "bush", label: "hedge", space: "s1", at: [1.75, 2.4], box: [1.3, 0.7, 2.2, 4], affords: [
+          "hide"
+        ] },
+      { id: "f5", kind: "bush", label: "L-shaped hedge", space: "s2", at: [5.2, 2.3], box: [4.75, 0.7, 6.6, 3.75], affords: [
+          "hide"
+        ] },
+      { id: "f6", kind: "bush", label: "hedge", space: "s3", at: [1.6, 6.6], box: [0.25, 6.2, 3.2, 6.95], affords: [
+          "hide"
+        ] },
+      { id: "f7", kind: "streetlamp", label: "lamppost seen from above", space: "s2", at: [4.35, 1.75], affords: [
+          "light"
+        ] },
+      { id: "f8", kind: "streetlamp", label: "lamppost seen from above", space: "s3", at: [1.05, 5.85], affords: [
+          "light"
+        ] },
+      { id: "f9", kind: "streetlamp", label: "lamppost seen from above", space: "s4", at: [6.25, 5.35], affords: [
+          "light"
+        ] }
+    ]
+  },
+  TileSideMainExhibit: {
+    desc: "Museum exhibit hall with a checkered floor, a long dinosaur skeleton laid out on a roped-off wooden platform, and a glass display case against the north wall",
+    roomTypes: [
+      "gallery"
+    ],
+    tags: [
+      "indoor",
+      "museum",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "northwest hall",
+        outline: [[0, 0], [2.65, 0], [2.65, 0.9], [4.4, 2.6], [4.4, 3.5], [2.7, 3.45], [1.85, 4.4], [0, 4.4]],
+        anchor: [1.53, 1.53],
+        spots: [[1.33, 2.93]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "northeast hall",
+        outline: [[2.65, 0], [7, 0], [7, 3.5], [4.4, 3.5], [4.4, 2.6], [2.65, 0.9]],
+        anchor: [5.43, 1.53],
+        spots: [[6.23, 2.68], [4.03, 1.28]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "southwest hall",
+        outline: [[2.7, 3.45], [4.4, 3.5], [4.4, 7], [0, 7], [0, 4.4], [1.85, 4.4]],
+        anchor: [1.28, 5.68],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "southeast hall",
+        outline: [[4.4, 3.5], [7, 3.5], [7, 7], [4.4, 7]],
+        anchor: [5.68, 4.78],
+        spots: [[5.28, 6.13]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bones", label: "dinosaur skeleton on wooden platform", space: "s3", at: [3.5, 4], box: [2.7, 2.05, 4.35, 6.35], affords: [
+          "search", "interact"
+        ] },
+      { id: "f2", kind: "fence", label: "red rope barrier", space: "s3", at: [3.5, 4.2], box: [2.6, 2, 4.45, 6.35] },
+      { id: "f3", kind: "cabinet", label: "glass display case", space: "s2", at: [3.5, 0.55], box: [3.1, 0.25, 3.9, 0.75], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "painting", label: "framed specimen", space: "s1", at: [2.2, 0.32] },
+      { id: "f5", kind: "painting", label: "framed specimen", space: "s2", at: [4.4, 0.32] },
+      { id: "f6", kind: "painting", label: "framed specimen", space: "s2", at: [5.6, 0.32] },
+      { id: "f7", kind: "pillar", space: "s1", at: [0.55, 0.45] },
+      { id: "f8", kind: "pillar", space: "s2", at: [6.45, 0.45] }
+    ]
+  },
+  TileSideLab: {
+    desc: "Tiled laboratory with three long sink benches, one cluttered with glassware and chemicals, cabinets along the walls and tall windows to the east",
+    roomTypes: [
+      "laboratory"
+    ],
+    tags: [
+      "indoor",
+      "science",
+      "dirty"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north lab",
+        outline: [[0, 0], [4.4, 0], [4.4, 4.35], [2.6, 4.35], [0.9, 2.6], [0, 2.6]],
+        anchor: [1.13, 1.98],
+        spots: [[2.08, 0.73]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east lab",
+        outline: [[4.4, 0], [7, 0], [7, 7], [4.4, 7]],
+        anchor: [5.63, 4.53],
+        spots: [[5.88, 2.33]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "south lab",
+        outline: [[0, 2.6], [0.9, 2.6], [2.6, 4.35], [4.4, 4.35], [4.4, 7], [0, 7]],
+        anchor: [1.03, 5.88],
+        spots: [[1.38, 4.48], [2.38, 6.38]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "workbench", label: "lab bench with sink", space: "s1", at: [3.6, 1.85], box: [1.9, 1.4, 5.25, 2.3], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "workbench", label: "lab bench with sink", space: "s1", at: [3.55, 3.7], box: [1.9, 3.25, 5.2, 4.15], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "workbench", label: "lab bench with two sinks", space: "s3", at: [3.55, 5.35], box: [1.9, 4.95, 5.2, 5.8], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "lab_equipment", label: "glassware and chemicals", space: "s1", at: [3.6, 3.75], box: [2.9, 3.4, 4.35, 4.1], affords: [
+          "search", "interact"
+        ] },
+      { id: "f5", kind: "sink", space: "s1", at: [2.45, 1.95] },
+      { id: "f6", kind: "sink", space: "s1", at: [2.5, 3.85] },
+      { id: "f7", kind: "sink", space: "s3", at: [2.5, 5.45] },
+      { id: "f8", kind: "sink", space: "s3", at: [3.9, 5.45] },
+      { id: "f9", kind: "cabinet", label: "glass-fronted wall cabinet", space: "s1", at: [3.6, 0.6], box: [2.75, 0.25, 4.5, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "cabinet", label: "corner cabinet", space: "s1", at: [0.8, 0.7], box: [0.25, 0.25, 1.4, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "cabinet", label: "corner cabinet", space: "s2", at: [6.3, 0.7], box: [5.6, 0.25, 6.75, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "cabinet", label: "tall glass cabinet", space: "s3", at: [0.5, 3.6], box: [0.25, 2.85, 0.7, 4.3], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "cabinet", label: "glass-fronted cabinet", space: "s2", at: [6.35, 3.5], box: [5.9, 3, 6.75, 4], affords: [
+          "search"
+        ] },
+      { id: "f14", kind: "chest", label: "low wooden chest", space: "s2", at: [6, 6.45], box: [5.3, 6.15, 6.75, 6.7], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "window", space: "s2", at: [6.65, 2.1], box: [6.55, 1.25, 6.8, 2.9] },
+      { id: "f16", kind: "window", space: "s2", at: [6.65, 4.85], box: [6.55, 4, 6.8, 5.7] }
+    ]
+  },
+  TileSideBandstand: {
+    desc: "Park lawn with an octagonal wooden bandstand ringed by four benches, two lampposts and scattered bushes",
+    roomTypes: [
+      "park"
+    ],
+    tags: [
+      "outdoor",
+      "park"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "north lawn",
+        outline: [[0, 0], [7, 0], [7, 2.65], [5.55, 2.6], [5.2, 2.85], [4.55, 2.15], [4.55, 2.05], [4.2, 1.8], [2.85, 1.8], [2.15, 2.5], [1.8, 3], [1.8, 4.2], [1.3, 4.45], [0, 4.4]],
+        anchor: [1.53, 1.53],
+        spots: [[6.03, 1.63], [4.28, 0.93]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "E", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "bandstand",
+        outline: [[2.85, 1.8], [4.2, 1.8], [4.45, 1.95], [5.2, 2.8], [5.15, 4.2], [4.3, 5.2], [2.85, 5.2], [1.9, 4.2], [1.8, 4.2], [1.8, 3], [2.15, 2.5]],
+        anchor: [3.48, 3.48],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "south lawn",
+        outline: [[5.55, 2.6], [7, 2.65], [7, 7], [0, 7], [0, 4.4], [1.3, 4.45], [1.6, 4.35], [1.7, 4.2], [1.9, 4.2], [2.85, 5.2], [4.3, 5.2], [5.15, 4.2], [5.15, 2.9]],
+        anchor: [2.48, 5.93],
+        spots: [[4.58, 5.98], [6.08, 3.48]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 },
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "bench", space: "s2", at: [3.5, 2.3], box: [3.05, 2, 4, 2.6] },
+      { id: "f2", kind: "bench", space: "s2", at: [2.25, 3.55], box: [1.95, 3.05, 2.6, 4.05] },
+      { id: "f3", kind: "bench", space: "s2", at: [4.7, 3.6], box: [4.4, 3.15, 4.95, 4.05] },
+      { id: "f4", kind: "bench", space: "s2", at: [3.55, 4.75], box: [3.1, 4.5, 4, 5] },
+      { id: "f5", kind: "streetlamp", label: "lamppost seen from above", space: "s1", at: [3.95, 1.2], affords: [
+          "light"
+        ] },
+      { id: "f6", kind: "streetlamp", label: "lamppost seen from above", space: "s3", at: [6.1, 2.95], affords: [
+          "light"
+        ] },
+      { id: "f7", kind: "bush", space: "s1", at: [5.45, 0.55], box: [5.2, 0.15, 5.8, 0.95], affords: [
+          "hide"
+        ] },
+      { id: "f8", kind: "bush", space: "s3", at: [5.6, 5.2], box: [5.2, 4.75, 6.05, 5.6], affords: [
+          "hide"
+        ] },
+      { id: "f9", kind: "bush", space: "s3", at: [1, 6.4], box: [0.55, 5.85, 1.45, 6.9], affords: [
+          "hide"
+        ] },
+      { id: "f10", kind: "bush", space: "s1", at: [1.45, 4.3], box: [1.15, 3.95, 1.75, 4.6], affords: [
+          "hide"
+        ] }
+    ]
+  },
+  TileSideLobbyMAD25: {
+    desc: "Parquet-floored lobby with a round table and four pink armchairs, a desk with papers on a patterned rug, an armchair with a newspaper and a low table on a half-round rug",
+    roomTypes: [
+      "foyer",
+      "lounge"
+    ],
+    tags: [
+      "indoor",
+      "wealthy"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "west lobby",
+        outline: [[0, 0], [2.65, 0], [2.7, 3.5], [1.85, 4.35], [0, 4.35]],
+        anchor: [1.18, 1.18],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "north lobby",
+        outline: [[2.65, 0], [7, 0], [7, 4.4], [6.05, 4.4], [5.25, 3.5], [2.75, 3.5], [2.65, 3.4]],
+        anchor: [5.88, 1.13],
+        spots: [[3.53, 2.63], [5.48, 2.48]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 1 },
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "south lobby",
+        outline: [[2.7, 3.45], [5.25, 3.5], [6.05, 4.4], [7, 4.4], [7, 7], [0, 7], [0, 4.35], [1.85, 4.35]],
+        anchor: [2.88, 5.23],
+        spots: [[4.28, 4.93], [1.33, 5.68]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 1 },
+          { side: "S", index: 0 },
+          { side: "W", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "table", label: "round table with plant and candle", space: "s2", at: [3.8, 1.45], box: [3.35, 1.15, 4.3, 1.8], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "rug", label: "round floral rug", space: "s2", at: [3.7, 1.5], box: [2.9, 0.75, 4.45, 2.2] },
+      { id: "f3", kind: "armchair", space: "s2", at: [2.85, 0.9], box: [2.6, 0.45, 3.2, 1.3] },
+      { id: "f4", kind: "armchair", space: "s1", at: [2.65, 1.6], box: [2.3, 1.25, 3, 1.95] },
+      { id: "f5", kind: "armchair", space: "s2", at: [4.4, 0.95], box: [4.1, 0.55, 4.8, 1.3] },
+      { id: "f6", kind: "armchair", space: "s2", at: [4.75, 1.8], box: [4.4, 1.45, 5.05, 2.15] },
+      { id: "f7", kind: "desk", label: "desk with papers and telephone", space: "s1", at: [1.9, 3.3], box: [1.5, 2.5, 2.3, 4.15], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "papers", label: "newspapers on desk", space: "s1", at: [1.85, 3.15], box: [1.6, 2.9, 2.15, 3.45], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "rug", label: "patterned rug", space: "s1", at: [1.6, 3.3], box: [0.85, 2.15, 2.4, 4.45] },
+      { id: "f10", kind: "chair", label: "wooden chair", space: "s1", at: [0.95, 3.1], box: [0.55, 2.65, 1.4, 3.6] },
+      { id: "f11", kind: "papers", label: "wall notice board", space: "s1", at: [0.4, 3.75], box: [0.25, 3.4, 0.55, 4.3], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "armchair", label: "armchair with newspaper", space: "s2", at: [6.05, 3.35], box: [5.7, 3, 6.5, 3.8], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "plant", label: "potted plant", space: "s2", at: [6.3, 2.85] },
+      { id: "f14", kind: "table", label: "low table with lace runner and vase", space: "s3", at: [5.4, 6.25], box: [4.65, 5.95, 6.2, 6.6], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "rug", label: "half-round rug", space: "s3", at: [5.3, 6.1], box: [4.3, 5.35, 6.3, 6.75] },
+      { id: "f16", kind: "painting", space: "s2", at: [3.6, 0.35] },
+      { id: "f17", kind: "painting", space: "s2", at: [6.65, 4.15] },
+      { id: "f18", kind: "painting", space: "s3", at: [1.95, 6.65] }
+    ]
+  },
+  TileSideExhibit3: {
+    desc: "Cluttered museum storeroom with a checkered floor full of crates of fossils and dirt, rolled rugs, loose planks and rope, cloth-covered objects, a lamp-lit table and a roped-off section",
+    roomTypes: [
+      "storage",
+      "gallery"
+    ],
+    tags: [
+      "indoor",
+      "museum",
+      "cluttered",
+      "dirty"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "northwest storeroom",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.85], [3.5, 2.7], [0, 2.65]],
+        anchor: [1.38, 1.83],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "northeast storeroom",
+        outline: [[4.4, 0], [7, 0], [7, 4.4], [3.6, 4.4], [3.5, 4.3], [3.5, 2.65], [4.4, 1.85]],
+        anchor: [5.88, 1.83],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "southwest storeroom",
+        outline: [[0, 2.65], [3.5, 2.7], [3.55, 4.4], [2.6, 5.25], [2.6, 7], [0, 7]],
+        anchor: [1.78, 6.18],
+        spots: [[2.73, 3.33]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "southeast storeroom",
+        outline: [[3.55, 4.35], [7, 4.4], [7, 7], [2.6, 7], [2.6, 5.25]],
+        anchor: [4.93, 5.83],
+        spots: [[6.28, 5.43]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 1 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "barrel", label: "barrel of gravel", space: "s1", at: [0.95, 0.9], box: [0.65, 0.6, 1.3, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "cabinet", label: "low wooden cabinet", space: "s1", at: [1.8, 0.75], box: [1.3, 0.5, 2.3, 1], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "lamp", label: "oil lamp", space: "s1", at: [1.65, 0.65], affords: [
+          "light"
+        ] },
+      { id: "f4", kind: "painting", space: "s1", at: [2.9, 0.6] },
+      { id: "f5", kind: "painting", space: "s1", at: [3.45, 0.55] },
+      { id: "f6", kind: "crate", label: "crate with fossil", space: "s1", at: [3.05, 1.3], box: [2.6, 0.8, 3.45, 1.75], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "crate", label: "crates of dirt and bones", space: "s1", at: [2.55, 1.85], box: [2.1, 1.35, 3.05, 2.35], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "crate", space: "s1", at: [3.8, 1.2], box: [3.45, 0.75, 4.1, 1.6], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "rug", label: "rolled-up rug", space: "s1", at: [3.95, 1], box: [3.65, 0.5, 4.25, 1.5] },
+      { id: "f10", kind: "crate", label: "rope-bound wooden bundle", space: "s2", at: [5.05, 1], box: [4.85, 0.55, 5.25, 1.45], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "other", label: "cloth-covered objects", space: "s2", at: [5.9, 0.85], box: [5.2, 0.4, 6.55, 1.3], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "rubble", label: "loose planks and rope", space: "s2", at: [4.8, 2.75], box: [4.1, 1.95, 5.5, 3.45] },
+      { id: "f13", kind: "crate", label: "stack of planks", space: "s2", at: [6, 2.8], box: [5.5, 2.4, 6.4, 3.2] },
+      { id: "f14", kind: "table", label: "wooden table with lamp", space: "s2", at: [6.25, 3.5], box: [5.9, 3, 6.6, 4], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "lamp", space: "s2", at: [6.35, 3.85], affords: [
+          "light"
+        ] },
+      { id: "f16", kind: "crate", label: "crate of red cloth", space: "s2", at: [3.85, 3.4], box: [3.5, 3, 4.15, 3.8], affords: [
+          "search"
+        ] },
+      { id: "f17", kind: "rug", label: "rolled red rug", space: "s4", at: [4.4, 4.5], box: [3.6, 4, 5.2, 5] },
+      { id: "f18", kind: "fence", label: "red rope on brass stanchions", space: "s2", at: [4.5, 4.35], box: [2.3, 4, 6.55, 4.75] },
+      { id: "f19", kind: "other", label: "pile of leather hides", space: "s3", at: [0.75, 3.35], box: [0.3, 2.95, 1.1, 3.8], affords: [
+          "search"
+        ] },
+      { id: "f20", kind: "crate", label: "open metal box", space: "s3", at: [1.65, 3.25], box: [1.15, 2.9, 2.1, 3.7], affords: [
+          "search"
+        ] },
+      { id: "f21", kind: "crate", space: "s3", at: [1.95, 3.85], box: [1.65, 3.6, 2.15, 4.15], affords: [
+          "search"
+        ] },
+      { id: "f22", kind: "papers", label: "rolled maps", space: "s3", at: [0.7, 3.95], box: [0.3, 3.75, 1, 4.1], affords: [
+          "search"
+        ] },
+      { id: "f23", kind: "painting", label: "stacked frames", space: "s3", at: [0.75, 4.4], box: [0.45, 4.15, 1, 4.65] },
+      { id: "f24", kind: "barrel", space: "s3", at: [0.85, 5.25], box: [0.5, 4.95, 1.15, 5.6], affords: [
+          "search"
+        ] },
+      { id: "f25", kind: "crate", space: "s3", at: [1.2, 5.05], box: [0.85, 4.6, 1.55, 5.65], affords: [
+          "search"
+        ] },
+      { id: "f26", kind: "crate", label: "crate with rolled scrolls", space: "s4", at: [3.45, 6.25], box: [2.85, 5.85, 3.9, 6.6], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideClassroom1: {
+    desc: "Tiered wooden lecture room with rows of school desks and chairs facing a chalkboard, a small teacher's desk with scrolls, a globe, maps and a wall cabinet",
+    roomTypes: [
+      "study",
+      "other"
+    ],
+    tags: [
+      "indoor",
+      "school",
+      "shabby"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "upper tiers",
+        outline: [[0, 0], [4.4, 0], [4.4, 1.85], [3.5, 2.7], [0, 2.65]],
+        anchor: [3.28, 1.13],
+        spots: [[0.88, 0.88]],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "east desks",
+        outline: [[4.4, 0], [7, 0], [7, 4.4], [3.6, 4.4], [3.5, 4.3], [3.5, 2.65], [4.4, 1.85]],
+        anchor: [6.53, 0.48],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s3",
+        label: "west desks and globe",
+        outline: [[0, 2.65], [3.5, 2.7], [3.55, 4.4], [2.6, 5.25], [2.6, 7], [0, 7]],
+        anchor: [2.08, 4.88],
+        spots: [[0.73, 6.23], [0.63, 4.38]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s2", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s4",
+        label: "front of class",
+        outline: [[3.55, 4.35], [7, 4.4], [7, 7], [2.6, 7], [2.6, 5.25]],
+        anchor: [3.33, 5.23],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "desk", label: "pair of school desks", space: "s1", at: [1.85, 2.15], box: [1, 1.65, 2.75, 2.45], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "desk", label: "rows of school desks", space: "s3", at: [1.85, 3.5], box: [0.95, 2.65, 2.75, 4.15], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "desk", label: "rows of school desks", space: "s2", at: [5.35, 1.7], box: [4.4, 0.65, 6.3, 2.45], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "desk", label: "rows of school desks", space: "s2", at: [5.1, 3.5], box: [4.15, 2.65, 6.05, 4.15], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "desk", label: "teacher's desk with scrolls", space: "s4", at: [4.35, 5.05], box: [3.9, 4.75, 4.75, 5.35], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "papers", label: "scrolls on teacher's desk", space: "s4", at: [4.1, 4.95] },
+      { id: "f7", kind: "other", label: "chalkboard", space: "s4", at: [4.3, 6.05], box: [2.85, 5.85, 5.75, 6.25], affords: [
+          "interact"
+        ] },
+      { id: "f8", kind: "other", label: "globe", space: "s3", at: [1.65, 5.7], box: [1.4, 5.45, 1.95, 5.95], affords: [
+          "interact"
+        ] },
+      { id: "f9", kind: "papers", label: "framed map on floor", space: "s3", at: [2.2, 6.1], box: [1.7, 5.95, 2.75, 6.25], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "papers", label: "wall map", space: "s3", at: [0.9, 5.2], box: [0.75, 4.85, 1, 5.6] },
+      { id: "f11", kind: "cabinet", label: "wall cabinet", space: "s4", at: [6.1, 5.1], box: [5.75, 4.4, 6.75, 5.9], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideLibraryMAD25: {
+    desc: "Herringbone-floored library with bookcases on every wall, a round reading table with a candelabra and papers, armchairs, a reading desk with books and lamps",
+    roomTypes: [
+      "library"
+    ],
+    tags: [
+      "indoor",
+      "wealthy",
+      "scholarly"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "reading nook",
+        outline: [[0, 0], [2.65, 0], [2.65, 4.4], [0, 4.4]],
+        anchor: [1.08, 2.38],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: []
+      },
+      {
+        id: "s2",
+        label: "north stacks",
+        outline: [[2.65, 0], [7, 0], [7, 2.7], [5.2, 2.7], [4.35, 1.8], [2.65, 1.8]],
+        anchor: [5.28, 0.93],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "reading table",
+        outline: [[2.65, 1.8], [4.35, 1.8], [5.2, 2.7], [7, 2.7], [7, 7], [4.35, 7], [4.35, 6.1], [2.65, 4.45]],
+        anchor: [5.63, 4.83],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s1", via: "line" },
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "south stacks",
+        outline: [[0, 4.4], [2.65, 4.4], [4.35, 6.1], [4.35, 7], [0, 7]],
+        anchor: [1.73, 5.53],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "S", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      }
+    ],
+    features: [
+      { id: "f1", kind: "cabinet", label: "card catalogue cabinet with scrolls", space: "s1", at: [1.5, 0.6], box: [0.4, 0.35, 2.55, 0.85], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "bookcase", space: "s2", at: [3.5, 0.6], box: [2.65, 0.25, 4.4, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f3", kind: "bookcase", label: "bookcase with scroll on top", space: "s2", at: [3.6, 1.55], box: [2.6, 1.25, 4.6, 1.85], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "lamp", space: "s3", at: [3.7, 1.8], affords: [
+          "light"
+        ] },
+      { id: "f5", kind: "armchair", space: "s1", at: [0.95, 1.5], box: [0.55, 1, 1.4, 2] },
+      { id: "f6", kind: "table", label: "reading table with books and lamp", space: "s1", at: [1.7, 1.7], box: [1.4, 1, 2, 2.35], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "bookcase", space: "s1", at: [0.5, 3.45], box: [0.25, 2.45, 0.8, 4.45], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "bookcase", label: "low bookcase with scrolls", space: "s1", at: [1.7, 3.45], box: [1.45, 2.45, 1.9, 4.45], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "lamp", label: "floor lamp", space: "s1", at: [1.2, 3.1], affords: [
+          "light"
+        ] },
+      { id: "f10", kind: "table", label: "round reading table", space: "s3", at: [3.5, 3.65], box: [2.6, 2.95, 4.15, 4.35], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "candles", label: "candelabra", space: "s3", at: [3.5, 3.7], affords: [
+          "light"
+        ] },
+      { id: "f12", kind: "papers", label: "papers and inkwell", space: "s3", at: [3.5, 3.4], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "chair", space: "s3", at: [4.1, 2.85], box: [3.8, 2.4, 4.4, 3.3] },
+      { id: "f14", kind: "chair", space: "s3", at: [4.75, 3.6], box: [4.5, 3.35, 5.05, 3.9] },
+      { id: "f15", kind: "chair", space: "s1", at: [2.5, 4.25], box: [2.2, 3.95, 2.85, 4.55] },
+      { id: "f16", kind: "chair", space: "s4", at: [2.85, 4.95], box: [2.5, 4.6, 3.15, 5.25] },
+      { id: "f17", kind: "armchair", space: "s3", at: [6, 3.4], box: [5.6, 2.95, 6.5, 3.85] },
+      { id: "f18", kind: "bookcase", space: "s2", at: [6.45, 1.65], box: [6.15, 0.3, 6.75, 3], affords: [
+          "search"
+        ] },
+      { id: "f19", kind: "lamp", label: "wall lamp", space: "s2", at: [6.05, 0.45], affords: [
+          "light"
+        ] },
+      { id: "f20", kind: "lamp", label: "wall lamp", space: "s3", at: [6.5, 4.05], affords: [
+          "light"
+        ] },
+      { id: "f21", kind: "bookcase", label: "bookcase with books and scrolls", space: "s3", at: [4.5, 5.6], box: [4.35, 4.35, 4.65, 6.8], affords: [
+          "search"
+        ] },
+      { id: "f22", kind: "bookcase", space: "s3", at: [5.6, 6.2], box: [4.65, 5.8, 6.6, 6.6], affords: [
+          "search"
+        ] },
+      { id: "f23", kind: "bookcase", label: "low bookcase", space: "s4", at: [3.3, 6.35], box: [2.55, 6.1, 4.05, 6.6], affords: [
+          "search"
+        ] },
+      { id: "f24", kind: "table", label: "side table with lamp", space: "s4", at: [0.9, 6.3], box: [0.6, 6, 1.15, 6.6], affords: [
+          "search"
+        ] }
+    ]
+  },
+  TileSideGeneralShop: {
+    desc: "General store with a U-shaped counter and cash register, shelves of jars and goods, crates of produce and barrels, beside a cluttered stockroom of crates, shelves and a lamp",
+    roomTypes: [
+      "shop",
+      "storage"
+    ],
+    tags: [
+      "indoor",
+      "cluttered",
+      "shabby"
+    ],
+    spaces: [
+      {
+        id: "s1",
+        label: "shop floor",
+        outline: [[0, 0], [4.25, 0], [4.25, 4.4], [2.6, 4.4], [0.85, 2.6], [0, 2.6]],
+        anchor: [1.23, 2.03],
+        links: [
+          { to: "s3", via: "line" }
+        ],
+        openings: [
+          { side: "N", index: 0 },
+          { side: "W", index: 0 }
+        ]
+      },
+      {
+        id: "s2",
+        label: "stockroom",
+        outline: [[4.25, 0], [7, 0], [7, 4.4], [6.05, 4.4], [5.25, 3.5], [4.25, 3.5]],
+        anchor: [6.38, 1.83],
+        links: [
+          { to: "s4", via: "line" }
+        ],
+        openings: [
+          { side: "E", index: 0 }
+        ]
+      },
+      {
+        id: "s3",
+        label: "shop entrance",
+        outline: [[0, 2.6], [0.85, 2.6], [2.6, 4.4], [4.25, 4.4], [4.25, 7], [0, 7]],
+        anchor: [1.78, 5.03],
+        spots: [[3.43, 5.28]],
+        links: [
+          { to: "s1", via: "line" },
+          { to: "s4", via: "door" }
+        ],
+        openings: [
+          { side: "S", index: 0 }
+        ]
+      },
+      {
+        id: "s4",
+        label: "back stockroom",
+        outline: [[4.25, 3.5], [5.25, 3.5], [6.05, 4.4], [7, 4.4], [7, 7], [4.25, 7]],
+        anchor: [5.48, 4.53],
+        links: [
+          { to: "s2", via: "line" },
+          { to: "s3", via: "door" }
+        ],
+        openings: []
+      }
+    ],
+    features: [
+      { id: "f1", kind: "counter", label: "U-shaped shop counter", space: "s1", at: [3, 3], box: [2.1, 1.75, 4.15, 4.2], affords: [
+          "search"
+        ] },
+      { id: "f2", kind: "other", label: "cash register", space: "s1", at: [2.45, 2], affords: [
+          "interact", "search"
+        ] },
+      { id: "f3", kind: "crate", label: "crates of carrots and leeks", space: "s1", at: [2.95, 4], box: [2.1, 3.65, 3.4, 4.3], affords: [
+          "search"
+        ] },
+      { id: "f4", kind: "shelf", label: "shelf below counter", space: "s3", at: [3.1, 4.45], box: [2.3, 4.3, 4.15, 4.6], affords: [
+          "search"
+        ] },
+      { id: "f5", kind: "cabinet", label: "cabinet with potted plant", space: "s1", at: [0.6, 0.8], box: [0.3, 0.4, 0.95, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f6", kind: "barrel", label: "barrel with jugs", space: "s1", at: [1.15, 0.85], box: [0.9, 0.55, 1.4, 1.15], affords: [
+          "search"
+        ] },
+      { id: "f7", kind: "shelf", label: "shelves of jugs and goods", space: "s1", at: [3.15, 0.65], box: [2.5, 0.3, 3.8, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f8", kind: "crate", label: "box of tins", space: "s1", at: [3.45, 1.2], box: [3.2, 0.95, 3.7, 1.45], affords: [
+          "search"
+        ] },
+      { id: "f9", kind: "shelf", label: "tall shelf of goods", space: "s1", at: [3.9, 1.4], box: [3.7, 0.6, 4.1, 2.2], affords: [
+          "search"
+        ] },
+      { id: "f10", kind: "shelf", label: "wall shelf with sacks and jars", space: "s3", at: [0.55, 3.1], box: [0.3, 2.5, 0.85, 3.7], affords: [
+          "search"
+        ] },
+      { id: "f11", kind: "cabinet", label: "open cabinet of jugs", space: "s3", at: [0.55, 4.4], box: [0.3, 3.75, 0.8, 5.05], affords: [
+          "search"
+        ] },
+      { id: "f12", kind: "shelf", label: "bookshelf with jars", space: "s3", at: [0.6, 5.95], box: [0.3, 5.2, 0.95, 6.75], affords: [
+          "search"
+        ] },
+      { id: "f13", kind: "barrel", space: "s3", at: [1.15, 6.3], box: [0.85, 6.05, 1.45, 6.6], affords: [
+          "search"
+        ] },
+      { id: "f14", kind: "crate", label: "crate of apples", space: "s3", at: [2.85, 5.85], box: [2.6, 5.6, 3.1, 6.1], affords: [
+          "search"
+        ] },
+      { id: "f15", kind: "crate", label: "open crate of goods", space: "s3", at: [3.3, 6.45], box: [2.45, 6.15, 4.15, 6.75], affords: [
+          "search"
+        ] },
+      { id: "f16", kind: "shelf", label: "shelf of goods", space: "s2", at: [4.95, 0.6], box: [4.4, 0.3, 5.4, 0.95], affords: [
+          "search"
+        ] },
+      { id: "f17", kind: "sack", space: "s2", at: [5.2, 0.45] },
+      { id: "f18", kind: "crate", label: "stacked crates", space: "s2", at: [5.8, 0.7], box: [5.4, 0.3, 6.15, 1.2], affords: [
+          "search"
+        ] },
+      { id: "f19", kind: "crate", label: "crates of cabbages and apples", space: "s2", at: [5.3, 1.35], box: [4.7, 1.05, 5.9, 1.75], affords: [
+          "search"
+        ] },
+      { id: "f20", kind: "crate", label: "crates of tools", space: "s2", at: [4.6, 1.55], box: [4.35, 1.1, 4.85, 1.95], affords: [
+          "search"
+        ] },
+      { id: "f21", kind: "lamp", label: "wall lamp", space: "s2", at: [6.3, 0.6], affords: [
+          "light"
+        ] },
+      { id: "f22", kind: "table", label: "table with apples and papers", space: "s2", at: [4.65, 2.9], box: [4.4, 2.1, 4.95, 3.7], affords: [
+          "search"
+        ] },
+      { id: "f23", kind: "crate", label: "overturned crate", space: "s2", at: [5.4, 2.5], box: [5, 2.15, 5.75, 2.85], affords: [
+          "search"
+        ] },
+      { id: "f24", kind: "barrel", space: "s4", at: [4.6, 4.2], box: [4.35, 3.9, 4.85, 4.5], affords: [
+          "search"
+        ] },
+      { id: "f25", kind: "cabinet", label: "shelves of jars", space: "s2", at: [6.3, 3], box: [5.85, 2.5, 6.75, 3.5], affords: [
+          "search"
+        ] },
+      { id: "f26", kind: "shelf", label: "shelf with crate of carrots", space: "s4", at: [6.45, 4.4], box: [6.2, 3.6, 6.75, 5.25], affords: [
+          "search"
+        ] },
+      { id: "f27", kind: "crate", label: "crates of apples and chains", space: "s4", at: [5.65, 5.8], box: [4.95, 5.2, 6.35, 6.4], affords: [
+          "search"
+        ] },
+      { id: "f28", kind: "barrel", space: "s4", at: [5.55, 6], box: [5.3, 5.75, 5.85, 6.25], affords: [
+          "search"
+        ] },
+      { id: "f29", kind: "bench", label: "low bench with bottles", space: "s4", at: [5.5, 6.5], box: [4.6, 6.3, 6.4, 6.75], affords: [
+          "search"
+        ] }
+    ]
+  },
   TileSideStudio: { desc: "Dark artist studio with ghostly canvas, paint supplies, and columns", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideSewer1: { desc: "Dark stone sewer corridor with debris and mechanical equipment", roomTypes: [], tags: [], spaces: [], features: [] },
   TileSideLibraryArchives: { desc: "Wooden archive room with bookshelves, scattered papers and red chairs", roomTypes: [], tags: [], spaces: [], features: [] },
