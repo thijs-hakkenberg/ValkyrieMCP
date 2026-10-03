@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.4.1] - 2026-10-04
+
+### Fixed
+
+- A token just inside a tile that touches another tile is reported on its own tile. Before, `get_map_ascii`, `render_map`, validation and placement picked the first tile within the edge tolerance, so a token by the shared wall could be listed on the neighbour, in the neighbour's spaces.
+- Tile search matches whole words in descriptions, object labels and room types (plurals count): "grave" no longer finds gravel tunnels, and `has=["table"]` no longer matches a timetable.
+
 ## [2.4.0] - 2026-10-03
 
 ### Added
