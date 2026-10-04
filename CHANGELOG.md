@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.6.0] - 2026-10-04
+
+### Added
+
+- **Generated sound effects with Stable Audio 3.** `generate_sound_effect` turns a description ("heavy oak door creaking open slowly, echoing hallway") into a sound with [Stable Audio 3 Small SFX](https://huggingface.co/stabilityai/stable-audio-3-small-sfx) on a local ComfyUI, saves it as OGG Vorbis (`audio/sfx/<Event>.ogg`) and sets the events' `audio=`. About 1 s per clip on an M1 Pro after the model has loaded. Clips are peak-normalised to −1 dBFS, their silent tail is cut and they fade out over 50 ms. Narration and other custom clips on an event are kept unless `assign=true`; stock sounds and earlier effects are replaced.
+- `sound_status` checks ComfyUI, the two model files (2.3 GB checkpoint, 1.2 GB text encoder) and the `--fp32-vae` flag, and prints what to download or change.
+- `/sound-effects` skill: setup, how Valkyrie plays effects, when a stock sound will do, writing prompts and picking lengths, and an effect plus narration on one moment through a hidden event.
+
+### Fixed
+
+- Stable Audio 3 sounds came out as broadband noise when ComfyUI ran with its default precision on Apple Silicon: it decodes the audio VAE in bfloat16. Only the VAE needs full precision (fp16 model plus fp32 VAE gives the same output as fp32 throughout), so `--fp32-vae` is required and checked; `--force-fp16` for FLUX can stay. Found before release.
+- ComfyUI scales decoded audio to a fixed loudness, at which Stable Audio 3's transients reach 11–14 dB above full scale and were clipped when saved. The workflow lowers the level by 20 dB first and the server normalises afterwards.
+
+### Changed
+
+- The ComfyUI client's submit-and-wait and download steps are shared by artwork and sound effects (`runWorkflow`, `downloadOutput`).
+- New dependencies `wasm-media-encoders` and `@wasm-audio-decoders/flac` (WebAssembly, about 3 MB) to read ComfyUI's FLAC and write OGG Vorbis without ffmpeg.
+
 ## [2.5.2] - 2026-10-04
 
 ### Fixed

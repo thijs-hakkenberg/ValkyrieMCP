@@ -76,6 +76,7 @@ Common patterns: \`{qst:CONTINUE}\`, \`{qst:PASS}\`, \`{qst:FAIL}\`
 - An event (or spawn) with \`xposition\`/\`yposition\` moves the camera there when it runs; \`highlight=true\` also pulses a circle at that spot. Spawns use it to show where the monster goes.
 - \`audio\` plays a one-off sound on top of whatever is playing, when the event runs (also for hidden events and clicked tokens). It keeps playing after the dialog closes, so a long clip overlaps the next one. \`music\` replaces the background music (the previous track fades out). Both take catalog Audio IDs or \`.ogg\` files in the scenario folder (Valkyrie's editor lists only .ogg). A translated clip in a language folder (\`audio/German/x.ogg\` or \`German/audio/x.ogg\`) is played instead when the game runs in that language.
 - \`generate_narration\` speaks an event's text into \`audio/narration/<Event>.ogg\` and sets \`audio\` (see the /narration skill).
+- \`generate_sound_effect\` makes a sound from a description into \`audio/sfx/<Event>.ogg\` and sets \`audio\` (see the /sound-effects skill). For an effect and narration on one moment, put the effect on a hidden event (\`display=false\`, \`buttons=1\`) whose \`event1\` is the narrated event.
 
 ## Text codes (in any dialog text)
 - \`{c:ComponentName}\` prints a component's name: a tile's name and pack icon (use it in placement dialogs so players take the right tile), or the item a random QItem picked. For an event, it prints the \`{rnd:hero}\` that event chose.

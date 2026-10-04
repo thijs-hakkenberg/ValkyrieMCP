@@ -8,7 +8,7 @@ MCP (Model Context Protocol) server and Claude Code plugin for AI-assisted Mansi
 
 This server exposes Valkyrie scenario editing as MCP tools, enabling AI assistants (Claude, etc.) to create, modify, validate, and build complete MoM scenarios. It auto-detects the Valkyrie editor directory so scenarios appear directly in the app.
 
-The plugin bundles 9 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, generated artwork, spoken narration, etc.) and an autonomous scenario designer agent.
+The plugin bundles 10 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, generated artwork, spoken narration, generated sound effects, etc.) and an autonomous scenario designer agent.
 
 ## Install
 
@@ -21,7 +21,7 @@ claude plugin install valkyrie-mom
 
 This gives you:
 - **MCP server** with 25 tools for scenario editing (auto-started)
-- **9 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`, `/artwork`, `/narration`
+- **10 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`, `/artwork`, `/narration`, `/sound-effects`
 - **Scenario designer agent** for autonomous scenario creation
 - **5 MCP resources** for format documentation
 
@@ -85,6 +85,7 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `/items-and-distribution` | Random items, unique items, starting items, inspection events |
 | `/artwork` | Generate pictures with a local ComfyUI (FLUX.2 [klein] 4B) and show them: cover, intro cutscene, handouts, scenes, monsters, tokens, image puzzles |
 | `/narration` | Read story text aloud with a local Kokoro voice: what to narrate, voices, pronunciations, how Valkyrie plays event audio |
+| `/sound-effects` | Generate sound effects with a local ComfyUI (Stable Audio 3): prompts, lengths, stock sound or generated, an effect and narration on one moment |
 
 ## MCP Tools
 
@@ -154,6 +155,22 @@ On NVIDIA GPUs with less VRAM, the fp8 model (`black-forest-labs/FLUX.2-klein-4b
 | `generate_narration` | Speak components' dialog text with Kokoro-82M into OGG clips in the scenario folder (`audio/narration/<Event>.ogg`) and set their `audio=`. Speaks only the italic story text by default, expands `{qst:}`, turns icons into words, takes respellings for names |
 
 Narration is optional and runs entirely on your machine, on the CPU: [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache 2.0) through [kokoro-js](https://github.com/hexgrad/kokoro/tree/main/kokoro.js), with OGG Vorbis encoding in WebAssembly, so no Python or ffmpeg is needed. `narration_status install=true` installs the engine once (about 450 MB, in `~/.cache/valkyrie-mom-mcp/kokoro`, or `VALKYRIE_TTS_DIR`); the first narration downloads the model (about 330 MB). English voices only. The default voice, `af_nicole` at speed 0.9, was picked by ear from 15 voices for horror (`bf_isabella`, `bm_lewis` and `bm_daniel` also fit); the model's quality grades didn't predict the fit. The `/narration` skill covers what to narrate and how Valkyrie plays the clips.
+
+### Sound effects
+| Tool | Description |
+|------|-------------|
+| `sound_status` | Check a local ComfyUI server, the Stable Audio 3 Small SFX model files and the `--fp32-vae` flag; prints setup and download commands for anything missing |
+| `generate_sound_effect` | Generate a sound from a description (8 steps, about 1 s per clip) into an OGG clip in the scenario folder (`audio/sfx/<Event>.ogg`) and set the events' `audio=`. Peak-normalised, silent tail cut; narration on an event is kept unless `assign=true` |
+
+Sound effects are optional and run on the same ComfyUI as artwork, with [Stable Audio 3 Small SFX](https://huggingface.co/stabilityai/stable-audio-3-small-sfx) (Stability AI Community License), small enough for the CPU:
+
+```bash
+comfy model download --url https://huggingface.co/Comfy-Org/stable-audio-3/resolve/main/checkpoints/stable_audio_3_small_sfx.safetensors --relative-path models/checkpoints
+comfy model download --url https://huggingface.co/Comfy-Org/stable-audio-3/resolve/main/text_encoders/t5gemma_b_b_ul2.safetensors --relative-path models/text_encoders
+comfy launch --background -- --fp32-vae
+```
+
+Start ComfyUI with `--fp32-vae`: by default it decodes the audio in bfloat16, and every clip comes out as noise. Other flags (such as `--force-fp16` for FLUX) can stay. ComfyUI saves FLAC; the server converts it to OGG Vorbis in WebAssembly, so no ffmpeg is needed. The `/sound-effects` skill covers prompts and when a stock sound will do.
 
 ### Reference
 | Tool | Description |
@@ -259,6 +276,7 @@ src/
   story/           Storyline graph: outline, Mermaid, HTML
   artwork/         ComfyUI (FLUX.2 [klein]) artwork generation
   narration/       Kokoro text-to-speech, dialog text to speech text
+  audio/           Stable Audio 3 sound effects through ComfyUI, FLAC to OGG Vorbis
   resources/       Format documentation resources
   catalogs/        846-entry game content catalog
   diagnostics/     Bug report builder, session trace, ring buffer

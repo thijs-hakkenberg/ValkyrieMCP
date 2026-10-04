@@ -1,6 +1,6 @@
 {
   "name": "@thijshakkenberg/valkyrie-mom-mcp",
-  "version": "2.5.2",
+  "version": "2.6.0",
   "description": "MCP server for AI-assisted Mansions of Madness scenario creation with Valkyrie",
   "type": "module",
   "main": "dist/index.js",
@@ -49,7 +49,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "@wasm-audio-decoders/flac": "^0.2.11",
     "archiver": "^7.0.1",
+    "wasm-media-encoders": "^0.7.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

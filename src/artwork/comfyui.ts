@@ -95,16 +95,16 @@ export function buildFlux2KleinWorkflow(s: Flux2KleinSettings): Record<string, u
   };
 }
 
-type Fetch = typeof fetch;
+export type Fetch = typeof fetch;
 
-async function getJson(fetchFn: Fetch, url: string): Promise<unknown> {
+export async function getJson(fetchFn: Fetch, url: string): Promise<unknown> {
   const res = await fetchFn(url, { signal: AbortSignal.timeout(10_000) });
   if (!res.ok) throw new Error(`${url} answered ${res.status}`);
   return res.json();
 }
 
 /** Picks the preferred file: the distilled model over "base", then the first match */
-function pickModel(files: string[], match: RegExp): string | undefined {
+export function pickModel(files: string[], match: RegExp): string | undefined {
   const candidates = files.filter(f => match.test(f));
   return candidates.find(f => !/base/i.test(f)) ?? candidates[0];
 }
@@ -170,6 +170,68 @@ export function setupInstructions(status: ArtworkStatus): string {
   return lines.join('\n');
 }
 
+/** A file a ComfyUI save node wrote, as listed in /history */
+export interface ComfyOutputFile {
+  filename: string;
+  subfolder: string;
+  type: string;
+}
+
+/** One node's outputs in /history: SaveImage lists images, the SaveAudio nodes list audio */
+export interface ComfyNodeOutput {
+  images?: ComfyOutputFile[];
+  audio?: ComfyOutputFile[];
+}
+
+/**
+ * Queues an API-format workflow and waits until ComfyUI has run it. The first job of a
+ * session also loads the models, which can take minutes, hence the long default timeout.
+ */
+export async function runWorkflow(
+  url: string,
+  workflow: Record<string, unknown>,
+  opts: { fetchFn?: Fetch; timeoutMs?: number; pollMs?: number } = {},
+): Promise<ComfyNodeOutput[]> {
+  const fetchFn = opts.fetchFn ?? fetch;
+  const started = Date.now();
+  const submit = await fetchFn(`${url}/prompt`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: workflow }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  const submitted = await submit.json() as { prompt_id?: string; error?: { message?: string }; node_errors?: unknown };
+  if (!submit.ok || !submitted.prompt_id) {
+    throw new Error(`ComfyUI rejected the workflow: ${submitted.error?.message ?? submit.status} ${JSON.stringify(submitted.node_errors ?? {})}`);
+  }
+
+  const timeoutMs = opts.timeoutMs ?? 15 * 60_000;
+  const pollMs = opts.pollMs ?? 2000;
+  type History = Record<string, { status?: { status_str?: string; messages?: unknown[] }; outputs?: Record<string, ComfyNodeOutput> }>;
+  for (;;) {
+    if (Date.now() - started > timeoutMs) throw new Error(`ComfyUI did not finish within ${Math.round(timeoutMs / 1000)} s (prompt ${submitted.prompt_id})`);
+    await new Promise(r => setTimeout(r, pollMs));
+    const history = await getJson(fetchFn, `${url}/history/${submitted.prompt_id}`) as History;
+    const entry = history[submitted.prompt_id];
+    if (!entry) continue;
+    if (entry.status?.status_str === 'error') {
+      throw new Error(`ComfyUI failed: ${JSON.stringify(entry.status.messages ?? []).slice(0, 1000)}`);
+    }
+    const outputs = Object.values(entry.outputs ?? {});
+    if (outputs.some(o => o.images?.length || o.audio?.length) || entry.status?.status_str === 'success') return outputs;
+  }
+}
+
+/** Fetches a file a save node wrote; extra adds query options such as &preview=jpeg;80 */
+export async function downloadOutput(url: string, file: ComfyOutputFile, fetchFn: Fetch = fetch, extra = ''): Promise<Buffer> {
+  const res = await fetchFn(
+    `${url}/view?filename=${encodeURIComponent(file.filename)}&subfolder=${encodeURIComponent(file.subfolder)}&type=${file.type}${extra}`,
+    { signal: AbortSignal.timeout(60_000) },
+  );
+  if (!res.ok) throw new Error(`Could not download ${file.filename} from ComfyUI (${res.status})`);
+  return Buffer.from(await res.arrayBuffer());
+}
+
 export interface GenerateArtworkOptions {
   prompt: string;
   /** Where to save the image; .jpg/.jpeg saves a JPEG (much smaller in the package), otherwise PNG */
@@ -233,45 +295,13 @@ export async function generateArtwork(opts: GenerateArtworkOptions): Promise<Gen
   };
 
   const started = Date.now();
-  const submit = await fetchFn(`${url}/prompt`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: buildFlux2KleinWorkflow(settings) }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  const submitted = await submit.json() as { prompt_id?: string; error?: { message?: string }; node_errors?: unknown };
-  if (!submit.ok || !submitted.prompt_id) {
-    throw new Error(`ComfyUI rejected the workflow: ${submitted.error?.message ?? submit.status} ${JSON.stringify(submitted.node_errors ?? {})}`);
-  }
+  const outputs = await runWorkflow(url, buildFlux2KleinWorkflow(settings), { fetchFn, timeoutMs: opts.timeoutMs, pollMs: opts.pollMs });
+  const image = outputs.flatMap(o => o.images ?? [])[0];
+  if (!image) throw new Error('ComfyUI finished without an image');
 
-  // The first image of a session also loads the models, which can take minutes
-  const timeoutMs = opts.timeoutMs ?? 15 * 60_000;
-  const pollMs = opts.pollMs ?? 2000;
-  type History = Record<string, { status?: { status_str?: string; messages?: unknown[] }; outputs?: Record<string, { images?: Array<{ filename: string; subfolder: string; type: string }> }> }>;
-  let image: { filename: string; subfolder: string; type: string } | undefined;
-  while (!image) {
-    if (Date.now() - started > timeoutMs) throw new Error(`ComfyUI did not finish within ${Math.round(timeoutMs / 1000)} s (prompt ${submitted.prompt_id})`);
-    await new Promise(r => setTimeout(r, pollMs));
-    const history = await getJson(fetchFn, `${url}/history/${submitted.prompt_id}`) as History;
-    const entry = history[submitted.prompt_id];
-    if (!entry) continue;
-    if (entry.status?.status_str === 'error') {
-      throw new Error(`ComfyUI failed: ${JSON.stringify(entry.status.messages ?? []).slice(0, 1000)}`);
-    }
-    image = Object.values(entry.outputs ?? {}).flatMap(o => o.images ?? [])[0];
-    if (!image && entry.status?.status_str === 'success') throw new Error('ComfyUI finished without an image');
-  }
-
-  const view = (extra = '') =>
-    `${url}/view?filename=${encodeURIComponent(image!.filename)}&subfolder=${encodeURIComponent(image!.subfolder)}&type=${image!.type}${extra}`;
-  const download = async (u: string) => {
-    const res = await fetchFn(u, { signal: AbortSignal.timeout(60_000) });
-    if (!res.ok) throw new Error(`Could not download the image from ComfyUI (${res.status})`);
-    return Buffer.from(await res.arrayBuffer());
-  };
   const jpeg = /\.jpe?g$/i.test(opts.outputFile);
-  const full = await download(view(jpeg ? '&preview=jpeg;90' : ''));
-  const preview = jpeg ? full : await download(view('&preview=jpeg;80'));
+  const full = await downloadOutput(url, image, fetchFn, jpeg ? '&preview=jpeg;90' : '');
+  const preview = jpeg ? full : await downloadOutput(url, image, fetchFn, '&preview=jpeg;80');
 
   fs.mkdirSync(path.dirname(opts.outputFile), { recursive: true });
   fs.writeFileSync(opts.outputFile, full);

@@ -649,6 +649,74 @@
     }
   },
   {
+    "name": "sound_status",
+    "description": "Check whether a local ComfyUI server with Stable Audio 3 Small SFX is ready for generate_sound_effect (models present, started with --fp32-vae so the audio is not decoded into noise), and how to set up what is missing",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "comfyUrl": {
+          "type": "string",
+          "description": "ComfyUI address (default http://127.0.0.1:8188, or VALKYRIE_COMFYUI_URL)"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "generate_sound_effect",
+    "description": "Generate a sound effect with Stable Audio 3 Small SFX on a local ComfyUI and save it as an OGG clip in the scenario folder (default audio/sfx/<first component>.ogg), setting the components' audio= so Valkyrie plays it when the event runs. Describe the sound literally: source, material, space and how it evolves (\"heavy oak door creaking open slowly, echoing stone hallway\"), not the story. The clip is peak-normalised and its silent tail trimmed. Valkyrie plays it on top of the music and does not stop it, so keep effects short (1-6 s). An event plays one clip: narration on a component is kept unless assign=true (put the effect on a hidden event that runs first). The first call loads the model (~20 s); then about 2 s per clip",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "What the sound is: source, material, space, timing"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Components (events, tokens, spawns, ...) whose audio= plays the sound; they share the clip"
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "File to write, relative to the scenario folder or absolute (.ogg). Default audio/sfx/<first component, or the prompt's first words>.ogg"
+        },
+        "seconds": {
+          "type": "number",
+          "description": "Length to generate, 1 to 30 s (default 3); a silent tail is trimmed"
+        },
+        "seed": {
+          "type": "integer",
+          "description": "Fixed seed to reproduce or vary a sound (random by default)"
+        },
+        "steps": {
+          "type": "integer",
+          "description": "Sampling steps (default 8 for the distilled model, 50 for base)"
+        },
+        "fadeOut": {
+          "type": "number",
+          "description": "Fade at the end in seconds (default 0.05); longer for ambience that should die away"
+        },
+        "assign": {
+          "type": "boolean",
+          "description": "Set audio= to the clip. Default: unless audio= is narration or another custom clip; true replaces it, false never assigns"
+        },
+        "comfyUrl": {
+          "type": "string",
+          "description": "ComfyUI address (default http://127.0.0.1:8188)"
+        }
+      },
+      "required": [
+        "prompt"
+      ],
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
     "name": "suggest_tile_layout",
     "description": "Suggest anchor coordinates for large (7x7) tiles placed edge to edge. For real tiles, prefer place_tile_relative, which also lines up doors and handles small (7x3.5) tiles",
     "inputSchema": {
