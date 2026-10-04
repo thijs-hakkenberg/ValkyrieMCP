@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The intro cutscene pattern in `/artwork` put the story text over the right part of the picture on every screen, cut the picture off at the left edge on 16:9 and narrower screens, and ran the text off the right edge on screens narrower than 16:10. The new layout follows the official app: the picture in the app's `ImageCutsceneFrame`, the story under its `ImageCutsceneTextTopper` ornament, all one centred group that fits screens from 3:2 to 2:1. The background's transparent video window stays covered by the frame, and the Begin button's click area matches the button. The skill explains the numbers, and `/ui-and-puzzles` shows how to check an element's edges against the narrowest screen.
+
 ### Changed
 
 - `/narration` skill: keep clips short, like the official scenarios' intros. `af_nicole` at speed 0.9 reads about 85 words a minute, so a 30-second clip is 40–45 words; a three-paragraph intro came out at 98 seconds and felt like an audiobook. Narrate a few sentences of a long intro cutscene with `text`, and put the clip on the event that adds the cutscene.
