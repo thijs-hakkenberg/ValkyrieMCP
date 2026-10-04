@@ -16,18 +16,14 @@ Planned work, roughly in order. Done items move to the [changelog](CHANGELOG.md)
 
 ## Later
 
-### Sound effects
+### Sound effect follow-ups
 
-Generate short sound effects (a creaking door, a scream, chanting, thunder) locally and use them as event `audio=`, like narration.
-
-- Pick a local text-to-audio model that runs on a laptop (Stable Audio Open Small, AudioLDM 2, MMAudio, ...) and compare quality and speed.
-- Save as OGG in `audio/sfx/`; reuse the WebAssembly OGG encoder from narration.
-- An event plays one `audio`: chain a hidden sound event before the narrated event, or mix the effect under the narration into one clip.
-- Search the catalog's built-in sounds first (`search_game_content type=audio`) and only generate what is missing.
+- Boss and room music with `music=`: instrumental loops from ACE-Step 1.5 or Stable Audio 3 Small Music on the same ComfyUI. An event's music plays its list once and then returns to the default quest music (`defaultmusicon=true`), so a boss track needs repeating in the list or `defaultmusicon=false`, and the defeat event sets the atmosphere tracks back.
+- Mix an effect under narration into one clip, as an alternative to the hidden-event chain.
+- Notice outdated clips, as for narration.
 
 ### Narration follow-ups
 
 - Other languages: kokoro-js speaks English only. Kokoro's Python package also has Spanish, French, Italian, Portuguese, Hindi, Japanese and Chinese voices; narrate translated text into Valkyrie's language folders (`audio/narration/German/EventStart.ogg`).
 - Notice outdated clips: remember which text a clip was made from and have `validate_scenario` warn when the text changed since.
 - Different voices for quoted speech or documents within one event.
-- Background music generation (event `music=`).

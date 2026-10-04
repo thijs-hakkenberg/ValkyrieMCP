@@ -47,6 +47,8 @@ import {
   narrationSetupInstructions,
 } from './narration/kokoro.js';
 import { generateNarration } from './tools/narration.js';
+import { DEFAULT_SFX_SECONDS, MAX_SFX_SECONDS, generateSound, getSoundStatus, soundReady, soundSetupInstructions } from './audio/stable-audio.js';
+import { SFX_FOLDER, generateSoundEffect } from './tools/sound-effects.js';
 import {
   EVENT_FORMAT_DOC,
   LOCALIZATION_FORMAT_DOC,
@@ -467,6 +469,56 @@ export function createServer(): McpServer {
       });
       const assigned = items.some(i => i.component && !i.error && !i.keptAudio) && args.assign !== false;
       if (assigned) lines.push('', 'audio= is set on the narrated components; save_scenario to keep it.');
+      return { content: [{ type: 'text', text: lines.join('\n') }] };
+    },
+  );
+
+  // ── Sound Effect Tools ──
+
+  server.tool(
+    'sound_status',
+    'Check whether a local ComfyUI server with Stable Audio 3 Small SFX is ready for generate_sound_effect (models present, started with --fp32-vae so the audio is not decoded into noise), and how to set up what is missing',
+    { comfyUrl: z.string().optional().describe(`ComfyUI address (default ${DEFAULT_COMFYUI_URL}, or VALKYRIE_COMFYUI_URL)`) },
+    async ({ comfyUrl }) => {
+      const status = await getSoundStatus(comfyUrl ?? DEFAULT_COMFYUI_URL);
+      const ready = soundReady(status);
+      const lines = [
+        ready ? `Ready: ComfyUI ${status.comfyuiVersion ?? ''} at ${status.url}${status.device ? ` on ${status.device}` : ''}` : 'Not ready.',
+        ...Object.entries(status.models).map(([k, v]) => `  ${k}: ${v}`),
+      ];
+      if (!ready) lines.push('', soundSetupInstructions(status));
+      return { content: [{ type: 'text', text: lines.join('\n') }] };
+    },
+  );
+
+  server.tool(
+    'generate_sound_effect',
+    'Generate a sound effect with Stable Audio 3 Small SFX on a local ComfyUI and save it as an OGG clip in the scenario folder '
+    + `(default ${SFX_FOLDER}/<first component>.ogg), setting the components' audio= so Valkyrie plays it when the event runs. `
+    + 'Describe the sound literally: source, material, space and how it evolves ("heavy oak door creaking open slowly, echoing stone hallway"), not the story. '
+    + 'The clip is peak-normalised and its silent tail trimmed. Valkyrie plays it on top of the music and does not stop it, so keep effects short (1-6 s). '
+    + 'An event plays one clip: narration on a component is kept unless assign=true (put the effect on a hidden event that runs first). '
+    + 'The first call loads the model (~20 s); then about 2 s per clip',
+    {
+      prompt: z.string().describe('What the sound is: source, material, space, timing'),
+      components: z.array(z.string()).optional().describe('Components (events, tokens, spawns, ...) whose audio= plays the sound; they share the clip'),
+      outputPath: z.string().optional().describe(`File to write, relative to the scenario folder or absolute (.ogg). Default ${SFX_FOLDER}/<first component, or the prompt's first words>.ogg`),
+      seconds: z.number().optional().describe(`Length to generate, 1 to ${MAX_SFX_SECONDS} s (default ${DEFAULT_SFX_SECONDS}); a silent tail is trimmed`),
+      seed: z.number().int().optional().describe('Fixed seed to reproduce or vary a sound (random by default)'),
+      steps: z.number().int().optional().describe('Sampling steps (default 8 for the distilled model, 50 for base)'),
+      fadeOut: z.number().optional().describe('Fade at the end in seconds (default 0.05); longer for ambience that should die away'),
+      assign: z.boolean().optional().describe('Set audio= to the clip. Default: unless audio= is narration or another custom clip; true replaces it, false never assigns'),
+      comfyUrl: z.string().optional().describe(`ComfyUI address (default ${DEFAULT_COMFYUI_URL})`),
+    },
+    async (args) => {
+      const r = await generateSoundEffect(currentModel, args, generateSound);
+      const lines = [`Saved ${r.file} (${r.duration} s, ${Math.round(r.bytes / 1024)} KB, seed ${r.seed}, ${r.steps} steps, ${r.checkpoint}, made in ${r.seconds} s).`];
+      for (const a of r.assignments) {
+        if (a.keptAudio) lines.push(`  ${a.component}: kept audio=${a.keptAudio} (an event plays one clip; use a hidden event that runs first, or assign=true)`);
+        else lines.push(`  ${a.component}: audio=${r.file}${a.replacedAudio ? ` (replaced ${a.replacedAudio})` : ''}`);
+      }
+      if (r.assignments.some(a => !a.keptAudio)) lines.push('', 'save_scenario to keep the audio= changes.');
+      else if (!args.components?.length) lines.push(`Reference it as audio=${r.file}.`);
       return { content: [{ type: 'text', text: lines.join('\n') }] };
     },
   );

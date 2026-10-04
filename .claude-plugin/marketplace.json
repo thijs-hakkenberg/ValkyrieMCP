@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "valkyrie-mom",
-      "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie — MCP server, 7 skills, and scenario designer agent",
+      "description": "AI-assisted Mansions of Madness scenario editor for Valkyrie — MCP server, 10 skills, and scenario designer agent",
       "version": "1.0.1",
       "author": {
         "name": "Thijs Hakkenberg"
