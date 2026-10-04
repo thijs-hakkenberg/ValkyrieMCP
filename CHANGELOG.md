@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.5.0] - 2026-10-04
+
+### Added
+
+- **Spoken narration with Kokoro.** `generate_narration` reads components' dialog text with [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) on the CPU, saves an OGG Vorbis clip per component (`audio/narration/<Event>.ogg`) and sets its `audio=`, so Valkyrie plays it when the event runs. Several components in one call share one model load; after the first call a sentence takes about 2 s on an M1 Pro.
+- Narration speaks only the italic story text when the text has any (community scenarios set the story in italics and the rules in plain text), expands `{qst:}` entries, turns icons into words, says "an investigator" for `{rnd:hero}`, leaves out `{var:}` with a note, and takes respellings for names the voice gets wrong (`pronunciations`). `text` speaks something else than the dialog shows.
+- An existing sound effect on a component is kept unless `assign=true`, because an event plays only one clip.
+- The default voice is `af_nicole` at speed 0.9, picked by ear from 15 voices reading the same passage; `bf_isabella`, `bm_lewis` and `bm_daniel` also fit. The model's quality grades didn't predict this: the A and A- voices weren't picked, and two D voices were. `narration_status` and the `/narration` skill list the picks.
+- `narration_status` checks the engine and model and lists the 28 English voices with their quality grades; `install=true` installs the engine. kokoro-js brings onnxruntime (~450 MB), so it is installed on demand in `~/.cache/valkyrie-mom-mcp/kokoro` (or `VALKYRIE_TTS_DIR`) rather than with this package; OGG encoding runs in WebAssembly, so neither Python nor ffmpeg is needed.
+- `/narration` skill: how Valkyrie plays event audio (on top of the music, not stopped when the dialog closes, language folders for translated clips), what to narrate and what to skip, voices and speeds.
+- [TODO.md](TODO.md) with the roadmap: hybrid semantic search for game content, generated sound effects, narration in other languages.
+
 ## [2.4.1] - 2026-10-04
 
 ### Fixed

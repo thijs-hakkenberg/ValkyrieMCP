@@ -580,6 +580,75 @@
     }
   },
   {
+    "name": "narration_status",
+    "description": "Check whether the local Kokoro text-to-speech engine for generate_narration is installed and its model downloaded, and list the voices. install=true installs it with npm (~450 MB, once per machine)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "install": {
+          "type": "boolean",
+          "description": "Install the engine (kokoro-js and an OGG encoder) into its folder if it is missing"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
+    "name": "generate_narration",
+    "description": "Speak components' dialog text with Kokoro-82M (local, English voices) and save OGG clips in the scenario folder (default audio/narration/<Component>.ogg), setting each component's audio= so Valkyrie plays the clip when the event runs. part=auto (default) speaks only the <i>italic</i> story text when the text has any, so rules like \"Place a search token\" are not read out; part=all speaks everything. {qst:} is expanded, icons become words, {rnd:hero} is spoken as \"an investigator\" and {var:} is left out. The audio does not stop when the dialog closes, so keep narrated passages short. The first call loads (and once downloads) the model; then about 2 s per sentence",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Components to narrate (events, tokens, spawns, ...); each needs <name>.text unless text is given"
+        },
+        "text": {
+          "type": "string",
+          "description": "Speak this instead of the component text (one component), or on its own with outputPath"
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "File to write for a single clip, relative to the scenario folder or absolute (.ogg)"
+        },
+        "voice": {
+          "type": "string",
+          "description": "Voice id (default af_nicole). Picked for horror: af_nicole, bf_isabella, bm_lewis, bm_daniel; narration_status lists all"
+        },
+        "speed": {
+          "type": "number",
+          "description": "Speaking speed, 0.5 to 2 (default 0.9)"
+        },
+        "part": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "flavor",
+            "all"
+          ],
+          "description": "auto: italic story text if any, else all; flavor: italic only; all: the whole text"
+        },
+        "pronunciations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Respellings for words the voice gets wrong, e.g. {\"Cthulhu\":\"Kuh-thoo-loo\",\"Arkham\":\"Ark-um\"}"
+        },
+        "assign": {
+          "type": "boolean",
+          "description": "Set audio= to the clip. Default: only where audio= is empty or already narration, so sound effects are kept; true replaces them, false never assigns"
+        }
+      },
+      "additionalProperties": false,
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  {
     "name": "suggest_tile_layout",
     "description": "Suggest anchor coordinates for large (7x7) tiles placed edge to edge. For real tiles, prefer place_tile_relative, which also lines up doors and handles small (7x3.5) tiles",
     "inputSchema": {
