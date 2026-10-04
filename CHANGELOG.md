@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [2.5.1] - 2026-10-04
 
 ### Fixed
 
+- Localization text that starts and ends with a double quote, such as a line of dialogue, lost both quotes in Valkyrie. It was written as `|||"..."|||`, and Valkyrie's `ParseEntry` removes the `|||` and then a pair of outer quotes too, so `"I don't know," he admits. "Look around."` showed as `I don't know," he admits. "Look around.`. Such values are now written as a quoted field with doubled quotes, which reads back exactly. Found in At the Mountains of Madness.
 - The intro cutscene pattern in `/artwork` put the story text over the right part of the picture on every screen, cut the picture off at the left edge on 16:9 and narrower screens, and ran the text off the right edge on screens narrower than 16:10. The new layout follows the official app: the picture in the app's `ImageCutsceneFrame`, the story under its `ImageCutsceneTextTopper` ornament, all one centred group that fits screens from 3:2 to 2:1. The background's transparent video window stays covered by the frame, and the Begin button's click area matches the button. The skill explains the numbers, and `/ui-and-puzzles` shows how to check an element's edges against the narrowest screen.
 
 ### Changed

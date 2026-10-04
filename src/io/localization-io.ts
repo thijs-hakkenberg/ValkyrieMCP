@@ -87,7 +87,9 @@ export function writeLocalization(language: string, entries: Map<string, string>
 
   for (const [key, rawValue] of entries) {
     const value = rawValue.replace(/\r\n|\r|\n/g, '\\n');
-    if (value.includes('"') && !value.includes(TRIPLE)) {
+    // ParseEntry strips a pair of outer quotes even inside |||, so |||"dialogue"||| would lose them
+    const quotedAtBothEnds = value.length > 1 && value.startsWith('"') && value.endsWith('"');
+    if (value.includes('"') && !value.includes(TRIPLE) && !quotedAtBothEnds) {
       lines.push(`${key},${TRIPLE}${value}${TRIPLE}`);
     } else if (value.includes('"') || value.includes(TRIPLE) || value.includes('\\n') || value.includes(',')) {
       lines.push(`${key},"${value.replace(/"/g, '""')}"`);
