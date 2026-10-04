@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Changed
+
+- `/narration` skill: keep clips short, like the official scenarios' intros. `af_nicole` at speed 0.9 reads about 85 words a minute, so a 30-second clip is 40–45 words; a three-paragraph intro came out at 98 seconds and felt like an audiobook. Narrate a few sentences of a long intro cutscene with `text`, and put the clip on the event that adds the cutscene.
+
 ## [2.5.0] - 2026-10-04
 
 ### Added

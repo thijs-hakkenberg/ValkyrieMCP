@@ -38,6 +38,8 @@ Run `narration_status`. If the engine is missing, `narration_status install=true
 | `{ffg:MONSTER_DEEP_ONE}`, `{c:TileStudy}` | "deep one", "Study" |
 | `\n` | A short pause; blank lines separate paragraphs |
 
+**Keep it short, like the official scenarios' intros.** `af_nicole` at speed 0.9 reads about 85 words a minute, pauses included, so a 30-second clip is 40–45 words. A three-paragraph intro cutscene (165 words) came out at 98 seconds. It sounded good, but it was like listening to an audiobook, and the clip keeps playing after the players click on. The screen can keep the full text: pass `text` with a few of its sentences (the hook, the stakes) and narrate those.
+
 Write narrated text for the ear: short sentences, no "as shown", no numbers the players must act on. When the dialog text doesn't read well aloud, pass `text` with a spoken version. The dialog stays as it is.
 
 ## Workflow
@@ -54,7 +56,7 @@ Write narrated text for the ear: short sentences, no "as shown", no numbers the 
 
 ## Choosing what to narrate
 
-Good candidates: the introduction (`EventStart` or the first story event), discovering a key clue, a letter or diary page read aloud (pair it with a handout picture from `/artwork`), the monster reveal, and the endings (win, lose, `Eliminated`).
+Good candidates: the introduction (`EventStart` or the first story event; for an intro cutscene built from UI elements, put the clip on the event that adds them), discovering a key clue, a letter or diary page read aloud (pair it with a handout picture from `/artwork`), the monster reveal, and the endings (win, lose, `Eliminated`).
 
 Skip: placement instructions, tests and their pass/fail results, mythos events that repeat every round (the same clip gets tiresome), and anything shown while players are busy with the board.
 
