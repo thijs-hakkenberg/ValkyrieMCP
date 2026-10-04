@@ -23,7 +23,7 @@ Always use vertical units: sizes and positions are then fractions of the **scree
 | `image` | A built-in image (`ImageCutsceneBG`, `ImageInvestigatorSelectTitle`, ...) or a file in the scenario folder (`img/Letter.jpg`) |
 | `textsize`, `textaspect`, `textcolor`, `textAlignment`, `richText` | Text styling for elements with `<name>.uitext` |
 
-For example, `xposition=0 yposition=0 size=1` fills the middle of the screen, and `xposition=-0.45 size=0.9` puts a square picture on the left half. On a 16:9 screen the visible range is roughly ±0.89 horizontally and ±0.5 vertically.
+For example, `xposition=0 yposition=0 size=1` fills the middle of the screen, and `xposition=-0.28 size=0.8` puts a square picture left of centre (it spans −0.68…+0.12). The visible range is ±0.5 vertically and, horizontally, ±0.75 on a 3:2 screen, ±0.8 on 16:10 and ±0.89 on 16:9. Check an element's edges (`x ± width/2`) against the narrowest screen you support, and check that neighbours don't overlap.
 
 ### Layering Order
 
@@ -45,7 +45,7 @@ While **any** UI element is on the board, Valkyrie's next phase button does noth
 
 ## Prologue / Intro Cutscene
 
-`/artwork` has the complete, tested pattern. It uses a full-screen `ImageCutsceneBG` backdrop, the scenario's own picture on the left (`xposition=-0.45`), the story on the right (`xposition=0.35`, `textAlignment=TOP`), and a Begin button anchored to the bottom (`valign=bottom`) whose event removes the UI and sets up the board. `/artwork` also covers showing handouts and scene pictures during play, and generating the pictures with ComfyUI.
+`/artwork` has the complete pattern, laid out like the official app's: the `ImageCutsceneBG` backdrop, the scenario's picture in the app's `ImageCutsceneFrame` on the left, the story under the `ImageCutsceneTextTopper` ornament on the right, and a Begin button anchored to the bottom (`valign=bottom`) whose event removes the UI and sets up the board. It is one centred group that fits screens from 3:2 to 2:1. `/artwork` also covers showing handouts and scene pictures during play, and generating the pictures with ComfyUI.
 
 
 ## Interactive Journal

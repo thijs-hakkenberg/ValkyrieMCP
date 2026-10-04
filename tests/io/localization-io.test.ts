@@ -114,6 +114,22 @@ describe('writeLocalization', () => {
     expect(lines[1]).toBe('key,|||He said "hello", then left|||');
   });
 
+  it('keeps the quotes of a value that starts and ends with one (a line of dialogue)', () => {
+    // Valkyrie's ParseEntry strips ||| and then also a pair of outer quotes, so |||"..."|||
+    // loses them; a quoted field with doubled quotes reads back exactly
+    const value = '"I don\'t know," Danforth admits. "Look around more."';
+    const output = writeLocalization('English', new Map([['k', value]]));
+    expect(output.split('\n')[1]).toBe('k,"""I don\'t know,"" Danforth admits. ""Look around more."""');
+    expect(parseLocalization(output).entries.get('k')).toBe(value);
+  });
+
+  it('round-trips values with quotes at either end', () => {
+    for (const value of ['"quoted"', '"', '""', 'ends with "quote"', '"starts" here', '"a, b"\\nnext line "c"']) {
+      const output = writeLocalization('English', new Map([['k', value]]));
+      expect(parseLocalization(output).entries.get('k'), value).toBe(value);
+    }
+  });
+
   it('writes real line breaks as literal \\n on one line', () => {
     const entries = new Map<string, string>([['key', 'line one\nline two']]);
 
