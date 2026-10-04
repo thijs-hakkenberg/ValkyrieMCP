@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import { ScenarioModel } from '../model/scenario-model.js';
-import { DEFAULT_QUEST_CONFIG, getTypePrefix, serializeQuestConfig } from '../model/component-types.js';
+import { DEFAULT_QUEST_CONFIG, getTypePrefix, serializeQuestConfig, type IniSection } from '../model/component-types.js';
 import { writeIni } from '../io/ini-writer.js';
 import { buildPackage } from '../io/package-builder.js';
 import { parseLocalization } from '../io/localization-io.js';
@@ -197,32 +197,62 @@ export async function saveScenario(model: ScenarioModel): Promise<void> {
 }
 
 /**
+ * Expansions a component only runs with: its tests check that the pack is present
+ * (`VarOperation:#BtT,==,1`), all of them must pass (no OR), so its content is optional.
+ * Valkyrie ignores conditions when vartests are set.
+ */
+function gatedPacks(data: IniSection): Set<string> {
+  const packs = new Set<string>();
+  const vartests = (data.vartests ?? '').split(/\s+/).filter(Boolean);
+  if (vartests.some(t => /^VarTestsLogicalOperator:OR$/i.test(t))) return packs;
+  const tests = vartests.length > 0
+    ? vartests.map(t => t.replace(/^VarOperation:/, ''))
+    : (data.conditions ?? '').split(/\s+/).filter(Boolean);
+  for (const t of tests) {
+    const m = t.match(/^#(\w+),(==|>=|>|!=),(-?\d+(?:\.\d+)?)$/);
+    if (!m) continue;
+    const [, pack, op, raw] = m;
+    const v = Number(raw);
+    const owned = op === '==' ? v === 1 : op === '>' ? v >= 0 && v < 1 : op === '>=' ? v > 0 && v <= 1 : v === 0;
+    if (owned) packs.add(pack);
+  }
+  return packs;
+}
+
+/**
  * The expansions a scenario needs, from everything it puts on the table:
  * tile sides, spawned monsters (a custom monster counts through its base),
- * catalog monsters shown as tokens, and quest items given by name.
+ * catalog monsters shown as tokens, and quest items given by name. Content behind
+ * a test for its own expansion ("the Thrall if Beyond the Threshold is owned") is optional.
  */
 export function computeRequiredPacks(model: ScenarioModel): Set<string> {
   const catalog = getSharedCatalog();
   const requiredPacks = new Set<string>();
-  const add = (pack: string | undefined) => {
-    if (pack && pack !== 'MoMBase') requiredPacks.add(pack);
+  const add = (pack: string | undefined, gated?: Set<string>) => {
+    if (pack && pack !== 'MoMBase' && !gated?.has(pack)) requiredPacks.add(pack);
   };
-  const addMonster = (name: string) => {
+  const monsterPack = (name: string) => {
     const custom = name.startsWith('CustomMonster') ? model.get(name) : undefined;
-    add(catalog.getPackForMonster(custom?.data.base ?? name));
+    return catalog.getPackForMonster(custom?.data.base ?? name);
   };
 
   for (const comp of model.getByType('Tile')) {
     if (comp.data.side) add(catalog.getPackForTileSide(comp.data.side));
   }
+  const spawned = new Set<string>();
   for (const comp of model.getByType('Spawn')) {
-    for (const name of parseRefList(comp.data.monster ?? '')) addMonster(name);
+    const gated = gatedPacks(comp.data);
+    for (const name of parseRefList(comp.data.monster ?? '')) {
+      spawned.add(name);
+      add(monsterPack(name), gated);
+    }
   }
+  // A custom monster counts through the spawns that place it; one nothing spawns may be placed another way
   for (const comp of model.getByType('CustomMonster')) {
-    if (comp.data.base) add(catalog.getPackForMonster(comp.data.base));
+    if (comp.data.base && !spawned.has(comp.name)) add(catalog.getPackForMonster(comp.data.base));
   }
   for (const comp of model.getByType('Token')) {
-    if (comp.data.type && !comp.data.customImage) add(catalog.getPackForMonster(comp.data.type));
+    if (comp.data.type && !comp.data.customImage) add(catalog.getPackForMonster(comp.data.type), gatedPacks(comp.data));
   }
   for (const comp of model.getByType('QItem')) {
     // With traits, itemname lists items to exclude from the draw, so they need not be owned

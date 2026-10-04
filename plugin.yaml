@@ -1,5 +1,5 @@
 name: valkyrie-mom
-version: "2.5.1"
+version: "2.5.2"
 description: "AI-assisted Mansions of Madness scenario editor for the Valkyrie app: create, lay out, validate and package scenarios, review the storyline as an event tree, generate artwork with a local ComfyUI, and narrate story text with a local Kokoro voice. Runs the valkyrie-mom MCP server (Node.js 20+ with npx required)."
 author: "Thijs Hakkenberg"
 license: MIT
