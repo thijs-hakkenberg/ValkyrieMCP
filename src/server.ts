@@ -37,7 +37,9 @@ import { toPackageName, writePackageManifest } from './io/package-manifest.js';
 import { buildStoryGraph, renderMermaid, renderOutline, renderStoryHtml } from './story/story-graph.js';
 import { DEFAULT_COMFYUI_URL, generateArtwork, getArtworkStatus, setupInstructions } from './artwork/comfyui.js';
 import {
+  DEFAULT_SPEED,
   DEFAULT_VOICE,
+  HORROR_PICKS,
   VOICES,
   getNarrationStatus,
   installNarrationEngine,
@@ -424,7 +426,12 @@ export function createServer(): McpServer {
       );
       const setup = narrationSetupInstructions(status);
       if (setup && !status.installed) lines.push('', setup);
-      lines.push('', `Voices (default ${DEFAULT_VOICE}; grade = quality rating):`, ...Object.entries(VOICES).map(([id, d]) => `  ${id}: ${d}`));
+      lines.push(
+        '', 'Picked by ear for horror narration (the quality grades did not predict this):',
+        ...HORROR_PICKS.map(p => `  ${p.voice}: ${p.verdict}${p.voice === DEFAULT_VOICE ? ' (default)' : ''}`),
+        '', `All voices (grade = audio quality rating, not mood; default ${DEFAULT_VOICE} at speed ${DEFAULT_SPEED}):`,
+        ...Object.entries(VOICES).map(([id, d]) => `  ${id}: ${d}`),
+      );
       return { content: [{ type: 'text', text: lines.join('\n') }] };
     },
   );
@@ -439,8 +446,8 @@ export function createServer(): McpServer {
       components: z.array(z.string()).optional().describe('Components to narrate (events, tokens, spawns, ...); each needs <name>.text unless text is given'),
       text: z.string().optional().describe('Speak this instead of the component text (one component), or on its own with outputPath'),
       outputPath: z.string().optional().describe('File to write for a single clip, relative to the scenario folder or absolute (.ogg)'),
-      voice: z.string().optional().describe(`Voice id (default ${DEFAULT_VOICE}); narration_status lists them`),
-      speed: z.number().optional().describe('Speaking speed, 0.5 to 2 (default 1; 0.9 suits slow, ominous passages)'),
+      voice: z.string().optional().describe(`Voice id (default ${DEFAULT_VOICE}). Picked for horror: ${HORROR_PICKS.map(p => p.voice).join(', ')}; narration_status lists all`),
+      speed: z.number().optional().describe(`Speaking speed, 0.5 to 2 (default ${DEFAULT_SPEED})`),
       part: z.enum(['auto', 'flavor', 'all']).optional().describe('auto: italic story text if any, else all; flavor: italic only; all: the whole text'),
       pronunciations: z.record(z.string()).optional().describe('Respellings for words the voice gets wrong, e.g. {"Cthulhu":"Kuh-thoo-loo","Arkham":"Ark-um"}'),
       assign: z.boolean().optional().describe('Set audio= to the clip. Default: only where audio= is empty or already narration, so sound effects are kept; true replaces them, false never assigns'),

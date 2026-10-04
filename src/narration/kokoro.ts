@@ -22,8 +22,26 @@ export const DEFAULT_DTYPE: KokoroDtype = (process.env.VALKYRIE_TTS_DTYPE as Kok
 
 export const SAMPLE_RATE = 24000;
 
-/** A measured 1920s narrator; af_heart and bf_emma have the highest quality grades */
-export const DEFAULT_VOICE = 'bm_george';
+/**
+ * Voices picked by ear for horror narration. 15 voices read the same passage at speed 0.9
+ * ("The lamp gutters and goes out. / Somewhere beneath the floorboards of the Blackwood
+ * house, something has begun to sing. / It knows your name.") on 2026-10-04. The quality
+ * grades did not predict the fit: the A and A- voices (af_heart, af_bella) were not picked,
+ * and two D voices were. Best first.
+ */
+export const HORROR_PICKS: ReadonlyArray<{ voice: string; verdict: string }> = [
+  { voice: 'af_nicole', verdict: 'best fit' },
+  { voice: 'bf_isabella', verdict: 'good' },
+  { voice: 'bm_lewis', verdict: 'good' },
+  { voice: 'bm_daniel', verdict: 'good' },
+];
+
+/** Also in that trial, not picked */
+export const HORROR_TRIAL_OTHERS = ['am_fenrir', 'am_michael', 'am_onyx', 'am_puck', 'am_echo', 'af_heart', 'af_bella', 'af_kore', 'bm_george', 'bm_fable', 'bf_emma'] as const;
+
+/** The trial's winner, at the speed it was judged at */
+export const DEFAULT_VOICE = HORROR_PICKS[0].voice;
+export const DEFAULT_SPEED = 0.9;
 
 /** kokoro-js speaks English only: a = American, b = British. Grades are hexgrad's quality ratings */
 export const VOICES: Record<string, string> = {
@@ -244,7 +262,7 @@ export function assertVoice(voice: string): void {
 export async function narrate(opts: NarrateOptions): Promise<NarrateResult> {
   const voice = opts.voice ?? DEFAULT_VOICE;
   assertVoice(voice);
-  const speed = opts.speed ?? 1;
+  const speed = opts.speed ?? DEFAULT_SPEED;
   if (!(speed >= 0.5 && speed <= 2)) throw new Error('speed must be between 0.5 and 2');
   if (opts.paragraphs.length === 0) throw new Error('Nothing to narrate');
 

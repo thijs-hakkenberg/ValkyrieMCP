@@ -3,8 +3,13 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {
+  DEFAULT_SPEED,
+  DEFAULT_VOICE,
   ENGINE_PACKAGES,
+  HORROR_PICKS,
+  HORROR_TRIAL_OTHERS,
   SAMPLE_RATE,
+  VOICES,
   getNarrationStatus,
   installNarrationEngine,
   narrate,
@@ -100,6 +105,21 @@ describe('narrate', () => {
       { text: 'One. Two.', voice: 'af_heart', speed: 0.9 },
       { text: 'Three.', voice: 'af_heart', speed: 0.9 },
     ]);
+  });
+
+  it('defaults to the horror trial\'s winner at the speed it was judged at', async () => {
+    const engine = fakeEngine();
+    await narrate({ paragraphs: ['Hi.'], outputFile: path.join(tmpDir(), 'x.ogg'), engine });
+    expect(engine.calls[0]).toEqual({ text: 'Hi.', voice: 'af_nicole', speed: 0.9 });
+    expect(DEFAULT_VOICE).toBe(HORROR_PICKS[0].voice);
+    expect(DEFAULT_SPEED).toBe(0.9);
+  });
+
+  it('records the horror trial with real, distinct voices', () => {
+    const tried = [...HORROR_PICKS.map(p => p.voice), ...HORROR_TRIAL_OTHERS];
+    expect(tried).toHaveLength(15);
+    expect(new Set(tried).size).toBe(15);
+    for (const v of tried) expect(VOICES).toHaveProperty(v);
   });
 
   it('rejects unknown voices, odd speeds and empty text', async () => {

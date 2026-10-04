@@ -15,7 +15,7 @@ Run `narration_status`. If the engine is missing, `narration_status install=true
 |---|---|---|
 | Model | Kokoro-82M v1.0, ONNX, fp32 | On the CPU, fp32 is faster than q8 (about 2 s per sentence on an M1 Pro) and cleaner. `VALKYRIE_TTS_DTYPE=q8` saves download size |
 | Output | OGG Vorbis, mono, 24 kHz, ~45 kb/s | Valkyrie's editor lists only `.ogg` files for event audio; a 10 s line is about 60 KB |
-| Default voice | `bm_george` (British male) | Fits a 1920s narrator. `af_heart` (A) and `bf_emma` (B-) have the best quality grades |
+| Default voice | `af_nicole` (American female) at speed 0.9 | Picked by ear as the best fit for horror out of 15 voices; see Voices below |
 | Languages | English (American `a*`, British `b*` voices) | kokoro-js has no other languages yet |
 
 ## How Valkyrie plays event audio
@@ -44,7 +44,7 @@ Write narrated text for the ear: short sentences, no "as shown", no numbers the 
 
 1. Write the story text first (`set_localization` or the upsert tools), with the story part in `<i>…</i>`.
 2. Narrate a test line and listen before doing the whole scenario:
-   `generate_narration components=["EventStart"] voice="bm_george"`
+   `generate_narration components=["EventStart"]` (or try `voice="bf_isabella"`)
 3. Batch the rest. One call narrates several components and loads the model once:
    `generate_narration components=["EventStart","EventStudyFound","EventWinRitual","EventLose"]`
 4. Fix names the voice gets wrong with respellings, and use the same map on every call:
@@ -60,11 +60,17 @@ Skip: placement instructions, tests and their pass/fail results, mythos events t
 
 ## Voices
 
-`narration_status` lists every voice with its quality grade. Some pairings:
+Picked by ear for horror narration. Fifteen voices read the same passage at speed 0.9 ("The lamp gutters and goes out. Somewhere beneath the floorboards of the Blackwood house, something has begun to sing. It knows your name."):
 
-- **Narrator:** `bm_george`, `bm_fable` (British male), `af_heart` (American female, highest grade)
-- **A letter from a woman / a diary:** `bf_emma`, `af_bella`
-- **A cultist or a menacing voice:** `am_fenrir` or `bm_george` at `speed=0.85`
-- Use one narrator voice for the whole scenario and a second voice only for quoted documents.
+| Voice | Verdict |
+|---|---|
+| `af_nicole` (American female) | Best fit; the default |
+| `bf_isabella` (British female) | Good |
+| `bm_lewis` (British male) | Good |
+| `bm_daniel` (British male) | Good |
+| `am_fenrir`, `am_michael`, `am_onyx`, `am_puck`, `am_echo`, `af_heart`, `af_bella`, `af_kore`, `bm_george`, `bm_fable`, `bf_emma` | Tried, not picked |
 
-`speed` 0.85–0.95 suits slow, ominous passages; above 1.1 sounds rushed.
+**The quality grades in `narration_status` don't predict the fit.** They rate audio quality, not mood. The two best-graded voices (`af_heart` A, `af_bella` A-) weren't picked, and two D voices (`bm_lewis`, `bm_daniel`) were. A British accent isn't required either: Lovecraft is set in New England, and the mood matters more. When trying other voices, listen rather than going by grade.
+
+- Use one narrator voice for the whole scenario. For quoted letters or diaries, use a second voice from the picks, such as `bm_lewis` or `bm_daniel` for a man's letter.
+- The default speed is 0.9, the speed the trial was judged at.

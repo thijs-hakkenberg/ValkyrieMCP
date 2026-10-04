@@ -617,11 +617,11 @@
         },
         "voice": {
           "type": "string",
-          "description": "Voice id (default bm_george); narration_status lists them"
+          "description": "Voice id (default af_nicole). Picked for horror: af_nicole, bf_isabella, bm_lewis, bm_daniel; narration_status lists all"
         },
         "speed": {
           "type": "number",
-          "description": "Speaking speed, 0.5 to 2 (default 1; 0.9 suits slow, ominous passages)"
+          "description": "Speaking speed, 0.5 to 2 (default 0.9)"
         },
         "part": {
           "type": "string",
