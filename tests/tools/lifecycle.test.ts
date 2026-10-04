@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { createScenario, loadScenario, getScenarioState, saveScenario, buildScenario, setQuestConfig } from '../../src/tools/lifecycle.js';
+import { createScenario, loadScenario, getScenarioState, saveScenario, buildScenario, setQuestConfig, computeRequiredPacks } from '../../src/tools/lifecycle.js';
 import { ScenarioModel } from '../../src/model/scenario-model.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -204,6 +204,40 @@ describe('lifecycle tools', () => {
 
       const questContent = fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8');
       expect(questContent).toContain('packs=MoM1EM');
+    });
+
+    it('does not require an expansion whose content is gated behind a test for it', async () => {
+      const tmp = makeTmpDir();
+      tmpDirs.push(tmp);
+
+      // Herbert West: the Specimen uses the Thrall figure with Beyond the Threshold, the Hybrid without
+      const { model } = await createScenario('Gated', { dir: tmp });
+      model.upsert('CustomMonsterSpecimenThrall', { base: 'MonsterThrall' });
+      model.upsert('CustomMonsterSpecimenHybrid', { base: 'MonsterDeepOneHybrid' });
+      model.upsert('SpawnSpecimenThrall', { monster: 'CustomMonsterSpecimenThrall', vartests: 'VarOperation:#BtT,==,1', buttons: '1', event1: '' });
+      model.upsert('SpawnSpecimenHybrid', { monster: 'CustomMonsterSpecimenHybrid', buttons: '1', event1: '' });
+      model.upsert('TokenSkeleton', { type: 'MonsterSkeleton', xposition: '0', yposition: '0', vartests: 'VarOperation:#SoA,>,0' });
+
+      await saveScenario(model);
+
+      expect(fs.readFileSync(path.join(tmp, 'quest.ini'), 'utf-8')).not.toContain('packs=');
+    });
+
+    it('still requires an expansion behind a test for another pack, an OR, or a negative test', async () => {
+      const { model } = await createScenario('GatedWrong', { dir: (() => { const t = makeTmpDir(); tmpDirs.push(t); return t; })() });
+      model.upsert('CustomMonsterA', { base: 'MonsterThrall' });
+      model.upsert('SpawnA', { monster: 'CustomMonsterA', vartests: 'VarOperation:#SoA,==,1', buttons: '1', event1: '' });
+      expect([...computeRequiredPacks(model)]).toEqual(['BtT']);
+
+      model.upsert('SpawnA', { vartests: 'VarOperation:#BtT,==,1 VarOperation:Act,==,2 VarTestsLogicalOperator:OR' });
+      expect([...computeRequiredPacks(model)]).toEqual(['BtT']);
+
+      model.upsert('SpawnA', { vartests: 'VarOperation:#BtT,==,0' });
+      expect([...computeRequiredPacks(model)]).toEqual(['BtT']);
+
+      // A custom monster that nothing spawns ungated is not on the table
+      model.upsert('SpawnA', { vartests: 'VarOperation:#BtT,==,1' });
+      expect([...computeRequiredPacks(model)]).toEqual([]);
     });
 
     it('computes packs from quest items and monster tokens', async () => {

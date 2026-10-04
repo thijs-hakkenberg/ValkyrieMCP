@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.5.2] - 2026-10-04
+
+### Fixed
+
+- Saving no longer makes an expansion required when its content only appears behind a test for that expansion. Herbert West spawns the Specimen as a Thrall with `vartests=VarOperation:#BtT,==,1` and as a Deep One Hybrid otherwise, but saving wrote `packs=BtT`, so Valkyrie offered the scenario only to players who own Beyond the Threshold. Spawns and monster tokens whose tests (all of them, no OR) require a pack no longer count it, and a custom monster counts only through the spawns that place it. Since 2.3.2. A `packs` value already saved stays until you remove it, because Valkyrie's editor also lets authors set it by hand.
+
 ## [2.5.1] - 2026-10-04
 
 ### Fixed
