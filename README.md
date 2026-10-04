@@ -8,7 +8,7 @@ MCP (Model Context Protocol) server and Claude Code plugin for AI-assisted Mansi
 
 This server exposes Valkyrie scenario editing as MCP tools, enabling AI assistants (Claude, etc.) to create, modify, validate, and build complete MoM scenarios. It auto-detects the Valkyrie editor directory so scenarios appear directly in the app.
 
-The plugin bundles 8 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, generated artwork, etc.) and an autonomous scenario designer agent.
+The plugin bundles 9 skills covering advanced patterns (event loops, mythos scaling, tile placement chains, custom puzzles, generated artwork, spoken narration, etc.) and an autonomous scenario designer agent.
 
 ## Install
 
@@ -21,7 +21,7 @@ claude plugin install valkyrie-mom
 
 This gives you:
 - **MCP server** with 25 tools for scenario editing (auto-started)
-- **8 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`, `/artwork`
+- **9 skills**: `/scenario`, `/event-patterns`, `/tile-placement`, `/variables-and-mythos`, `/custom-monsters`, `/ui-and-puzzles`, `/items-and-distribution`, `/artwork`, `/narration`
 - **Scenario designer agent** for autonomous scenario creation
 - **5 MCP resources** for format documentation
 
@@ -84,6 +84,7 @@ npx tsx src/index.ts   # Run MCP server via stdio
 | `/ui-and-puzzles` | Prologues, interactive journals, combination locks, built-in puzzle types |
 | `/items-and-distribution` | Random items, unique items, starting items, inspection events |
 | `/artwork` | Generate pictures with a local ComfyUI (FLUX.2 [klein] 4B) and show them: cover, intro cutscene, handouts, scenes, monsters, tokens, image puzzles |
+| `/narration` | Read story text aloud with a local Kokoro voice: what to narrate, voices, pronunciations, how Valkyrie plays event audio |
 
 ## MCP Tools
 
@@ -145,6 +146,14 @@ comfy launch --background
 ```
 
 On NVIDIA GPUs with less VRAM, the fp8 model (`black-forest-labs/FLUX.2-klein-4b-fp8`) is smaller. Set `VALKYRIE_COMFYUI_URL` if ComfyUI runs somewhere other than `http://127.0.0.1:8188`. The `/artwork` skill covers prompts and where Valkyrie shows images.
+
+### Narration
+| Tool | Description |
+|------|-------------|
+| `narration_status` | Check the local text-to-speech engine and model, list the voices; `install=true` installs the engine |
+| `generate_narration` | Speak components' dialog text with Kokoro-82M into OGG clips in the scenario folder (`audio/narration/<Event>.ogg`) and set their `audio=`. Speaks only the italic story text by default, expands `{qst:}`, turns icons into words, takes respellings for names |
+
+Narration is optional and runs entirely on your machine, on the CPU: [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache 2.0) through [kokoro-js](https://github.com/hexgrad/kokoro/tree/main/kokoro.js), with OGG Vorbis encoding in WebAssembly, so no Python or ffmpeg is needed. `narration_status install=true` installs the engine once (about 450 MB, in `~/.cache/valkyrie-mom-mcp/kokoro`, or `VALKYRIE_TTS_DIR`); the first narration downloads the model (about 330 MB). English voices only. The `/narration` skill covers what to narrate and how Valkyrie plays the clips.
 
 ### Reference
 | Tool | Description |
@@ -239,7 +248,7 @@ npm run hermes:tools  # Re-export the Hermes plugin tool list after changing too
 .claude-plugin/    Claude Code plugin manifest
 plugin.yaml        Hermes Agent plugin manifest (+ __init__.py entry point)
 hermes_bridge/     Hermes plugin: MCP stdio client, tool registration, exported tools.json
-skills/            8 skill SKILL.md files (Claude Code and Hermes)
+skills/            9 skill SKILL.md files (Claude Code and Hermes)
 agents/            Scenario designer agent
 src/
   io/              INI parser/writer, localization CSV, ZIP packager
@@ -249,6 +258,7 @@ src/
   tools/           MCP tool implementations
   story/           Storyline graph: outline, Mermaid, HTML
   artwork/         ComfyUI (FLUX.2 [klein]) artwork generation
+  narration/       Kokoro text-to-speech, dialog text to speech text
   resources/       Format documentation resources
   catalogs/        846-entry game content catalog
   diagnostics/     Bug report builder, session trace, ring buffer
@@ -264,6 +274,10 @@ tests/
   golden.test.ts   Round-trip integrity tests
   integration.test.ts  Full pipeline tests
 ```
+
+## Changes and Roadmap
+
+See [CHANGELOG.md](CHANGELOG.md) for what changed in each release and [TODO.md](TODO.md) for what is planned next (hybrid semantic search for game content, generated sound effects).
 
 ## Related Projects
 

@@ -37,6 +37,15 @@ import { toPackageName, writePackageManifest } from './io/package-manifest.js';
 import { buildStoryGraph, renderMermaid, renderOutline, renderStoryHtml } from './story/story-graph.js';
 import { DEFAULT_COMFYUI_URL, generateArtwork, getArtworkStatus, setupInstructions } from './artwork/comfyui.js';
 import {
+  DEFAULT_VOICE,
+  VOICES,
+  getNarrationStatus,
+  installNarrationEngine,
+  loadKokoroEngine,
+  narrationSetupInstructions,
+} from './narration/kokoro.js';
+import { generateNarration } from './tools/narration.js';
+import {
   EVENT_FORMAT_DOC,
   LOCALIZATION_FORMAT_DOC,
   COMPONENT_FORMAT_DOC,
@@ -392,6 +401,66 @@ export function createServer(): McpServer {
           { type: 'text', text: `Saved ${relative} (${r.width}x${r.height}, seed ${r.seed}, ${r.steps} steps, CFG ${r.cfg}, ${r.diffusionModel}, ${r.seconds} s). Reference it as "${relative}".` },
         ],
       };
+    },
+  );
+
+  // ── Narration Tools ──
+
+  server.tool(
+    'narration_status',
+    'Check whether the local Kokoro text-to-speech engine for generate_narration is installed and its model downloaded, and list the voices. install=true installs it with npm (~450 MB, once per machine)',
+    { install: z.boolean().optional().describe('Install the engine (kokoro-js and an OGG encoder) into its folder if it is missing') },
+    async ({ install }) => {
+      let status = getNarrationStatus();
+      const lines: string[] = [];
+      if (install && !status.installed) {
+        status = await installNarrationEngine(status.engineDir);
+        lines.push(`Installed the narration engine in ${status.engineDir}.`);
+      }
+      lines.push(
+        status.installed
+          ? `Ready: kokoro-js ${status.packages['kokoro-js']} in ${status.engineDir}, model ${status.dtype} ${status.modelDownloaded ? 'downloaded' : 'not downloaded yet (the first narration fetches it)'}`
+          : 'Not ready.',
+      );
+      const setup = narrationSetupInstructions(status);
+      if (setup && !status.installed) lines.push('', setup);
+      lines.push('', `Voices (default ${DEFAULT_VOICE}; grade = quality rating):`, ...Object.entries(VOICES).map(([id, d]) => `  ${id}: ${d}`));
+      return { content: [{ type: 'text', text: lines.join('\n') }] };
+    },
+  );
+
+  server.tool(
+    'generate_narration',
+    'Speak components\' dialog text with Kokoro-82M (local, English voices) and save OGG clips in the scenario folder (default audio/narration/<Component>.ogg), setting each component\'s audio= so Valkyrie plays the clip when the event runs. '
+    + 'part=auto (default) speaks only the <i>italic</i> story text when the text has any, so rules like "Place a search token" are not read out; part=all speaks everything. '
+    + '{qst:} is expanded, icons become words, {rnd:hero} is spoken as "an investigator" and {var:} is left out. The audio does not stop when the dialog closes, so keep narrated passages short. '
+    + 'The first call loads (and once downloads) the model; then about 2 s per sentence',
+    {
+      components: z.array(z.string()).optional().describe('Components to narrate (events, tokens, spawns, ...); each needs <name>.text unless text is given'),
+      text: z.string().optional().describe('Speak this instead of the component text (one component), or on its own with outputPath'),
+      outputPath: z.string().optional().describe('File to write for a single clip, relative to the scenario folder or absolute (.ogg)'),
+      voice: z.string().optional().describe(`Voice id (default ${DEFAULT_VOICE}); narration_status lists them`),
+      speed: z.number().optional().describe('Speaking speed, 0.5 to 2 (default 1; 0.9 suits slow, ominous passages)'),
+      part: z.enum(['auto', 'flavor', 'all']).optional().describe('auto: italic story text if any, else all; flavor: italic only; all: the whole text'),
+      pronunciations: z.record(z.string()).optional().describe('Respellings for words the voice gets wrong, e.g. {"Cthulhu":"Kuh-thoo-loo","Arkham":"Ark-um"}'),
+      assign: z.boolean().optional().describe('Set audio= to the clip. Default: only where audio= is empty or already narration, so sound effects are kept; true replaces them, false never assigns'),
+    },
+    async (args) => {
+      if (args.outputPath && !/\.ogg$/i.test(args.outputPath)) throw new Error('outputPath must end in .ogg: Valkyrie lists only .ogg files for event audio');
+      const items = await generateNarration(currentModel, args, () => loadKokoroEngine());
+      const lines = items.map(i => {
+        const head = i.component ?? i.file ?? 'text';
+        if (i.error) return `✗ ${head}: ${i.error}${i.notes.length ? ` (${i.notes.join('; ')})` : ''}`;
+        const out = [`✓ ${head}: ${i.file} (${i.duration} s of speech, ${Math.round(i.bytes! / 1024)} KB, made in ${i.seconds} s)`];
+        if (i.replacedAudio) out.push(`  replaced audio=${i.replacedAudio}`);
+        if (i.keptAudio) out.push(`  kept audio=${i.keptAudio} (an event plays one clip; assign=true replaces it with the narration)`);
+        out.push(`  spoken: ${i.spoken!.length > 160 ? `${i.spoken!.slice(0, 160)}…` : i.spoken}`);
+        for (const n of i.notes) out.push(`  note: ${n}`);
+        return out.join('\n');
+      });
+      const assigned = items.some(i => i.component && !i.error && !i.keptAudio) && args.assign !== false;
+      if (assigned) lines.push('', 'audio= is set on the narrated components; save_scenario to keep it.');
+      return { content: [{ type: 'text', text: lines.join('\n') }] };
     },
   );
 

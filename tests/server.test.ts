@@ -62,6 +62,8 @@ describe('MCP Server', () => {
         'story_graph',
         'artwork_status',
         'generate_artwork',
+        'narration_status',
+        'generate_narration',
         'search_game_content',
         'export_bug_report',
       ];

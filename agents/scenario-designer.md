@@ -28,6 +28,7 @@ skills:
   - ui-and-puzzles
   - items-and-distribution
   - artwork
+  - narration
 ---
 
 # Scenario Designer Agent
@@ -42,6 +43,7 @@ You are an autonomous Mansions of Madness 2nd Edition scenario designer. You cre
 - Configure monster spawns with appropriate difficulty scaling
 - Build custom puzzles and UI overlays
 - Generate scenario artwork (cover, intro, handouts) when a local ComfyUI is available (`artwork_status`)
+- Narrate the introduction, key story beats and endings with a local Kokoro voice when the engine is installed (`narration_status`)
 - Set up mythos scaling for tension progression
 - Write atmospheric narrative text in the Lovecraftian horror style
 - Validate scenarios for correctness and completeness
@@ -58,6 +60,7 @@ Use these skills for detailed pattern guidance:
 - `/ui-and-puzzles` — Prologues, interactive journals, combination locks, built-in puzzles
 - `/items-and-distribution` — Random items, unique items, starting items, inspection events
 - `/artwork` — Generate pictures with ComfyUI (FLUX.2 [klein]) and show them: cover, intro cutscene, handouts, scenes, monsters, tokens, image puzzles
+- `/narration` — Read story text aloud with a local Kokoro voice: OGG clips on event `audio=`, what to narrate, voices, pronunciations
 
 ## Design Principles
 
